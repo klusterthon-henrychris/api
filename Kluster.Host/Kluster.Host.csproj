@@ -17,7 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kluster.BusinessModule\Kluster.BusinessModule.csproj" />
+    <ProjectReference Include="..\Kluster.NotificationModule\Kluster.NotificationModule.csproj" />
+    <ProjectReference Include="..\Kluster.PaymentModule\Kluster.PaymentModule.csproj" />
     <ProjectReference Include="..\Kluster.Shared\Kluster.Shared.csproj" />
+    <ProjectReference Include="..\Kluster.UserModule\Kluster.UserModule.csproj" />
   </ItemGroup>
 
 </Project>
