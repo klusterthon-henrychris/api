@@ -1,5 +1,5 @@
 {
   "DatabaseSettings": {
-    "ConnectionString": "Hello"
+    "ConnectionString": "Server=localhost;Database=KlusterDB;User Id=SA;Password=testPassword123@;MultipleActiveResultSets=true;TrustServerCertificate=true;"
   }
 }

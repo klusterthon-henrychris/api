@@ -4,7 +4,6 @@ using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -20,6 +19,7 @@ namespace Kluster.Host
             RegisterFilters(services);
             SetupAuthentication(services, environment);
             BindConfigFiles(services, environment);
+            RegisterModules(services);
         }
 
         private static void SetupControllers(IServiceCollection services)
@@ -99,7 +99,7 @@ namespace Kluster.Host
             services.AddAuthorization();
         }
 
-        // bind config files here and use them everywhere else.
+        // bind config files here and use them through all modules.
         private static void BindConfigFiles(this IServiceCollection services, IWebHostEnvironment environment)
         {
             if (environment.IsDevelopment())
@@ -117,7 +117,7 @@ namespace Kluster.Host
 
         private static void RegisterModules(IServiceCollection services)
         {
-
+            services.AddUserModule();
         }
     }
 }

@@ -4,7 +4,7 @@
     {
         public static void AddUserModule(this IServiceCollection services)
         {
-            
+            services.AddCore();
         }
 
         public static void UseUserModule(this WebApplication app)
