@@ -7,7 +7,7 @@ public class PaymentModuleDbContext(DbContextOptions<PaymentModuleDbContext> opt
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ApplicationUser>().ToTable("ApplicationUsers", t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
         modelBuilder.Entity<Business>().ToTable("Businesses", t => t.ExcludeFromMigrations());
     }
     
