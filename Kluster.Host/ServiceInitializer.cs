@@ -14,24 +14,22 @@ namespace Kluster.Host
 {
     public static class ServiceInitializer
     {
-        public static void RegisterApplicationServices(this IServiceCollection services, IWebHostEnvironment environment)
+        public static void RegisterApplicationServices(this IServiceCollection services,
+            IWebHostEnvironment environment)
         {
+            BindConfigFiles(services, environment);
+            RegisterModules(services);
             SetupControllers(services);
             RegisterSwagger(services);
             RegisterFilters(services);
             SetupAuthentication(services, environment);
-            BindConfigFiles(services, environment);
-            RegisterModules(services);
         }
 
         private static void SetupControllers(IServiceCollection services)
         {
             services.AddControllers();
             services.AddRouting(options => options.LowercaseUrls = true);
-            services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+            services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
         }
 
         private static void RegisterSwagger(IServiceCollection services)
@@ -45,7 +43,8 @@ namespace Kluster.Host
             {
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Description =
+                        "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
@@ -64,9 +63,11 @@ namespace Kluster.Host
             var jwtSettings = new JwtSettings();
             if (environment.IsDevelopment())
             {
-                jwtSettings = new ConfigurationBuilder()
-                .AddUserSecrets<Program>()
-                .Build().Get<JwtSettings>();
+                var configuration = new ConfigurationBuilder()
+                    .AddUserSecrets<Program>()
+                    .Build();
+
+                configuration.GetSection(nameof(JwtSettings)).Bind(jwtSettings);
             }
 
             if (environment.IsProduction())
@@ -75,29 +76,29 @@ namespace Kluster.Host
             }
 
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(
-                x =>
                 {
-                    x.TokenValidationParameters = new TokenValidationParameters
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(
+                    x =>
                     {
-                        ValidAudience = jwtSettings?.Audience ??
-                            throw new InvalidOperationException("Audience is null!"),
-                        ValidIssuer = jwtSettings.Issuer ??
-                            throw new InvalidOperationException("Security Key is null!"),
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey ??
-                            throw new InvalidOperationException("Security Key is null!"))),
-                        ValidateAudience = true,
-                        ValidateIssuer = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        RoleClaimType = JwtClaims.Role
-                    };
-                });
+                        x.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidAudience = jwtSettings?.Audience ??
+                                            throw new InvalidOperationException("Audience is null!"),
+                            ValidIssuer = jwtSettings.Issuer ??
+                                          throw new InvalidOperationException("Security Key is null!"),
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey ??
+                                throw new InvalidOperationException("Security Key is null!"))),
+                            ValidateAudience = true,
+                            ValidateIssuer = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            RoleClaimType = JwtClaims.Role
+                        };
+                    });
             services.AddAuthorization();
         }
 
@@ -107,12 +108,13 @@ namespace Kluster.Host
             if (environment.IsDevelopment())
             {
                 var configuration = new ConfigurationBuilder()
-                        .AddJsonFile("database.json", optional: true, reloadOnChange: true)
-                        .AddEnvironmentVariables().Build();
+                    .AddJsonFile("database.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables().Build();
 
-                services.Configure<DatabaseSettings>(options => configuration.GetSection("DatabaseSettings").Bind(options));
+                services.Configure<DatabaseSettings>(options =>
+                    configuration.GetSection("DatabaseSettings").Bind(options));
             }
-            
+
             // todo: if not development, use key vault for appSettings.
         }
 
