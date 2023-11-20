@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Kluster.BusinessModule.ModuleSetup;
+using Kluster.PaymentModule.ModuleSetup;
 using Kluster.Shared;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Filters;
@@ -120,6 +121,7 @@ namespace Kluster.Host
         {
             services.AddUserModule();
             services.AddBusinessModule();
+            services.AddPaymentModule();
         }
     }
 }

@@ -19,4 +19,8 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Kluster.Shared\Kluster.Shared.csproj" />
+	</ItemGroup>
+
 </Project>
