@@ -71,7 +71,7 @@ namespace Kluster.Host
 
             if (environment.IsProduction())
             {
-                // get the jwt settings from azure key vault.
+                // todo: get the jwt settings from azure key vault.
             }
 
             services.AddAuthentication(options =>
@@ -112,9 +112,8 @@ namespace Kluster.Host
 
                 services.Configure<DatabaseSettings>(options => configuration.GetSection("DatabaseSettings").Bind(options));
             }
-
-            // TODO: USE -> var dbSettings = services.BuildServiceProvider().GetService<IOptions<DatabaseSettings>>()?.Value;
-            // if not development, use key vault
+            
+            // todo: if not development, use key vault for appSettings.
         }
 
         private static void RegisterModules(IServiceCollection services)
