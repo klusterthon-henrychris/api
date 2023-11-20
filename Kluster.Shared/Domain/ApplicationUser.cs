@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Kluster.Shared.Domain
 {
     public class ApplicationUser : IdentityUser
     {
-        public override string Id { get; set; } = "U-" + Guid.NewGuid().ToString();
+        [MaxLength(30)]
+        public override string Id { get; set; } = "U-" + Guid.NewGuid();
         [MaxLength(50)] public required string FirstName { get; set; } = string.Empty;
         [MaxLength(50)] public required string LastName { get; set; } = string.Empty;
         // ensure phone number and email are never null.
