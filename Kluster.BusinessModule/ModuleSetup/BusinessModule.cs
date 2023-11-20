@@ -1,6 +1,14 @@
 ﻿namespace Kluster.BusinessModule.ModuleSetup
 {
-    public class BusinessModule
+    public static class BusinessModule
     {
+        public static void AddBusinessModule(this IServiceCollection services)
+        {
+            services.AddCore();
+        }
+
+        public static void UseBusinessModule(this WebApplication app)
+        {
+        }
     }
 }

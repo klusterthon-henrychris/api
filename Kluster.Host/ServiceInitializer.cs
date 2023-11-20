@@ -1,4 +1,6 @@
-﻿using Kluster.Shared;
+﻿using System.Text;
+using Kluster.BusinessModule.ModuleSetup;
+using Kluster.Shared;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
@@ -6,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace Kluster.Host
 {
@@ -118,6 +119,7 @@ namespace Kluster.Host
         private static void RegisterModules(IServiceCollection services)
         {
             services.AddUserModule();
+            services.AddBusinessModule();
         }
     }
 }
