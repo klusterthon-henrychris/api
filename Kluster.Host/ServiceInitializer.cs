@@ -1,8 +1,10 @@
 ﻿using Kluster.Shared;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Filters;
+using Kluster.UserModule.ModuleSetup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -15,8 +17,9 @@ namespace Kluster.Host
         {
             SetupControllers(services);
             RegisterSwagger(services);
-            SetupAuthentication(services, environment);
             RegisterFilters(services);
+            SetupAuthentication(services, environment);
+            BindConfigFiles(services, environment);
         }
 
         private static void SetupControllers(IServiceCollection services)
@@ -96,10 +99,20 @@ namespace Kluster.Host
             services.AddAuthorization();
         }
 
-        // bind configuration files to settings classes
-        private static void BindConfigFiles(this IServiceCollection services)
+        // bind config files here and use them everywhere else.
+        private static void BindConfigFiles(this IServiceCollection services, IWebHostEnvironment environment)
         {
+            if (environment.IsDevelopment())
+            {
+                var configuration = new ConfigurationBuilder()
+                        .AddJsonFile("database.json", optional: true, reloadOnChange: true)
+                        .AddEnvironmentVariables().Build();
 
+                services.Configure<DatabaseSettings>(options => configuration.GetSection("DatabaseSettings").Bind(options));
+            }
+
+            // TODO: USE -> var dbSettings = services.BuildServiceProvider().GetService<IOptions<DatabaseSettings>>()?.Value;
+            // if not development, use key vault
         }
 
         private static void RegisterModules(IServiceCollection services)
