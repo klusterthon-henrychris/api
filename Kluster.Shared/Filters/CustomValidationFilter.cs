@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Kluster.Shared.Response;
 using Microsoft.AspNetCore.Mvc;
-using Kluster.Shared.Response;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Kluster.Shared.Filters
 {

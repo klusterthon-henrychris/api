@@ -1,5 +1,5 @@
-﻿using Kluster.Shared.Response;
-using System.Net;
+﻿using System.Net;
+using Kluster.Shared.Response;
 
 namespace Kluster.Shared.Middleware
 {
