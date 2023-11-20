@@ -38,7 +38,7 @@ namespace Kluster.PaymentModule.Migrations
                         column: x => x.BusinessId,
                         principalTable: "Businesses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,7 +61,7 @@ namespace Kluster.PaymentModule.Migrations
                         column: x => x.BusinessId,
                         principalTable: "Businesses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Payments_Invoices_InvoiceId",
                         column: x => x.InvoiceId,

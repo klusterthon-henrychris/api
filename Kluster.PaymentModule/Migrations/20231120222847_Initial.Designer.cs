@@ -231,7 +231,7 @@ namespace Kluster.PaymentModule.Migrations
                     b.HasOne("Kluster.Shared.Domain.Business", "Business")
                         .WithMany()
                         .HasForeignKey("BusinessId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Kluster.Shared.Domain.ApplicationUser", "Client")
@@ -250,7 +250,7 @@ namespace Kluster.PaymentModule.Migrations
                     b.HasOne("Kluster.Shared.Domain.Business", "Business")
                         .WithMany()
                         .HasForeignKey("BusinessId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Kluster.Shared.Domain.Invoice", "Invoice")
