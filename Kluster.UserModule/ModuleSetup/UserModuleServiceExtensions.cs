@@ -1,9 +1,7 @@
-﻿using Kluster.Shared.Configuration;
-using Kluster.Shared.Domain;
+﻿using Kluster.Shared.Domain;
+using Kluster.Shared.Infrastructure;
 using Kluster.UserModule.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace Kluster.UserModule.ModuleSetup
 {
@@ -12,17 +10,11 @@ namespace Kluster.UserModule.ModuleSetup
         internal static void AddCore(this IServiceCollection services)
         {
             AddMSIdentity(services);
-            AddDatabase(services);
+            DbExtensions.AddDatabase<UserModuleDbContext>(services);
         }
 
         private static void RegisterDependencies(IServiceCollection services)
         { }
-
-        private static void AddDatabase(IServiceCollection services)
-        {
-            var dbSettings = services.BuildServiceProvider().GetService<IOptions<DatabaseSettings>>()?.Value;
-            services.AddDbContext<UserModuleDbContext>(options => options.UseSqlServer(dbSettings!.ConnectionString));
-        }
 
         private static void AddMSIdentity(IServiceCollection services)
         {
