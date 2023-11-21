@@ -112,12 +112,11 @@ namespace Kluster.Host
         {
             if (environment.IsDevelopment())
             {
-                var configuration = new ConfigurationBuilder()
-                    .AddJsonFile("database.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables().Build();
+                using var scope = services.BuildServiceProvider().CreateScope();
+                var configuration = scope.ServiceProvider.GetService<IConfiguration>();
 
                 services.Configure<DatabaseSettings>(options =>
-                    configuration.GetSection(nameof(DatabaseSettings)).Bind(options));
+                    configuration?.GetSection(nameof(DatabaseSettings)).Bind(options));
             }
 
             // todo: if not development, use key vault for appSettings.
