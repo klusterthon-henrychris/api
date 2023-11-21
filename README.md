@@ -1,6 +1,8 @@
 # api
-The API backend for 'Simplifying Small Business Payments'.
-Before starting the application, install Docker Desktop and ensure it is running.
+The API backend for 'Simplifying Small Business Payments'.  
+Before starting the application:
+1. Install Docker Desktop and ensure it is running.
+2. Clone the repository
   
 # Running Locally On Windows
 1. Navigate to `C:\%USER_PROFILE%\AppData\Roaming\Microsoft\UserSecrets` and create a folder named `41019bab-28dd-41f1-a221-82ed1e906626`.
