@@ -14,8 +14,8 @@ namespace Kluster.Shared.Domain
         public string? PaymentChannel { get; set; }
 
         // navigation properties
-        public required string BusinessId { get; set; } // Business association
-        public required string InvoiceId { get; set; } // Invoice association
+        [MaxLength(AppConstants.MaxIdLength)] public required string BusinessId { get; set; } // Business association
+        [MaxLength(AppConstants.MaxIdLength)] public required string InvoiceId { get; set; } // Invoice association
 
         public Business Business { get; set; } = null!;
         public Invoice Invoice { get; set; } = null!;

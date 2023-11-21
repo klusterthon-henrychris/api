@@ -22,8 +22,8 @@ namespace Kluster.Shared.Domain
 
 
         // navigation properties
-        public required string ClientId { get; set; }
-        public required string BusinessId { get; set; }
+        [MaxLength(AppConstants.MaxIdLength)] public required string ClientId { get; set; }
+        [MaxLength(AppConstants.MaxIdLength)] public required string BusinessId { get; set; }
         public ApplicationUser Client { get; set; } = null!;
         public Business Business { get; set; } = null!;
     }

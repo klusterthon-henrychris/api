@@ -20,7 +20,7 @@ namespace Kluster.Shared.Domain
         public required string ProductType { get; set; }
 
         // navigation properties
-        [MaxLength(30)] public required string BusinessId { get; set; }
+        [MaxLength(AppConstants.MaxIdLength)] public required string BusinessId { get; set; }
         public Business Business { get; set; } = null!;
     }
 }

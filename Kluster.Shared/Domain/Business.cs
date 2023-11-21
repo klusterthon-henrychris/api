@@ -19,7 +19,7 @@ namespace Kluster.Shared.Domain
         [MaxLength(20)] public required string Industry { get; set; }
 
         // navigation properties
-        [MaxLength(30)] public required string UserId { get; set; }
+        [MaxLength(AppConstants.MaxIdLength)] public required string UserId { get; set; }
 
         public ApplicationUser User { get; set; } = null!;
     }
