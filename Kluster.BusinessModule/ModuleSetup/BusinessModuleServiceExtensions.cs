@@ -16,6 +16,7 @@ namespace Kluster.BusinessModule.ModuleSetup
         private static void RegisterDependencies(this IServiceCollection services)
         {
             services.AddTransient<IBusinessService, BusinessService>();
+            services.AddTransient<IClientService, ClientService>();
         }
     }
 }

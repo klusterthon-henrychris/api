@@ -1,0 +1,53 @@
+﻿using ErrorOr;
+using Kluster.BusinessModule.Data;
+using Kluster.BusinessModule.DTOs.Requests;
+using Kluster.BusinessModule.DTOs.Responses;
+using Kluster.BusinessModule.Services.Contracts;
+using Kluster.BusinessModule.Validators;
+using Kluster.Shared.Domain;
+using Kluster.Shared.Exceptions;
+using Kluster.Shared.Extensions;
+using Kluster.Shared.ServiceErrors;
+using Kluster.Shared.SharedContracts.UserModule;
+using Microsoft.EntityFrameworkCore;
+
+namespace Kluster.BusinessModule.Services;
+
+public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext context) : IClientService
+{
+    public async Task<ErrorOr<GetClientResponse>> GetClient(string id)
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+
+        var client = await context.Clients
+            .Where(c => c.Business.UserId == userId && c.Id == id)
+            .FirstOrDefaultAsync();
+
+        return client is null ? SharedErrors<Client>.NotFound : Mapper.ToGetClientResponse(client);
+    }
+
+    public async Task<ErrorOr<CreateClientResponse>> CreateClientAsync(CreateClientRequest request)
+    {
+        var validateResult = await new CreateClientRequestValidator().ValidateAsync(request);
+        if (!validateResult.IsValid)
+        {
+            return validateResult.ToErrorList();
+        }
+
+        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var businessId = await context.Businesses
+            .Where(x => x.UserId == userId)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync();
+
+        if (businessId is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+
+        var client = Mapper.ToClient(request, businessId);
+        await context.Clients.AddAsync(client);
+        await context.SaveChangesAsync();
+        return new CreateClientResponse(client.Id);
+    }
+}

@@ -4,6 +4,8 @@ namespace Kluster.Shared.Domain;
 
 public class Client
 {
+    // todo: add logic to number clients according to the business
+    // generate short-code for business and prepend that to client ID
     [MaxLength(DomainConstants.MaxIdLength)]
     public string Id { get; set; } = "C-" + Guid.NewGuid();
 
