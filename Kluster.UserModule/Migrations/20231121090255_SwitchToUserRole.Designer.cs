@@ -79,6 +79,7 @@ namespace Kluster.UserModule.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Role")
+                        .HasMaxLength(10)
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

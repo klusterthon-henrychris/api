@@ -77,6 +77,7 @@ namespace Kluster.UserModule.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
+                        .HasMaxLength(10)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
