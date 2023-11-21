@@ -1,6 +1,7 @@
 ﻿services:
   kluster.host:
     image: kluster.host
+    container_name: kluster.api
     build:
       context: .
       dockerfile: Kluster.Host/Dockerfile
@@ -13,9 +14,9 @@
     volumes:
       - $APPDATA/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
-  sql:
+  database:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
-    container_name: sql_server2022
+    container_name: kluster.database
     ports:
       - "1433:1433"
     environment:
