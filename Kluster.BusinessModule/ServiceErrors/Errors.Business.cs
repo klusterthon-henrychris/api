@@ -7,6 +7,10 @@ public static class Errors
 {
     public static class Business
     {
+        public static Error NotFound => Error.NotFound(
+            code: $"{nameof(Business)}.NotFound",
+            description: $"{nameof(Business)} not found.");
+
         public static Error MissingBusinessName => Error.Validation(
             code: $"{nameof(Business)}.MissingBusinessName",
             description: "The business has no name.");
@@ -22,7 +26,8 @@ public static class Errors
 
         public static Error InvalidBusinessAddress => Error.Validation(
             code: $"{nameof(Business)}.InvalidBusinessAddress",
-            description: $"The business address must have at most {BusinessConstants.MaxAddressLength} characters.");
+            description: $"The business address must have at least {BusinessConstants.MinAddressLength} characters" +
+                         $" and at most {BusinessConstants.MaxAddressLength} characters.");
 
         public static Error MissingRcNumber => Error.Validation(
             code: $"{nameof(Business)}.MissingRcNumber",
@@ -50,10 +55,15 @@ public static class Errors
             code: $"{nameof(Business)}.InvalidIndustry",
             description:
             $"{nameof(Business)} name must have at most {BusinessConstants.MaxIndustryLength} characters.");
-        
+
         public static Error InvalidDescription => Error.Validation(
             code: $"{nameof(Business)}.InvalidDescription",
             description:
             $"{nameof(Business)} description must have at most {BusinessConstants.MaxDescriptionLength} characters.");
+
+        public static Error InvalidClientId => Error.Validation(
+            code: $"{nameof(Business)}.InvalidClientId",
+            description:
+            "The business must be linked to a client.");
     }
 }

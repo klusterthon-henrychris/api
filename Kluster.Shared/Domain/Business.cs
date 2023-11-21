@@ -5,7 +5,7 @@ namespace Kluster.Shared.Domain
     public class Business
     {
         // todo: use fluent validation to replace data annotations.
-        // prepend 'B' to Id
+        // prepend 'B' to Id and generate ID's internally
         [MaxLength(AppConstants.MaxIdLength)] public string Id { get; set; } = "B-" + Guid.NewGuid();
 
         [MaxLength(BusinessConstants.MaxNameLength)]
@@ -41,5 +41,6 @@ namespace Kluster.Shared.Domain
         public const int MaxDescriptionLength = 200;
         public const int MinNameLength = 3;
         public const int MaxNameLength = 50;
+        public const int MinAddressLength = 3;
     }
 }

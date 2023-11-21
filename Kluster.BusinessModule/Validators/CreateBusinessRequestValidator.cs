@@ -24,7 +24,7 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
             .NotEmpty()
             .WithMessage(Errors.Business.MissingBusinessAddress.Description)
             .WithErrorCode(Errors.Business.MissingBusinessAddress.Code)
-            .MaximumLength(BusinessConstants.MaxAddressLength)
+            .Length(BusinessConstants.MinAddressLength, BusinessConstants.MaxAddressLength)
             .WithMessage(Errors.Business.InvalidBusinessAddress.Description)
             .WithErrorCode(Errors.Business.InvalidBusinessAddress.Code);
 
