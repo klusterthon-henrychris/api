@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Kluster.BusinessModule.DTOs.Requests;
-using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared;
 using Kluster.Shared.API;
@@ -25,7 +24,7 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     }
     
     [Authorize(Roles = UserRoles.Business)]
-    [HttpPost("/client")]
+    [HttpPost("client")]
     public async Task<IActionResult> CreateClientBusiness([Required, FromBody] CreateClientBusinessRequest request)
     {
         var createBusinessResult = await businessService.CreateClientBusinessAsync(request);
