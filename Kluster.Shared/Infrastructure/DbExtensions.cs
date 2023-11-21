@@ -8,7 +8,7 @@ public static class DbExtensions
 {
     public static void AddDatabase<T>(IServiceCollection services) where T : DbContext
     {
-        var dbSettings = services.BuildServiceProvider().GetService<IOptions<DatabaseSettings>>()?.Value;
+        var dbSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>()?.Value;
         services.AddDbContext<T>(options => options.UseSqlServer(dbSettings!.ConnectionString));
 
         using var scope = services.BuildServiceProvider().CreateScope();
