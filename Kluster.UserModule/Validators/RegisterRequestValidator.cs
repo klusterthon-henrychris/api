@@ -1,9 +1,7 @@
 ﻿using FluentValidation;
 using Kluster.Shared;
-using Kluster.Shared.Domain;
 using Kluster.Shared.Validators;
 using Kluster.UserModule.DTOs.Requests;
-using Kluster.UserModule.ServiceErrors;
 
 namespace Kluster.UserModule.Validators;
 
