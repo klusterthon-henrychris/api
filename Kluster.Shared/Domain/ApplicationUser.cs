@@ -11,14 +11,13 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxNameLength)]
         public required string LastName { get; set; }
 
-        [MaxLength(200)] public required string Address { get; set; }
+        [MaxLength(DomainConstants.MaxAddressLength)] public required string Address { get; set; }
         // ensure phone number and email are never null.
 
         /// <summary>
         /// Can be either Admin or User.
-        ///  todo: refactor and update database to use Role not UserType
         /// </summary>
-        [MaxLength(10)]
+        [MaxLength(DomainConstants.MaxEnumLength)]
         public required string Role { get; set; }
     }
 }
