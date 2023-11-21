@@ -5,10 +5,6 @@ namespace Kluster.Shared.Domain
 {
     public class ApplicationUser : IdentityUser
     {
-        // todo: use global property for ID length
-        [MaxLength(AppConstants.MaxIdLength)]
-        public override string Id { get; set; } = "U-" + Guid.NewGuid();
-
         [MaxLength(AppConstants.MaxNameLength)]
         public required string FirstName { get; set; } = string.Empty;
 
