@@ -3,7 +3,7 @@ using Kluster.Shared.Domain;
 
 namespace Kluster.BusinessModule.ServiceErrors;
 
-public static class Errors
+public static partial class Errors
 {
     public static class Business
     {
