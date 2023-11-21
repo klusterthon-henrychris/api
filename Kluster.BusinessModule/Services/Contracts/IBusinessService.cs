@@ -7,5 +7,5 @@ namespace Kluster.BusinessModule.Services.Contracts;
 public interface IBusinessService
 {
     Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request);
-    Task<ErrorOr<GetBusinessResponse>> GetBusiness(string id);
+    Task<ErrorOr<GetBusinessResponse>> GetBusinessById(string id);
 }

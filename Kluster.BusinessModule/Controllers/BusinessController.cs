@@ -17,16 +17,16 @@ public class BusinessController(IBusinessService businessService) : BaseControll
         var createBusinessResult = await businessService.CreateBusinessAsync(request);
         
         return createBusinessResult.Match(
-            businessResponse => CreatedAtAction(nameof(GetBusiness), routeValues: new { id = businessResponse.Id },
+            businessResponse => CreatedAtAction(nameof(GetBusinessById), routeValues: new { id = businessResponse.Id },
                 createBusinessResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
     }
     
     // todo: businesses should only be able to view their client's businesses
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetBusiness(string id)
+    public async Task<IActionResult> GetBusinessById(string id)
     {
-        var getBusinessResult = await businessService.GetBusiness(id);
+        var getBusinessResult = await businessService.GetBusinessById(id);
 
         // If successful, return the event data in an ApiResponse.
         // If an error occurs, return an error response using the ReturnErrorResponse method.
