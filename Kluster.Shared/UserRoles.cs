@@ -5,7 +5,7 @@
     /// </summary>
     public static class UserRoles
     {
-        public const string Client = "Client";
-        public const string Business = "Business";
+        public const string Admin = nameof(Admin);
+        public const string User = nameof(User);
     }
 }

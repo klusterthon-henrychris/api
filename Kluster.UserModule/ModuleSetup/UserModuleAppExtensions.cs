@@ -37,7 +37,7 @@ namespace Kluster.UserModule.ModuleSetup
 
         private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
         {
-            var roles = new[] { UserRoles.Client, UserRoles.Business };
+            var roles = new[] { UserRoles.Admin, UserRoles.User };
 
             foreach (var role in roles)
             {
@@ -52,9 +52,9 @@ namespace Kluster.UserModule.ModuleSetup
 
         private static async Task SeedUsers(UserManager<ApplicationUser> userManager)
         {
-            var adminUser = CreateUser("Business", "xxxx@example.com", UserRoles.Business,
+            var adminUser = CreateUser("Admin", "admin@example.com", UserRoles.Admin,
                 "c0bdebd1-f275-4722-aa54-ca4524e4b998");
-            var normalUser = CreateUser("User", "user@example.com", UserRoles.Client,
+            var normalUser = CreateUser("User", "user@example.com", UserRoles.User,
                 "337fa2c2-09bc-44e4-ac44-3d5641619829");
 
             await AddUser(userManager, adminUser, "secretPassword12@");
