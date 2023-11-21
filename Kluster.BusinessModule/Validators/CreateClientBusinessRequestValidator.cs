@@ -35,5 +35,16 @@ public class CreateClientBusinessRequestValidator : AbstractValidator<CreateClie
             .MaximumLength(BusinessConstants.MaxIndustryLength)
             .WithMessage(Errors.Business.InvalidIndustry.Description)
             .WithErrorCode(Errors.Business.InvalidIndustry.Code);
+
+        RuleFor(x => x.ClientId)
+            .NotEmpty()
+            .Must(IsGuid)
+            .WithMessage(Errors.Business.InvalidClientId.Description)
+            .WithErrorCode(Errors.Business.InvalidClientId.Code);
+    }
+
+    private bool IsGuid(string bar)
+    {
+        return Guid.TryParse(bar, out _);
     }
 }
