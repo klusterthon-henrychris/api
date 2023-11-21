@@ -5,7 +5,9 @@ namespace Kluster.Shared.Domain
 {
     public class Invoice
     {
-        [Key] public string InvoiceNo { get; set; } = "I-" + Guid.NewGuid();
+        [Key, MaxLength(AppConstants.MaxIdLength)]
+        public string InvoiceNo { get; set; } = "I-" + Guid.NewGuid();
+
         [Column(TypeName = "decimal(18,2)")] public decimal Amount { get; set; }
 
         public DateTime DueDate { get; set; }

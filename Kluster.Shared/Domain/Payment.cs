@@ -5,7 +5,7 @@ namespace Kluster.Shared.Domain
 {
     public class Payment
     {
-        [Key]
+        [Key, MaxLength(AppConstants.MaxIdLength)]
         public string PaymentReference { get; set; } = "Ref-" + Guid.NewGuid();
         [Column(TypeName = "decimal(18,2)")]
         public required decimal Amount { get; set; }

@@ -5,7 +5,8 @@ namespace Kluster.Shared.Domain
 {
     public class Product
     {
-        [Key, MaxLength(30)] public string ProductId { get; set; } = "P-" + Guid.NewGuid();
+        [Key, MaxLength(AppConstants.MaxIdLength)]
+        public string ProductId { get; set; } = "P-" + Guid.NewGuid();
 
         public required string Name { get; set; }
         public required string Description { get; set; }
