@@ -5,7 +5,9 @@ using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
+using Kluster.Shared.Domain;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.UserModule;
 
 namespace Kluster.BusinessModule.Services;
@@ -31,7 +33,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         var business = await context.Businesses.FindAsync(id);
         if (business is null)
         {
-            return Errors.Business.NotFound;
+            return SharedErrors<Business>.NotFound;
         }
 
         return Mapper.ToGetBusinessResponse(business);
