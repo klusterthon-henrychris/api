@@ -6,7 +6,8 @@ namespace Kluster.Shared.Domain
     {
         // todo: use fluent validation to replace data annotations.
         // prepend 'B' to Id and generate ID's internally
-        [MaxLength(DomainConstants.MaxIdLength)] public string Id { get; set; } = "B-" + Guid.NewGuid();
+        [MaxLength(DomainConstants.MaxIdLength)]
+        public string Id { get; set; } = "B-" + Guid.NewGuid();
 
         [MaxLength(DomainConstants.MaxNameLength)]
         public required string Name { get; set; }
@@ -27,8 +28,11 @@ namespace Kluster.Shared.Domain
         public required string Industry { get; set; }
 
         // navigation properties
-        [MaxLength(DomainConstants.MaxIdLength)] public required string UserId { get; set; }
+        [MaxLength(DomainConstants.MaxIdLength)]
+        public required string UserId { get; set; }
 
         public ApplicationUser User { get; set; } = null!;
+        public List<Product> Products { get; set; } = [];
+        public List<Client> Clients { get; set; } = [];
     }
 }

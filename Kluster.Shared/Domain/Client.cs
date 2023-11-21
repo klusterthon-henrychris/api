@@ -24,5 +24,4 @@ public class Client
 
     [MaxLength(DomainConstants.MaxIdLength)] public required string BusinessId { get; set; }
     public Business Business { get; set; } = null!;
-    public List<Invoice> Invoices { get; set; } = [];
 }

@@ -18,7 +18,7 @@ namespace Kluster.Shared.Domain
 
         // navigation properties
         [MaxLength(DomainConstants.MaxIdLength)]
-        public required string BusinessId { get; set; } // Business association
+        public required string BusinessId { get; set; }
 
         [MaxLength(DomainConstants.MaxIdLength)]
         public required string InvoiceId { get; set; }
