@@ -1,6 +1,8 @@
 ﻿using Kluster.Shared.Domain;
 using Kluster.Shared.Infrastructure;
 using Kluster.UserModule.Data;
+using Kluster.UserModule.Services;
+using Kluster.UserModule.Services.Contracts;
 using Microsoft.AspNetCore.Identity;
 
 namespace Kluster.UserModule.ModuleSetup
@@ -9,14 +11,18 @@ namespace Kluster.UserModule.ModuleSetup
     {
         internal static void AddCore(this IServiceCollection services)
         {
-            AddMSIdentity(services);
+            AddMsIdentity(services);
+            RegisterDependencies(services);
             DbExtensions.AddDatabase<UserModuleDbContext>(services);
         }
 
         private static void RegisterDependencies(IServiceCollection services)
-        { }
+        {
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<ITokenService, TokenService>();
+        }
 
-        private static void AddMSIdentity(IServiceCollection services)
+        private static void AddMsIdentity(IServiceCollection services)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
