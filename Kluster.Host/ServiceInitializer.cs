@@ -7,6 +7,7 @@ using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -66,8 +67,12 @@ namespace Kluster.Host
                 var configuration = new ConfigurationBuilder()
                     .AddUserSecrets<Program>()
                     .Build();
-
-                configuration.GetSection(nameof(JwtSettings)).Bind(jwtSettings);
+                
+                // configure app wide
+                services.Configure<JwtSettings>(options =>
+                    configuration.GetSection(nameof(JwtSettings)).Bind(options));
+                
+                jwtSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<JwtSettings>>()?.Value;
             }
 
             if (environment.IsProduction())
@@ -112,7 +117,7 @@ namespace Kluster.Host
                     .AddEnvironmentVariables().Build();
 
                 services.Configure<DatabaseSettings>(options =>
-                    configuration.GetSection("DatabaseSettings").Bind(options));
+                    configuration.GetSection(nameof(DatabaseSettings)).Bind(options));
             }
 
             // todo: if not development, use key vault for appSettings.
