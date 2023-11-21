@@ -6,9 +6,9 @@ namespace Kluster.Shared.Validators;
 
 public static class ValidatorHelpers
 {
-    public static IRuleBuilderOptions<T, string> ValidateName<T>(this IRuleBuilder<T, string> ruleBuilder)
+    public static void ValidateName<T>(this IRuleBuilder<T, string> ruleBuilder)
     {
-        return ruleBuilder
+        ruleBuilder
             .NotEmpty()
             .WithMessage(SharedErrors<T>.MissingName.Description)
             .WithErrorCode(SharedErrors<T>.MissingName.Code)

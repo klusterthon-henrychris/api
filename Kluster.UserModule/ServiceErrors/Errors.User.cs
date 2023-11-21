@@ -21,21 +21,5 @@ public static partial class Errors
         public static Error IsNotAllowed => Error.Unauthorized(
             code: "User.IsNotAllowed",
             description: "User is not allowed to access the system. Please contact admin.");
-
-        public static Error InvalidFirstName => Error.Validation(
-            code: "User.InvalidFirstName",
-            description: "First name is required and must be at most 50 characters.");
-
-        public static Error InvalidLastName => Error.Validation(
-            code: "User.InvalidLastName",
-            description: "Last name is required and must be at most 50 characters.");
-
-        public static Error MissingAddress => Error.Validation(
-            code: "User.MissingAddress",
-            description: "The address is required, and needs at least 5 characters.");
-
-        public static Error InvalidEmailAddress => Error.Validation(
-            code: "User.InvalidEmailAddress",
-            description: "The email address provided is invalid.");
     }
 }

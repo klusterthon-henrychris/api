@@ -7,28 +7,6 @@ public static partial class Errors
 {
     public static class Business
     {
-        public static Error NotFound => Error.NotFound(
-            code: $"{nameof(Business)}.NotFound",
-            description: $"{nameof(Business)} not found.");
-
-        public static Error MissingBusinessName => Error.Validation(
-            code: $"{nameof(Business)}.MissingBusinessName",
-            description: "The business has no name.");
-
-        public static Error InvalidName => Error.Validation(
-            code: $"{nameof(Business)}.InvalidName",
-            description: $"{nameof(Business)} name must be at least {DomainConstants.MinNameLength}" +
-                         $" characters long and at most {DomainConstants.MaxNameLength} characters long.");
-
-        public static Error MissingBusinessAddress => Error.Validation(
-            code: $"{nameof(Business)}.MissingBusinessAddress",
-            description: "The business has no address.");
-
-        public static Error InvalidBusinessAddress => Error.Validation(
-            code: $"{nameof(Business)}.InvalidBusinessAddress",
-            description: $"The business address must have at least {DomainConstants.MinAddressLength} characters" +
-                         $" and at most {DomainConstants.MaxAddressLength} characters.");
-
         public static Error MissingRcNumber => Error.Validation(
             code: $"{nameof(Business)}.MissingRcNumber",
             description: "The business has no RcNumber.");
