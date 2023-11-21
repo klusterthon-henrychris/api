@@ -9,7 +9,7 @@
 
         public static void UseUserModule(this WebApplication app)
         {
-            
+            app.SeedDatabase().Wait();
         }
     }
 }

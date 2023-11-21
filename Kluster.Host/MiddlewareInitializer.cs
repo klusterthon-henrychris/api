@@ -1,4 +1,5 @@
 ﻿using Kluster.Shared.Middleware;
+using Kluster.UserModule.ModuleSetup;
 
 namespace Kluster.Host
 {
@@ -12,6 +13,7 @@ namespace Kluster.Host
         {
             RegisterSwagger(app);
             RegisterMiddleware(app);
+            RegisterModules(app);
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace Kluster.Host
 
         private static void RegisterModules(WebApplication app)
         {
-
+            app.UseUserModule();
         }
     }
 }
