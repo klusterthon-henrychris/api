@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Kluster.Shared.Response;
+using Kluster.Shared.ServiceErrors;
 
 namespace Kluster.Shared.Middleware
 {
@@ -46,10 +47,10 @@ namespace Kluster.Shared.Middleware
 
             var errors = new List<object>
         {
-            new { SharedErrors.GenericError.Code, SharedErrors.GenericError.Description }
+            new { GenericErrors.GenericError.Code, GenericErrors.GenericError.Description }
         };
 
-            var response = new ApiErrorResponse<object>(errors, SharedErrors.GenericError.Description);
+            var response = new ApiErrorResponse<object>(errors, GenericErrors.GenericError.Description);
             await context.Response.WriteAsync(response.ToJsonString());
         }
     }
