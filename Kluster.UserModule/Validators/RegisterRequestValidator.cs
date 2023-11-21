@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Kluster.Shared;
 using Kluster.Shared.Domain;
+using Kluster.Shared.Validators;
 using Kluster.UserModule.DTOs.Requests;
 using Kluster.UserModule.ServiceErrors;
 
@@ -13,22 +14,10 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x)
             .NotEmpty();
 
-        RuleFor(x => x.FirstName).NotEmpty().Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
-            .WithErrorCode(Errors.User.InvalidFirstName.Code)
-            .WithMessage(Errors.User.InvalidFirstName.Description);
-
-        RuleFor(x => x.LastName).NotEmpty().Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
-            .WithErrorCode(Errors.User.InvalidLastName.Code)
-            .WithMessage(Errors.User.InvalidLastName.Description);
-
-        RuleFor(x => x.EmailAddress).NotEmpty().EmailAddress()
-            .WithErrorCode(Errors.User.InvalidEmailAddress.Code)
-            .WithMessage(Errors.User.InvalidEmailAddress.Description);
-
-        RuleFor(x => x.Address).NotEmpty()
-            .MinimumLength(5)
-            .WithErrorCode(Errors.User.MissingAddress.Code)
-            .WithMessage(Errors.User.MissingAddress.Description);
+        RuleFor(x => x.FirstName).ValidateFirstName();
+        RuleFor(x => x.LastName).ValidateLastName();
+        RuleFor(x => x.EmailAddress).ValidateEmailAddress();
+        RuleFor(x => x.Address).ValidateAddress();
 
         string[] validRoles = [UserRoles.Admin, UserRoles.User];
         RuleFor(x => x.Role)

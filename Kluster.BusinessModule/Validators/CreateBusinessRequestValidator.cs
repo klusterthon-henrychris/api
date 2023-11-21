@@ -2,6 +2,7 @@
 using Kluster.BusinessModule.DTOs.Requests;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.Shared.Domain;
+using Kluster.Shared.Validators;
 
 namespace Kluster.BusinessModule.Validators;
 
@@ -10,23 +11,8 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
     public CreateBusinessRequestValidator()
     {
         RuleFor(x => x).NotEmpty();
-
-        RuleFor(x => x.BusinessName)
-            .NotEmpty()
-            .WithMessage(Errors.Business.MissingBusinessName.Description)
-            .WithErrorCode(Errors.Business.MissingBusinessName.Code)
-            .Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
-            .WithMessage(Errors.Business.InvalidName.Description)
-            .WithErrorCode(Errors.Business.InvalidName.Code);
-
-
-        RuleFor(x => x.BusinessAddress)
-            .NotEmpty()
-            .WithMessage(Errors.Business.MissingBusinessAddress.Description)
-            .WithErrorCode(Errors.Business.MissingBusinessAddress.Code)
-            .Length(DomainConstants.MinAddressLength, DomainConstants.MaxAddressLength)
-            .WithMessage(Errors.Business.InvalidBusinessAddress.Description)
-            .WithErrorCode(Errors.Business.InvalidBusinessAddress.Code);
+        RuleFor(x => x.BusinessName).ValidateName();
+        RuleFor(x => x.BusinessAddress).ValidateAddress();
 
         RuleFor(x => x.RcNumber)
             .NotEmpty()
