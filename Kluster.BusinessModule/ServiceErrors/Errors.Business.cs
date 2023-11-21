@@ -38,5 +38,9 @@ public static partial class Errors
             code: $"{nameof(Business)}.InvalidDescription",
             description:
             $"{nameof(Business)} description must have at most {DomainConstants.MaxDescriptionLength} characters.");
+        
+        public static Error BusinessAlreadyExists => Error.Unexpected(
+            code: $"{nameof(Business)}.BusinessAlreadyExists",
+            description: "The user has already created a business.");
     }
 }
