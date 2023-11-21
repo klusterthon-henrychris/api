@@ -1,5 +1,5 @@
 ﻿using Kluster.Shared.Domain;
-using Kluster.Shared.Infrastructure;
+using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.UserModule;
 using Kluster.UserModule.Data;
 using Kluster.UserModule.Services;

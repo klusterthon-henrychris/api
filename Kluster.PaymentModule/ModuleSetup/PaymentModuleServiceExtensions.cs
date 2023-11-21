@@ -1,5 +1,5 @@
 ﻿using Kluster.PaymentModule.Data;
-using Kluster.Shared.Infrastructure;
+using Kluster.Shared.Extensions;
 
 namespace Kluster.PaymentModule.ModuleSetup
 {

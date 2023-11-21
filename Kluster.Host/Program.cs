@@ -8,4 +8,7 @@ app.ConfigureApplication();
 app.Run();
 
 // This is used for the integration tests.
-public partial class Program;
+namespace Kluster.Host
+{
+    public partial class Program;
+}

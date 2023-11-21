@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Kluster.Shared.Infrastructure;
+namespace Kluster.Shared.Extensions;
 
 public static class DbExtensions
 {
