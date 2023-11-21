@@ -17,8 +17,8 @@ public static class Errors
 
         public static Error InvalidName => Error.Validation(
             code: $"{nameof(Business)}.InvalidName",
-            description: $"{nameof(Business)} name must be at least {BusinessConstants.MinNameLength}" +
-                         $" characters long and at most {BusinessConstants.MaxNameLength} characters long.");
+            description: $"{nameof(Business)} name must be at least {DomainConstants.MinNameLength}" +
+                         $" characters long and at most {DomainConstants.MaxNameLength} characters long.");
 
         public static Error MissingBusinessAddress => Error.Validation(
             code: $"{nameof(Business)}.MissingBusinessAddress",
@@ -26,8 +26,8 @@ public static class Errors
 
         public static Error InvalidBusinessAddress => Error.Validation(
             code: $"{nameof(Business)}.InvalidBusinessAddress",
-            description: $"The business address must have at least {BusinessConstants.MinAddressLength} characters" +
-                         $" and at most {BusinessConstants.MaxAddressLength} characters.");
+            description: $"The business address must have at least {DomainConstants.MinAddressLength} characters" +
+                         $" and at most {DomainConstants.MaxAddressLength} characters.");
 
         public static Error MissingRcNumber => Error.Validation(
             code: $"{nameof(Business)}.MissingRcNumber",
@@ -36,7 +36,7 @@ public static class Errors
         public static Error InvalidRcNumber => Error.Validation(
             code: $"{nameof(Business)}.InvalidRcNumber",
             description:
-            $"{nameof(Business)} name must have at most {BusinessConstants.MaxRcNumberLength} characters.");
+            $"{nameof(Business)} name must have at most {DomainConstants.MaxRcNumberLength} characters.");
 
         public static Error MissingCacNumber => Error.Validation(
             code: $"{nameof(Business)}.MissingCacNumber",
@@ -45,7 +45,7 @@ public static class Errors
         public static Error InvalidCacNumber => Error.Validation(
             code: $"{nameof(Business)}.InvalidCacNumber",
             description:
-            $"{nameof(Business)} name must have at most {BusinessConstants.MaxCacNumberLength} characters.");
+            $"{nameof(Business)} name must have at most {DomainConstants.MaxCacNumberLength} characters.");
 
         public static Error MissingIndustry => Error.Validation(
             code: $"{nameof(Business)}.MissingIndustry",
@@ -54,12 +54,12 @@ public static class Errors
         public static Error InvalidIndustry => Error.Validation(
             code: $"{nameof(Business)}.InvalidIndustry",
             description:
-            $"{nameof(Business)} name must have at most {BusinessConstants.MaxIndustryLength} characters.");
+            $"{nameof(Business)} name must have at most {DomainConstants.MaxEnumLength} characters.");
 
         public static Error InvalidDescription => Error.Validation(
             code: $"{nameof(Business)}.InvalidDescription",
             description:
-            $"{nameof(Business)} description must have at most {BusinessConstants.MaxDescriptionLength} characters.");
+            $"{nameof(Business)} description must have at most {DomainConstants.MaxDescriptionLength} characters.");
 
         public static Error InvalidClientId => Error.Validation(
             code: $"{nameof(Business)}.InvalidClientId",

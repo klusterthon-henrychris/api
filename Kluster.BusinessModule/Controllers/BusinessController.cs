@@ -11,7 +11,7 @@ namespace Kluster.BusinessModule.Controllers;
 
 public class BusinessController(IBusinessService businessService) : BaseController
 {
-    [Authorize(Roles = UserRoles.Business)]
+    [Authorize(Roles = UserRoles.User)]
     [HttpPost]
     public async Task<IActionResult> CreateBusiness([Required, FromBody] CreateBusinessRequest request)
     {
@@ -23,7 +23,7 @@ public class BusinessController(IBusinessService businessService) : BaseControll
             ReturnErrorResponse);
     }
     
-    [Authorize(Roles = UserRoles.Business)]
+    [Authorize(Roles = UserRoles.User)]
     [HttpPost("client")]
     public async Task<IActionResult> CreateClientBusiness([Required, FromBody] CreateClientBusinessRequest request)
     {
@@ -36,7 +36,7 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     }
     
     // todo: businesses should only be able to view their client's businesses
-    [Authorize(Roles = UserRoles.Business)]
+    [Authorize(Roles = UserRoles.User)]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetBusiness(string id)
     {

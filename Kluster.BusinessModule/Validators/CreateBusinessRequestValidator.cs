@@ -15,7 +15,7 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
             .NotEmpty()
             .WithMessage(Errors.Business.MissingBusinessName.Description)
             .WithErrorCode(Errors.Business.MissingBusinessName.Code)
-            .Length(BusinessConstants.MinNameLength, BusinessConstants.MaxNameLength)
+            .Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
             .WithMessage(Errors.Business.InvalidName.Description)
             .WithErrorCode(Errors.Business.InvalidName.Code);
 
@@ -24,7 +24,7 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
             .NotEmpty()
             .WithMessage(Errors.Business.MissingBusinessAddress.Description)
             .WithErrorCode(Errors.Business.MissingBusinessAddress.Code)
-            .Length(BusinessConstants.MinAddressLength, BusinessConstants.MaxAddressLength)
+            .Length(DomainConstants.MinAddressLength, DomainConstants.MaxAddressLength)
             .WithMessage(Errors.Business.InvalidBusinessAddress.Description)
             .WithErrorCode(Errors.Business.InvalidBusinessAddress.Code);
 
@@ -32,7 +32,7 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
             .NotEmpty()
             .WithMessage(Errors.Business.MissingRcNumber.Description)
             .WithErrorCode(Errors.Business.MissingRcNumber.Code)
-            .MaximumLength(BusinessConstants.MaxRcNumberLength)
+            .MaximumLength(DomainConstants.MaxRcNumberLength)
             .WithMessage(Errors.Business.InvalidRcNumber.Description)
             .WithErrorCode(Errors.Business.InvalidRcNumber.Code);
 
@@ -40,7 +40,7 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
             .NotEmpty()
             .WithMessage(Errors.Business.MissingCacNumber.Description)
             .WithErrorCode(Errors.Business.MissingCacNumber.Code)
-            .MaximumLength(BusinessConstants.MaxCacNumberLength)
+            .MaximumLength(DomainConstants.MaxCacNumberLength)
             .WithMessage(Errors.Business.InvalidCacNumber.Description)
             .WithErrorCode(Errors.Business.InvalidCacNumber.Code);
 
@@ -48,12 +48,12 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
             .NotEmpty()
             .WithMessage(Errors.Business.MissingIndustry.Description)
             .WithErrorCode(Errors.Business.MissingIndustry.Code)
-            .MaximumLength(BusinessConstants.MaxIndustryLength)
+            .MaximumLength(DomainConstants.MaxEnumLength)
             .WithMessage(Errors.Business.InvalidIndustry.Description)
             .WithErrorCode(Errors.Business.InvalidIndustry.Code);
 
         RuleFor(x => x.BusinessDescription)
-            .MaximumLength(BusinessConstants.MaxDescriptionLength)
+            .MaximumLength(DomainConstants.MaxDescriptionLength)
             .WithMessage(Errors.Business.InvalidDescription.Description)
             .WithErrorCode(Errors.Business.InvalidDescription.Code);
     }

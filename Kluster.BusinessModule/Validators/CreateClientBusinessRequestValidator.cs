@@ -15,7 +15,7 @@ public class CreateClientBusinessRequestValidator : AbstractValidator<CreateClie
             .NotEmpty()
             .WithMessage(Errors.Business.MissingBusinessName.Description)
             .WithErrorCode(Errors.Business.MissingBusinessName.Code)
-            .Length(BusinessConstants.MinNameLength, BusinessConstants.MaxNameLength)
+            .Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
             .WithMessage(Errors.Business.InvalidName.Description)
             .WithErrorCode(Errors.Business.InvalidName.Code);
 
@@ -24,7 +24,7 @@ public class CreateClientBusinessRequestValidator : AbstractValidator<CreateClie
             .NotEmpty()
             .WithMessage(Errors.Business.MissingBusinessAddress.Description)
             .WithErrorCode(Errors.Business.MissingBusinessAddress.Code)
-            .MaximumLength(BusinessConstants.MaxAddressLength)
+            .MaximumLength(DomainConstants.MaxAddressLength)
             .WithMessage(Errors.Business.InvalidBusinessAddress.Description)
             .WithErrorCode(Errors.Business.InvalidBusinessAddress.Code);
 
@@ -32,7 +32,7 @@ public class CreateClientBusinessRequestValidator : AbstractValidator<CreateClie
             .NotEmpty()
             .WithMessage(Errors.Business.MissingIndustry.Description)
             .WithErrorCode(Errors.Business.MissingIndustry.Code)
-            .MaximumLength(BusinessConstants.MaxIndustryLength)
+            .MaximumLength(DomainConstants.MaxEnumLength)
             .WithMessage(Errors.Business.InvalidIndustry.Description)
             .WithErrorCode(Errors.Business.InvalidIndustry.Code);
 

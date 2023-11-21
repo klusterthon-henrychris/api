@@ -13,11 +13,11 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x)
             .NotEmpty();
 
-        RuleFor(x => x.FirstName).NotEmpty().Length(AppConstants.MinNameLength, AppConstants.MaxNameLength)
+        RuleFor(x => x.FirstName).NotEmpty().Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
             .WithErrorCode(Errors.User.InvalidFirstName.Code)
             .WithMessage(Errors.User.InvalidFirstName.Description);
 
-        RuleFor(x => x.LastName).NotEmpty().Length(AppConstants.MinNameLength, AppConstants.MaxNameLength)
+        RuleFor(x => x.LastName).NotEmpty().Length(DomainConstants.MinNameLength, DomainConstants.MaxNameLength)
             .WithErrorCode(Errors.User.InvalidLastName.Code)
             .WithMessage(Errors.User.InvalidLastName.Description);
 
@@ -30,7 +30,7 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
             .WithErrorCode(Errors.User.MissingAddress.Code)
             .WithMessage(Errors.User.MissingAddress.Description);
 
-        string[] validRoles = [UserRoles.Client, UserRoles.Business];
+        string[] validRoles = [UserRoles.Admin, UserRoles.User];
         RuleFor(x => x.Role)
             .Must(x => validRoles.Contains(x))
             .WithMessage("These are the valid roles: " + string.Join(", ", validRoles));
