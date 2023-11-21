@@ -44,7 +44,13 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         {
             return validateResult.ToErrorList();
         }
-
+        
+        var client = await context.Clients.FindAsync(request.ClientId);
+        if (client is null)
+        {
+            return Errors.Client.NotFound;
+        }
+        
         var business = Mapper.ToBusiness(request);
         await context.AddAsync(business);
         await context.SaveChangesAsync();
