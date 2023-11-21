@@ -60,10 +60,5 @@ public static partial class Errors
             code: $"{nameof(Business)}.InvalidDescription",
             description:
             $"{nameof(Business)} description must have at most {DomainConstants.MaxDescriptionLength} characters.");
-
-        public static Error InvalidClientId => Error.Validation(
-            code: $"{nameof(Business)}.InvalidClientId",
-            description:
-            "The business must be linked to a client.");
     }
 }
