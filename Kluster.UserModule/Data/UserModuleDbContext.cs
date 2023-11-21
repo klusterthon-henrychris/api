@@ -4,6 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.UserModule.Data
 {
-    public class UserModuleDbContext
-        (DbContextOptions<UserModuleDbContext> options) : IdentityDbContext<ApplicationUser>(options);
+    public class UserModuleDbContext(DbContextOptions<UserModuleDbContext> options)
+        : IdentityDbContext<ApplicationUser>(options);
 }

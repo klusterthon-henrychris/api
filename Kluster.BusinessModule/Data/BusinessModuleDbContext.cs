@@ -11,5 +11,6 @@ public class BusinessModuleDbContext(DbContextOptions<BusinessModuleDbContext> o
     }
     
     public DbSet<Business> Businesses { get; set; } = null!;
+    public DbSet<Client> Clients { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
 }
