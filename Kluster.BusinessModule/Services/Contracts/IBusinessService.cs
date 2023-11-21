@@ -8,5 +8,4 @@ public interface IBusinessService
 {
     Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request);
     Task<ErrorOr<GetBusinessResponse>> GetBusiness(string id);
-    Task<ErrorOr<BusinessCreationResponse>> CreateClientBusinessAsync(CreateClientBusinessRequest request);
 }

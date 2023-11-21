@@ -36,24 +36,4 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
 
         return Mapper.ToGetBusinessResponse(business);
     }
-
-    public async Task<ErrorOr<BusinessCreationResponse>> CreateClientBusinessAsync(CreateClientBusinessRequest request)
-    {
-        var validateResult = await new CreateClientBusinessRequestValidator().ValidateAsync(request);
-        if (!validateResult.IsValid)
-        {
-            return validateResult.ToErrorList();
-        }
-        
-        var client = await context.Clients.FindAsync(request.ClientId);
-        if (client is null)
-        {
-            return Errors.Client.NotFound;
-        }
-        
-        var business = Mapper.ToBusiness(request);
-        await context.AddAsync(business);
-        await context.SaveChangesAsync();
-        return new BusinessCreationResponse(business.Id);
-    }
 }

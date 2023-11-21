@@ -23,18 +23,6 @@ public class BusinessController(IBusinessService businessService) : BaseControll
             ReturnErrorResponse);
     }
     
-    [Authorize(Roles = UserRoles.User)]
-    [HttpPost("client")]
-    public async Task<IActionResult> CreateClientBusiness([Required, FromBody] CreateClientBusinessRequest request)
-    {
-        var createBusinessResult = await businessService.CreateClientBusinessAsync(request);
-        
-        return createBusinessResult.Match(
-            businessResponse => CreatedAtAction(nameof(GetBusiness), routeValues: new { id = businessResponse.Id },
-                createBusinessResult.ToSuccessfulApiResponse()),
-            ReturnErrorResponse);
-    }
-    
     // todo: businesses should only be able to view their client's businesses
     [Authorize(Roles = UserRoles.User)]
     [HttpGet("{id}")]

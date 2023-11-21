@@ -30,20 +30,6 @@ public static class Mapper
         return business;
     }
 
-    public static Business ToBusiness(CreateClientBusinessRequest request)
-    {
-        var business = new Business
-        {
-            UserId = request.ClientId,
-            Name = request.BusinessName,
-            Address = request.BusinessAddress,
-            Industry = request.Industry,
-            Description = request.BusinessDescription
-        };
-
-        return business;
-    }
-
     public static GetBusinessResponse ToGetBusinessResponse(Business business)
     {
         return new GetBusinessResponse(business.Name,
