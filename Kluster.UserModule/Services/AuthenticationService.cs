@@ -99,6 +99,7 @@ public class AuthenticationService(
             LastName = request.LastName.FirstCharToUpper(),
             Email = request.EmailAddress,
             UserName = request.EmailAddress,
+            Address = request.Address,
             Role = request.Role
         };
     }

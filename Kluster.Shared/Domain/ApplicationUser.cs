@@ -6,10 +6,12 @@ namespace Kluster.Shared.Domain
     public class ApplicationUser : IdentityUser
     {
         [MaxLength(AppConstants.MaxNameLength)]
-        public required string FirstName { get; set; } = string.Empty;
+        public required string FirstName { get; set; }
 
         [MaxLength(AppConstants.MaxNameLength)]
-        public required string LastName { get; set; } = string.Empty;
+        public required string LastName { get; set; }
+
+        [MaxLength(200)] public required string Address { get; set; }
         // ensure phone number and email are never null.
 
         /// <summary>

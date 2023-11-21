@@ -30,9 +30,9 @@ public static partial class Errors
             code: "User.InvalidLastName",
             description: "Last name is required and must be at most 50 characters.");
 
-        public static Error MissingEmailAddress => Error.Validation(
-            code: "User.MissingEmailAddress",
-            description: "Email address is required.");
+        public static Error MissingAddress => Error.Validation(
+            code: "User.MissingAddress",
+            description: "The address is required, and needs at least 5 characters.");
 
         public static Error InvalidEmailAddress => Error.Validation(
             code: "User.InvalidEmailAddress",

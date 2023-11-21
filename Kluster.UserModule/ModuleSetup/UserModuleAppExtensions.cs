@@ -74,6 +74,7 @@ namespace Kluster.UserModule.ModuleSetup
                 NormalizedEmail = email.ToUpper(),
                 UserName = userName,
                 NormalizedUserName = userName.ToUpper(),
+                Address = "",
                 PhoneNumber = $"+1{userName.Length}1".PadLeft(12, '1'),
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
