@@ -19,17 +19,15 @@ public abstract class BaseController : ControllerBase
     /// <returns>An IActionResult object based on the type of errors.</returns>
     protected static IActionResult ReturnErrorResponse(List<Error> errors)
     {
+        var errorMessage = "One or more errors occurred.";
         if (errors.All(e => e.Type == ErrorType.Validation))
         {
-            return CreateValidationError(errors);
+            errorMessage = "One or more validation errors occured.";
         }
 
         if (errors.Any(e => e.Type == ErrorType.Unexpected))
         {
-            return new ObjectResult(new ApiErrorResponse<List<Error>>(errors, "Something went wrong."))
-            {
-                StatusCode = StatusCodes.Status500InternalServerError
-            };
+            errorMessage = "Something went wrong.";
         }
 
         var firstError = errors[0];
@@ -38,41 +36,15 @@ public abstract class BaseController : ControllerBase
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Validation => StatusCodes.Status400BadRequest,
             ErrorType.Conflict => StatusCodes.Status409Conflict,
+            ErrorType.Failure => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
 
-        var problemDetails = new ApiErrorResponse<object>(
-            errors.ToDictionary(e => e.Code,
-                e => new[]
-                {
-                    e.Description
-                }),
-            message: firstError.Description);
-
+        var finalErrors = errors.Select(x => new { x.Code, x.Description }).ToList();
+        var problemDetails = new ApiErrorResponse<object>(finalErrors, errorMessage);
         return new ObjectResult(problemDetails)
         {
             StatusCode = statusCode
-        };
-    }
-
-    /// <summary>
-    /// Creates a validation error response with the given list of errors.
-    /// </summary>
-    /// <param name="errors">The list of errors to include in the response.</param>
-    /// <returns>An IActionResult representing the validation error response.</returns>
-    private static IActionResult CreateValidationError(List<Error> errors)
-    {
-        var problemDetails = new ApiErrorResponse<object>(
-            errors.ToDictionary(e => e.Code,
-                e => new[]
-                {
-                    e.Description
-                }),
-            message: "One or more validation errors occured.");
-
-        return new ObjectResult(problemDetails)
-        {
-            StatusCode = StatusCodes.Status400BadRequest
         };
     }
 }
