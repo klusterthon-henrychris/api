@@ -1,5 +1,6 @@
 ﻿using Kluster.Shared.Domain;
 using Kluster.Shared.Infrastructure;
+using Kluster.Shared.SharedContracts.UserModule;
 using Kluster.UserModule.Data;
 using Kluster.UserModule.Services;
 using Kluster.UserModule.Services.Contracts;
@@ -20,6 +21,8 @@ namespace Kluster.UserModule.ModuleSetup
         {
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<ITokenService, TokenService>();
+
+            services.AddScoped<ICurrentUser, CurrentUser>();
         }
 
         private static void AddMsIdentity(IServiceCollection services)
