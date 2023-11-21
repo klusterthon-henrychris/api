@@ -58,7 +58,7 @@ public class AuthenticationService(
         var user = await userManager.FindByEmailAsync(request.EmailAddress);
         if (user is null)
         {
-            return Errors.User.NotFound;
+            return Errors.Auth.LoginFailed;
         }
 
         var signInResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
@@ -82,7 +82,7 @@ public class AuthenticationService(
 
         if (signInResult.IsNotAllowed)
         {
-            logger.LogInformation($"User {user.Id} is not allowed to access the system out." +
+            logger.LogInformation($"User {user.Id} is not allowed to access the system." +
                                   $"\n\tRequest: {JsonSerializer.Serialize(request)}");
             return Errors.User.IsNotAllowed;
         }
