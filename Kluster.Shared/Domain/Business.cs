@@ -7,7 +7,7 @@ namespace Kluster.Shared.Domain
         // todo: use fluent validation to replace data annotations.
         // prepend 'B' to Id and generate ID's internally
         [MaxLength(DomainConstants.MaxIdLength)]
-        public string Id { get; set; } = "B-" + Guid.NewGuid();
+        public required string Id { get; set; }
 
         [MaxLength(DomainConstants.MaxNameLength)]
         public required string Name { get; set; }

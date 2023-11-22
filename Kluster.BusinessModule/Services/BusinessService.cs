@@ -30,10 +30,37 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return Errors.Business.BusinessAlreadyExists;
         }
 
-        var business = Mapper.ToBusiness(request, userId);
+        var businessId = await GetBusinessIdFromDb();
+        var business = Mapper.ToBusiness(request, userId, businessId);
         await context.AddAsync(business);
         await context.SaveChangesAsync();
         return new BusinessCreationResponse(business.Id);
+    }
+
+    private async Task<string> GetBusinessIdFromDb()
+    {
+        var lastBusiness = await context.Businesses
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefaultAsync();
+
+        if (lastBusiness is null) // only null when no other records exist
+        {
+            return "B-000001"; // Default ID when no records are present
+        }
+
+        var numericId = GetValueFromId(lastBusiness.Id);
+        return $"B-{numericId + 1:D6}";
+    }
+
+    private static int GetValueFromId(string lastBusinessId)
+    {
+        var numericPart = lastBusinessId.Substring(2); // Remove the 'B-'
+        if (int.TryParse(numericPart, out var numericId))
+        {
+            return numericId;
+        }
+
+        throw new InvalidOperationException("Invalid Business Id");
     }
 
     public async Task<ErrorOr<GetBusinessResponse>> GetBusinessById(string id)
@@ -55,7 +82,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         {
             return SharedErrors<Business>.NotFound;
         }
-        
+
         return Mapper.ToGetBusinessResponse(business);
     }
 }

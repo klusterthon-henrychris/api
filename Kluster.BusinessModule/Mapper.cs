@@ -8,10 +8,11 @@ namespace Kluster.BusinessModule;
 
 public static class Mapper
 {
-    public static Business ToBusiness(CreateBusinessRequest request, string userId)
+    public static Business ToBusiness(CreateBusinessRequest request, string userId, string businessId)
     {
         var business = new Business
         {
+            Id = businessId,
             UserId = userId,
             Name = request.BusinessName,
             Address = request.BusinessAddress,
