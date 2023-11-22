@@ -58,5 +58,6 @@ Before starting the application:
 - After the command is run, two containers will spin up. One is `kluster-api` and the other is `kluster-databse.` The names are self explanatory.
 - You might need to restart the container named `kluster.api` as it requires the `kluster.database` container to be fully setup to work.
 - Access the application's swagger documentation at [Swagger](http://localhost:5000/swagger/index.html). Requests can be sent to the api at `http://localhost:5000/api`.
+- If the required folders do not exist, *create them*.
 # Postman Documentation
 You can access the postman collection here: [PostmanDoc](https://documenter.getpostman.com/view/22039666/2s9YeAAumQ).
