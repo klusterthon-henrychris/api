@@ -40,9 +40,9 @@ public class ClientsController(IClientService clientService) : BaseController
     
     // todo: add sorting, filtering, and pagination
     [HttpGet("all")]
-    public async Task<IActionResult> GetAllClients()
+    public async Task<IActionResult> GetAllClients([FromQuery] GetClientsRequest request)
     {
-        var getClientsResult = await clientService.GetAllClients();
+        var getClientsResult = await clientService.GetAllClients(request);
 
         // If successful, return the event data in an ApiResponse.
         // If an error occurs, return an error response using the ReturnErrorResponse method.

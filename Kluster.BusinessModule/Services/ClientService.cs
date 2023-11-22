@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using Kluster.BusinessModule.Constants;
 using Kluster.BusinessModule.Data;
 using Kluster.BusinessModule.DTOs.Requests;
 using Kluster.BusinessModule.DTOs.Responses;
@@ -52,20 +53,41 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
         return new CreateClientResponse(client.Id);
     }
 
-    public async Task<ErrorOr<List<GetClientResponse>>> GetAllClients()
+    public async Task<ErrorOr<List<GetClientResponse>>> GetAllClients(GetClientsRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
+        Enum.TryParse<ClientSortOptions>(request.SortOption, out var sortOption);
 
-        // todo: this is probably slow. maybe get only what is needed. even, if it means another db trip.
-        var business = await context.Businesses
-            .Where(x => x.UserId == userId)
-            .Include(x => x.Clients).FirstOrDefaultAsync();
-        if (business is null)
+        var query = context.Clients
+            .Include(x => x.Business)
+            .Where(x => x.Business.UserId == userId);
+
+        query = SortClientsQuery(query, sortOption);
+        var clients = await query
+            .Skip(request.PageSize * (request.PageNumber - 1))
+            .Take(request.PageSize)
+            .ToListAsync();
+        
+        return clients.Select(Mapper.ToGetClientResponse).ToList();
+    }
+
+    private static IQueryable<Client> SortClientsQuery(IQueryable<Client> query, ClientSortOptions sortOption)
+    {
+        query = sortOption switch
         {
-            return SharedErrors<Business>.NotFound;
-        }
+            ClientSortOptions.FirstNameAsc => query.OrderBy(x => x.FirstName),
+            ClientSortOptions.FirstNameDesc => query.OrderByDescending(x => x.FirstName),
+            ClientSortOptions.LastNameAsc => query.OrderBy(x => x.LastName),
+            ClientSortOptions.LastNameDesc => query.OrderByDescending(x => x.LastName),
+            ClientSortOptions.BusinessNameAsc => query.OrderBy(x => x.BusinessName),
+            ClientSortOptions.BusinessNameDesc => query.OrderByDescending(x => x.BusinessName),
+            ClientSortOptions.CreatedDateAsc => query.OrderBy(x => x.CreatedDate),
+            ClientSortOptions.CreatedDateDesc => query.OrderByDescending(x => x.CreatedDate),
 
-        return business.Clients.Select(Mapper.ToGetClientResponse).ToList();
+            _ => query.OrderBy(x => x.CreatedDate)
+        };
+
+        return query;
     }
 
     public async Task<ErrorOr<Updated>> UpdateClient(string clientId, UpdateClientRequest request)

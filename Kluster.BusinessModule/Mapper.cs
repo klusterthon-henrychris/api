@@ -1,6 +1,7 @@
 ﻿using Kluster.BusinessModule.DTOs.Requests;
 using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.Shared.API;
+using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 
 namespace Kluster.BusinessModule;
@@ -28,9 +29,9 @@ public static class Mapper
     {
         return new GetBusinessResponse(business.Name,
             business.Address,
-            business.CacNumber ?? Constants.NotFound,
-            business.RcNumber ?? Constants.NotFound,
-            business.Description ?? Constants.NotFound,
+            business.CacNumber ?? SearchConstants.NotFound,
+            business.RcNumber ?? SearchConstants.NotFound,
+            business.Description ?? SearchConstants.NotFound,
             business.Industry);
     }
 
