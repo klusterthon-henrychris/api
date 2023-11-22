@@ -10,7 +10,7 @@ public static partial class Errors
             code: "User.NotFound",
             description: "User not found.");
 
-        public static Error DuplicateEmail => Error.NotFound(
+        public static Error DuplicateEmail => Error.Validation(
             code: "User.DuplicateEmail",
             description: "This email is already in use.");
 

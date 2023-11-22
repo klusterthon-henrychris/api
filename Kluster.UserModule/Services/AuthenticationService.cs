@@ -39,9 +39,6 @@ public class AuthenticationService(
         {
             await userManager.AddToRoleAsync(newUser, newUser.Role);
             return new UserAuthResponse(Id: newUser.Id,
-                FirstName: newUser.FirstName,
-                LastName: newUser.LastName,
-                EmailAddress: newUser.Email!,
                 Role: newUser.Role,
                 AccessToken: tokenService.CreateUserJwt(newUser.Email!, newUser.Role, newUser.Id));
         }
@@ -66,9 +63,6 @@ public class AuthenticationService(
         {
             logger.LogInformation($"User {user.Id} logged in successfully.");
             return new UserAuthResponse(Id: user.Id,
-                FirstName: user.FirstName,
-                LastName: user.LastName,
-                EmailAddress: user.Email!,
                 Role: user.Role,
                 AccessToken: tokenService.CreateUserJwt(user.Email!, user.Role, user.Id));
         }
