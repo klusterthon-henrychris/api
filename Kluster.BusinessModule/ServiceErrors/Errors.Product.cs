@@ -13,5 +13,9 @@ public static partial class Errors
         public static Error InvalidQuantity => Error.Validation(
             code: $"{nameof(Product)}.InvalidQuantity",
             description: "The quantity must be greater than, or equal to one.");
+        
+        public static Error InvalidBusiness => Error.Validation(
+            code: $"{nameof(Product)}.InvalidBusiness",
+            description: "The product could not be found for this business.");
     }
 }

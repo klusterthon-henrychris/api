@@ -17,6 +17,7 @@ namespace Kluster.BusinessModule.ModuleSetup
         {
             services.AddTransient<IBusinessService, BusinessService>();
             services.AddTransient<IClientService, ClientService>();
+            services.AddTransient<IProductService, ProductService>();
         }
     }
 }

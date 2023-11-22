@@ -1,6 +1,8 @@
-﻿using Kluster.BusinessModule.DTOs.Requests;
+﻿using ErrorOr;
+using Kluster.BusinessModule.DTOs.Requests;
 using Kluster.BusinessModule.DTOs.Requests.Products;
 using Kluster.BusinessModule.DTOs.Responses;
+using Kluster.BusinessModule.DTOs.Responses.Products;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 
@@ -75,5 +77,11 @@ public static class Mapper
             Quantity = request.Quantity,
             ImageUrl = imageUrl
         };
+    }
+
+    public static GetProductResponse ToGetProductResponse(Product product)
+    {
+        return new GetProductResponse(product.Name, product.Description, product.Price, product.Quantity,
+            product.ImageUrl, product.ProductType);
     }
 }

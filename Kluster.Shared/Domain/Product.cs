@@ -6,6 +6,7 @@ namespace Kluster.Shared.Domain
     public class Product
     {
         [Key, MaxLength(DomainConstants.MaxIdLength)]
+        // todo - name according to business?
         public string ProductId { get; set; } = "P-" + Guid.NewGuid();
 
         [MaxLength(DomainConstants.MaxNameLength)]
