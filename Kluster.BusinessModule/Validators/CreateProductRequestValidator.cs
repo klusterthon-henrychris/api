@@ -23,7 +23,12 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
             .Must(x => ProductType.AllProductTypeOptions.Contains(x))
             .WithMessage("These are the valid product classification: " +
                          string.Join(", ", ProductType.AllProductTypeOptions));
-
+        
+        RuleFor(x => x.Quantity)
+            .GreaterThanOrEqualTo(1)
+            .WithMessage(Errors.Product.InvalidQuantity.Description)
+            .WithErrorCode(Errors.Product.InvalidQuantity.Code);
+        
         RuleFor(x => x.ProductImage)
             .NotEmpty();
     }
