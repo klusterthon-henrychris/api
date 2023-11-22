@@ -50,4 +50,20 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
         await context.SaveChangesAsync();
         return new CreateClientResponse(client.Id);
     }
+
+    public async Task<ErrorOr<List<GetClientResponse>>> GetAllClients()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+
+        // todo: this is probably slow. maybe get only what is needed. even, if it means another db trip.
+        var business = await context.Businesses
+            .Where(x => x.UserId == userId)
+            .Include(x => x.Clients).FirstOrDefaultAsync();
+        if (business is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+
+        return business.Clients.Select(Mapper.ToGetClientResponse).ToList();
+    }
 }
