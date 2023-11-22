@@ -1,9 +1,9 @@
 ﻿using Kluster.BusinessModule.Constants;
-using Kluster.Shared.Constants;
+using Kluster.Shared.Requests;
 
 namespace Kluster.BusinessModule.DTOs.Requests;
 
-public record GetClientsRequest(
-    int PageSize = SearchConstants.PageSize,
-    int PageNumber = SearchConstants.PageNumber,
-    string SortOption = ClientSortStrings.FirstNameAsc);
+public class GetClientsRequest : QueryStringParameters
+{
+    public string SortOption { get; set; } = ClientSortStrings.FirstNameAsc;
+}
