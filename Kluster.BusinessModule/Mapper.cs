@@ -55,7 +55,7 @@ public static class Mapper
         return client;
     }
 
-    public static ErrorOr<GetClientResponse> ToGetClientResponse(Client client)
+    public static GetClientResponse ToGetClientResponse(Client client)
     {
         return new GetClientResponse(client.FirstName, client.LastName, client.EmailAddress,
             client.BusinessName ?? string.Join(" ", client.FirstName, client.LastName),
