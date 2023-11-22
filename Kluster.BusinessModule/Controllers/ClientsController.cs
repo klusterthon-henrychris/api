@@ -38,7 +38,6 @@ public class ClientsController(IClientService clientService) : BaseController
         return updateUserResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
     
-    // todo: add sorting, filtering, and pagination
     [HttpGet("all")]
     public async Task<IActionResult> GetAllClients([FromQuery] GetClientsRequest request)
     {
