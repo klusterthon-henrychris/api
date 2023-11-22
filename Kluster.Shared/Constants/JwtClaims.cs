@@ -1,4 +1,4 @@
-﻿namespace Kluster.Shared
+﻿namespace Kluster.Shared.Constants
 {
     public static class JwtClaims
     {

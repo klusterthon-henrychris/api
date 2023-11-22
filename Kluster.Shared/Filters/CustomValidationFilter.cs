@@ -1,4 +1,4 @@
-﻿using Kluster.Shared.Response;
+﻿using Kluster.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

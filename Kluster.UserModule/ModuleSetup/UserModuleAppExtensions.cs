@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Kluster.Shared;
+using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 using Kluster.UserModule.Data;
 using Microsoft.AspNetCore.Identity;

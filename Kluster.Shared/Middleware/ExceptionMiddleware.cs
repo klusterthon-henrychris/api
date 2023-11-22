@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Kluster.Shared.Response;
+using Kluster.Shared.Responses;
 using Kluster.Shared.ServiceErrors;
 
 namespace Kluster.Shared.Middleware

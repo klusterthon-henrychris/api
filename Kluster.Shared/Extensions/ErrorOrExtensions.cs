@@ -1,5 +1,5 @@
-﻿using Kluster.Shared.Response;
-using ErrorOr;
+﻿using ErrorOr;
+using Kluster.Shared.Responses;
 
 namespace Kluster.Shared.Extensions;
 

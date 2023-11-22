@@ -1,4 +1,4 @@
-﻿namespace Kluster.Shared
+﻿namespace Kluster.Shared.Constants
 {
     /// <summary>
     /// Use for Business Type

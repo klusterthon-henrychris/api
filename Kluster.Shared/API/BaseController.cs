@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 using Kluster.Shared.Filters;
-using Kluster.Shared.Response;
+using Kluster.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

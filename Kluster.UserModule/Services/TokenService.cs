@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Kluster.Shared;
 using Kluster.Shared.Configuration;
+using Kluster.Shared.Constants;
 using Kluster.UserModule.Services.Contracts;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
