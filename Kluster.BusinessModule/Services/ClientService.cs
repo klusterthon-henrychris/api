@@ -124,7 +124,7 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
             ClientSortOptions.CreatedDateAsc => query.OrderBy(x => x.CreatedDate),
             ClientSortOptions.CreatedDateDesc => query.OrderByDescending(x => x.CreatedDate),
 
-            _ => query.OrderBy(x => x.CreatedDate)
+            _ => query.OrderBy(x => x.FirstName)
         };
 
         return query;
