@@ -97,5 +97,4 @@ public class AuthenticationService(
             Role = request.Role
         };
     }
-    // todo: add method to create business in business controller
 }
