@@ -6,9 +6,11 @@ using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
+using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.Requests;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.UserModule;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +55,7 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
         return new CreateClientResponse(client.Id);
     }
 
-    public async Task<ErrorOr<List<GetClientResponse>>> GetAllClients(GetClientsRequest request)
+    public Task<ErrorOr<PagedList<GetClientResponse>>> GetAllClients(GetClientsRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         Enum.TryParse<ClientSortOptions>(request.SortOption, out var sortOption);
@@ -62,13 +64,51 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
             .Include(x => x.Business)
             .Where(x => x.Business.UserId == userId);
 
+        query = ApplyFilters(query, request);
         query = SortClientsQuery(query, sortOption);
-        var clients = await query
-            .Skip(request.PageSize * (request.PageNumber - 1))
-            .Take(request.PageSize)
-            .ToListAsync();
-        
-        return clients.Select(Mapper.ToGetClientResponse).ToList();
+        var pagedResults = PagedList<GetClientResponse>
+            .ToPagedList(
+                query.Select(x =>
+                    new GetClientResponse(x.FirstName,
+                        x.LastName,
+                        x.EmailAddress,
+                        x.BusinessName ?? string.Join(" ", x.FirstName, x.LastName),
+                        x.Address)),
+                request.PageNumber,
+                request.PageSize
+            );
+
+        return Task.FromResult<ErrorOr<PagedList<GetClientResponse>>>(pagedResults);
+    }
+
+    private static IQueryable<Client> ApplyFilters(IQueryable<Client> query, GetClientsRequest request)
+    {
+        if (!string.IsNullOrWhiteSpace(request.FirstName))
+        {
+            query = query.Where(x => x.FirstName.Contains(request.FirstName));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.LastName))
+        {
+            query = query.Where(x => x.LastName.Contains(request.LastName));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.BusinessName))
+        {
+            query = query.Where(x => x.BusinessName != null && x.BusinessName.Contains(request.BusinessName));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.EmailAddress))
+        {
+            query = query.Where(x => x.EmailAddress.Contains(request.EmailAddress));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Address))
+        {
+            query = query.Where(x => x.Address.Contains(request.Address));
+        }
+
+        return query;
     }
 
     private static IQueryable<Client> SortClientsQuery(IQueryable<Client> query, ClientSortOptions sortOption)
