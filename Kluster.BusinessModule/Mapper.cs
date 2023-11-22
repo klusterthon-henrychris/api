@@ -1,4 +1,5 @@
 ﻿using Kluster.BusinessModule.DTOs.Requests;
+using Kluster.BusinessModule.DTOs.Requests.Products;
 using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
@@ -60,5 +61,19 @@ public static class Mapper
         return new GetClientResponse(client.FirstName, client.LastName, client.EmailAddress,
             client.BusinessName ?? string.Join(" ", client.FirstName, client.LastName),
             client.Address);
+    }
+
+    public static Product ToProduct(CreateProductRequest request, string businessId, string imageUrl)
+    {
+        return new Product
+        {
+            BusinessId = businessId,
+            Name = request.Name,
+            Description = request.Description,
+            Price = request.Price,
+            ProductType = request.ProductType,
+            Quantity = request.Quantity,
+            ImageUrl = imageUrl
+        };
     }
 }
