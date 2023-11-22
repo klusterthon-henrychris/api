@@ -13,6 +13,7 @@
       - USER_SECRETS_ID=41019bab-28dd-41f1-a221-82ed1e906626
     volumes:
       - $APPDATA/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - $HOME/.microsoft/usersecrets:/root/.microsoft/usersecrets:ro
 
   database:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
