@@ -4,6 +4,7 @@ using Kluster.BusinessModule.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kluster.BusinessModule.Migrations
 {
     [DbContext(typeof(BusinessModuleDbContext))]
-    partial class BusinessModuleDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231122132019_removeEmailConfirmedFromClient")]
+    partial class removeEmailConfirmedFromClient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
