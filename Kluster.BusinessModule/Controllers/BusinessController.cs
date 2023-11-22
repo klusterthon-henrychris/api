@@ -20,11 +20,23 @@ public class BusinessController(IBusinessService businessService) : BaseControll
             ReturnErrorResponse);
     }
     
-    // todo: businesses should only be able to view their client's businesses
+    
     [HttpGet("{id}")]
     public async Task<IActionResult> GetBusinessById(string id)
     {
         var getBusinessResult = await businessService.GetBusinessById(id);
+
+        // If successful, return the event data in an ApiResponse.
+        // If an error occurs, return an error response using the ReturnErrorResponse method.
+        return getBusinessResult.Match(
+            _ => Ok(getBusinessResult.ToSuccessfulApiResponse()),
+            ReturnErrorResponse);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetBusinessOfLoggedInUser()
+    {
+        var getBusinessResult = await businessService.GetBusinessOfLoggedInUser();
 
         // If successful, return the event data in an ApiResponse.
         // If an error occurs, return an error response using the ReturnErrorResponse method.

@@ -23,13 +23,13 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         {
             return validateResult.ToErrorList();
         }
-        var userId = currentUser.UserId ?? throw new UserNotSetException("");
 
+        var userId = currentUser.UserId ?? throw new UserNotSetException("");
         if (await context.Businesses.AnyAsync(x => x.UserId == userId))
         {
             return Errors.Business.BusinessAlreadyExists;
         }
-            
+
         var business = Mapper.ToBusiness(request, userId);
         await context.AddAsync(business);
         await context.SaveChangesAsync();
@@ -44,6 +44,18 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return SharedErrors<Business>.NotFound;
         }
 
+        return Mapper.ToGetBusinessResponse(business);
+    }
+
+    public async Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
+        if (business is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+        
         return Mapper.ToGetBusinessResponse(business);
     }
 }
