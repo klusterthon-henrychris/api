@@ -112,4 +112,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         await context.SaveChangesAsync();
         return Result.Updated;
     }
+    
+    // todo: delete business 
+    // delete clients, delete invoices and delete payments.
 }
