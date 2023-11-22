@@ -17,9 +17,8 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x.EmailAddress).ValidateEmailAddress();
         RuleFor(x => x.Address).ValidateAddress();
 
-        string[] validRoles = [UserRoles.Admin, UserRoles.User];
         RuleFor(x => x.Role)
-            .Must(x => validRoles.Contains(x))
-            .WithMessage("These are the valid roles: " + string.Join(", ", validRoles));
+            .Must(x => UserRoles.AllRoles.Contains(x))
+            .WithMessage("These are the valid roles: " + string.Join(", ", UserRoles.AllRoles));
     }
 }
