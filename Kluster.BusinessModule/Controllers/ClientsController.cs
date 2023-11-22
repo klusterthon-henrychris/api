@@ -31,6 +31,13 @@ public class ClientsController(IClientService clientService) : BaseController
             ReturnErrorResponse);
     }
 
+    [HttpPut("{clientId}/update")]
+    public async Task<IActionResult> UpdateClient(string clientId, [Required] UpdateClientRequest request)
+    {
+        var updateUserResult = await clientService.UpdateClient(clientId, request);
+        return updateUserResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
+    
     // todo: add sorting, filtering, and pagination
     [HttpGet("all")]
     public async Task<IActionResult> GetAllClients()

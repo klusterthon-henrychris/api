@@ -9,4 +9,5 @@ public interface IClientService
     Task<ErrorOr<GetClientResponse>> GetClient(string id);
     Task<ErrorOr<CreateClientResponse>> CreateClientAsync(CreateClientRequest request);
     Task<ErrorOr<List<GetClientResponse>>> GetAllClients();
+    Task<ErrorOr<Updated>> UpdateClient(string clientId, UpdateClientRequest request);
 }

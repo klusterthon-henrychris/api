@@ -10,5 +10,10 @@ public static partial class Errors
             code: $"{nameof(Client)}.InvalidClientId",
             description:
             "The business must be linked to a client.");
+        
+        public static Error InvalidBusiness => Error.Unexpected(
+            code: $"{nameof(Client)}.InvalidBusiness",
+            description:
+            "This client is not linked to your business.");
     }
 }
