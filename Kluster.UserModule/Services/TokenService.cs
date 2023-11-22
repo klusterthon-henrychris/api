@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Kluster.Shared;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Constants;
 using Kluster.UserModule.Services.Contracts;

@@ -1,5 +1,4 @@
-﻿using Kluster.Shared;
-using Kluster.Shared.Constants;
+﻿using Kluster.Shared.Constants;
 using Kluster.Shared.SharedContracts.UserModule;
 
 namespace Kluster.UserModule.Services;

@@ -6,7 +6,6 @@ using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
-using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
