@@ -6,8 +6,7 @@ namespace Kluster.Shared.Domain
     public class Invoice
     {
         [Key, MaxLength(DomainConstants.MaxIdLength)]
-        // todo: for references and invoices, use a custom algorithm to set them.
-        public string InvoiceNo { get; init; } = "I-" + Guid.NewGuid();
+        public string InvoiceNo { get; init; } = SharedLogic.GenerateReference("INV");
 
         [Column(TypeName = "decimal(18,2)")] public decimal Amount { get; set; }
 

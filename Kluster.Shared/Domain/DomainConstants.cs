@@ -12,9 +12,9 @@ public static class DomainConstants
 
     public const int MaxCacNumberLength = 15;
     public const int MaxRcNumberLength = 15;
-    
+
     public const int MaxDescriptionLength = 200;
-    
+
     public const int MinAddressLength = 3;
     public const int MaxAddressLength = 200;
 
@@ -23,5 +23,5 @@ public static class DomainConstants
 
     public const int MaxJsonLength = 450;
     public const int MaxEnumLength = 20;
-    
+    public static readonly DateTime ReferenceStartDate = new DateTime(2020, 1, 1);
 }

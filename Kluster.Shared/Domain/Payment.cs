@@ -6,7 +6,7 @@ namespace Kluster.Shared.Domain
     public class Payment
     {
         [Key, MaxLength(DomainConstants.MaxIdLength)]
-        public string PaymentReference { get; set; } = "Ref-" + Guid.NewGuid();
+        public string PaymentReference { get; set; } = SharedLogic.GenerateReference("PAY");
 
         [Column(TypeName = "decimal(18,2)")] public required decimal Amount { get; set; }
         public required DateTime DateOfPayment { get; set; }
