@@ -1,5 +1,4 @@
-﻿using ErrorOr;
-using Kluster.Shared.API;
+﻿using Kluster.Shared.API;
 using Kluster.Shared.Extensions;
 using Kluster.UserModule.DTOs.Requests;
 using Kluster.UserModule.Services.Contracts;
