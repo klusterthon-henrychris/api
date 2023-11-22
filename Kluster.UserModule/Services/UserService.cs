@@ -15,7 +15,7 @@ public class UserService(ICurrentUser currentUser, UserModuleDbContext context) 
 {
     public async Task<ErrorOr<UserResponse>> GetLoggedInUser()
     {
-        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
         var user = await context.Users.FindAsync(userId);
         if (user is null)
         {
@@ -33,7 +33,7 @@ public class UserService(ICurrentUser currentUser, UserModuleDbContext context) 
             return validateResult.ToErrorList();
         }
 
-        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
         var user = await context.Users.FindAsync(userId);
         if (user is null)
         {

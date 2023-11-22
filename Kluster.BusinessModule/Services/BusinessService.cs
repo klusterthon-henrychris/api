@@ -24,7 +24,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return validateResult.ToErrorList();
         }
 
-        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
         if (await context.Businesses.AnyAsync(x => x.UserId == userId))
         {
             return Errors.Business.BusinessAlreadyExists;
@@ -76,7 +76,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
 
     public async Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser()
     {
-        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
         if (business is null)
         {
@@ -94,7 +94,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return validateResult.ToErrorList();
         }
 
-        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
         if (business is null)
         {
