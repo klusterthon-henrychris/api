@@ -1,5 +1,7 @@
-﻿using Kluster.Shared.API;
+﻿using ErrorOr;
+using Kluster.Shared.API;
 using Kluster.Shared.Extensions;
+using Kluster.UserModule.DTOs.Requests;
 using Kluster.UserModule.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,5 +19,12 @@ public class UserController(IUserService userService) : BaseController
         return getUserResult.Match(
             _ => Ok(getUserResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateUser(UpdateUserRequest request)
+    {
+        var updateUserResult = await userService.UpdateUser(request);
+        return updateUserResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }
