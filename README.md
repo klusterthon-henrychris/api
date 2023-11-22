@@ -14,7 +14,7 @@ Before starting the application:
 
     "DatabaseSettings": 
     {"ConnectionString": 
-"Server=sql_server2022;Database=KlusterDB;UserId=SA;Password{PASSWORD};MultipleActiveResultSets=true;TrustServerCertificate=true;"
+"Server=kluster.database;Database=KlusterDB;UserId=SA;Password{PASSWORD};MultipleActiveResultSets=true;TrustServerCertificate=true;"
     },
 
     "JwtSettings": {
@@ -37,7 +37,7 @@ Before starting the application:
 ```
 {
     "DatabaseSettings": {
-        "ConnectionString": "Server=sql_server2022;Database=KlusterDB;User Id=SA;Password={PASSWORD};
+        "ConnectionString": "Server=kluster.database;Database=KlusterDB;User Id=SA;Password={PASSWORD};
            MultipleActiveResultSets=true;TrustServerCertificate=true;"
     },
     "JwtSettings": {
