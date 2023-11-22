@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Kluster.BusinessModule.DTOs.Requests;
+using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared.API;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kluster.BusinessModule.Controllers;
 
@@ -13,14 +15,14 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     public async Task<IActionResult> CreateBusiness([Required, FromBody] CreateBusinessRequest request)
     {
         var createBusinessResult = await businessService.CreateBusinessAsync(request);
-        
+
         return createBusinessResult.Match(
             businessResponse => CreatedAtAction(nameof(GetBusinessById), routeValues: new { id = businessResponse.Id },
                 createBusinessResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
     }
-    
-    
+
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetBusinessById(string id)
     {
@@ -43,5 +45,12 @@ public class BusinessController(IBusinessService businessService) : BaseControll
         return getBusinessResult.Match(
             _ => Ok(getBusinessResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateBusiness(UpdateBusinessRequest request)
+    {
+        var updateBusinessResult = await businessService.UpdateBusiness(request);
+        return updateBusinessResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }

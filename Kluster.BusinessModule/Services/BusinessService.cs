@@ -85,4 +85,31 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
 
         return Mapper.ToGetBusinessResponse(business);
     }
+
+    public async Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request)
+    {
+        var validateResult = await new UpdateBusinessRequestValidator().ValidateAsync(request);
+        if (!validateResult.IsValid)
+        {
+            return validateResult.ToErrorList();
+        }
+
+        var userId = currentUser.UserId ?? throw new UserNotSetException("");
+        var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
+        if (business is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+
+        business.Name = request.Name ?? business.Name;
+        business.Address = request.Address ?? business.Address;
+        business.CacNumber = request.CacNumber ?? business.CacNumber;
+        business.RcNumber = request.RcNumber ?? business.RcNumber;
+        business.Description = request.Description ?? business.Description;
+        business.Industry = request.Industry ?? business.Industry;
+
+        context.Update(business);
+        await context.SaveChangesAsync();
+        return Result.Updated;
+    }
 }

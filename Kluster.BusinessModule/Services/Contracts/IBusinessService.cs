@@ -9,4 +9,5 @@ public interface IBusinessService
     Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request);
     Task<ErrorOr<GetBusinessResponse>> GetBusinessById(string id);
     Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser();
+    Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request);
 }
