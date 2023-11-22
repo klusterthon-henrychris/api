@@ -21,6 +21,7 @@ namespace Kluster.UserModule.ModuleSetup
         {
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IUserService, UserService>();
 
             services.AddScoped<ICurrentUser, CurrentUser>();
         }
