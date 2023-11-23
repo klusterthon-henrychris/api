@@ -2,8 +2,9 @@
 using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.DTOs.Responses.Invoices;
 using Kluster.Shared.DTOs.Responses.Requests;
+using Kluster.Shared.MessagingContracts.Commands.Invoice;
 
-namespace Kluster.PaymentModule.Services.Contracts;
+namespace Kluster.Shared.SharedContracts;
 
 public interface IInvoiceService
 {
@@ -12,4 +13,7 @@ public interface IInvoiceService
     Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request);
     Task<ErrorOr<PagedList<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request);
     Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id);
+    Task DeleteAllInvoicesLinkedToClient(DeleteInvoicesForClient command);
+    Task DeleteAllInvoicesLinkedToBusiness(DeleteInvoicesForBusiness command);
+    
 }
