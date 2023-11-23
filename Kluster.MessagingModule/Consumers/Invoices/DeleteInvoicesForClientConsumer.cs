@@ -1,5 +1,6 @@
 ﻿using Kluster.Shared.MessagingContracts.Commands.Invoice;
 using Kluster.Shared.SharedContracts;
+using Kluster.Shared.SharedContracts.PaymentModule;
 using MassTransit;
 
 namespace Kluster.Messaging.Consumers.Invoices;

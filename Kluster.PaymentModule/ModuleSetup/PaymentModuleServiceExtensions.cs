@@ -2,6 +2,7 @@
 using Kluster.PaymentModule.Services;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts;
+using Kluster.Shared.SharedContracts.PaymentModule;
 
 namespace Kluster.PaymentModule.ModuleSetup
 {

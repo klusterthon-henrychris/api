@@ -1,6 +1,6 @@
 ﻿using Kluster.Shared.MessagingContracts.Commands.Payment;
 
-namespace Kluster.Shared.SharedContracts;
+namespace Kluster.Shared.SharedContracts.PaymentModule;
 
 public interface IPaymentService
 {

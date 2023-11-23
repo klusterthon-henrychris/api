@@ -6,6 +6,7 @@ using Kluster.Shared.Constants;
 using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts;
+using Kluster.Shared.SharedContracts.PaymentModule;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Kluster.PaymentModule.Controllers;

@@ -4,7 +4,7 @@ using Kluster.Shared.DTOs.Responses.Invoices;
 using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.MessagingContracts.Commands.Invoice;
 
-namespace Kluster.Shared.SharedContracts;
+namespace Kluster.Shared.SharedContracts.PaymentModule;
 
 public interface IInvoiceService
 {

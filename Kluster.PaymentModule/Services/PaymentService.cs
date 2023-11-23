@@ -1,6 +1,7 @@
 ﻿using Kluster.PaymentModule.Data;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.SharedContracts;
+using Kluster.Shared.SharedContracts.PaymentModule;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.PaymentModule.Services;

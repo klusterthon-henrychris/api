@@ -13,6 +13,7 @@ using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts;
 using Kluster.Shared.SharedContracts.BusinessModule;
+using Kluster.Shared.SharedContracts.PaymentModule;
 using Kluster.Shared.SharedContracts.UserModule;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
