@@ -4,9 +4,11 @@ using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.Auth;
 using Kluster.Shared.DTOs.Responses.Auth;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.MessagingContracts.Events;
 using Kluster.UserModule.ServiceErrors;
 using Kluster.UserModule.Services.Contracts;
 using Kluster.UserModule.Validators;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -16,6 +18,7 @@ public class AuthenticationService(
     ITokenService tokenService,
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
+    IBus bus,
     ILogger<AuthenticationService> logger)
     : IAuthenticationService
 {
@@ -38,6 +41,8 @@ public class AuthenticationService(
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(newUser, newUser.Role);
+            await bus.Publish(new EmailOtpRequestedEvent(newUser.FirstName, newUser.LastName, newUser.Email!, newUser.Id));
+            
             return new UserAuthResponse(Id: newUser.Id,
                 Role: newUser.Role,
                 AccessToken: tokenService.CreateUserJwt(newUser.Email!, newUser.Role, newUser.Id));
