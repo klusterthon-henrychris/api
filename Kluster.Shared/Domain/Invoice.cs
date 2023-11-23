@@ -8,10 +8,10 @@ namespace Kluster.Shared.Domain
         [Key, MaxLength(DomainConstants.MaxIdLength)]
         public string InvoiceNo { get; init; } = SharedLogic.GenerateReference("INV");
 
-        [Column(TypeName = "decimal(18,2)")] public decimal Amount { get; set; }
+        [Column(TypeName = "decimal(18,2)")] public required decimal Amount { get; set; }
 
-        public DateTime DueDate { get; set; }
-        public DateTime DateOfIssuance { get; set; }
+        public required DateTime DueDate { get; set; }
+        public required DateTime DateOfIssuance { get; set; }
 
         [MaxLength(DomainConstants.MaxEnumLength)]
         public required string Status { get; set; }
@@ -20,8 +20,10 @@ namespace Kluster.Shared.Domain
         /// add invoice items as JSON
         /// </summary>
         [MaxLength(DomainConstants.MaxJsonLength)]
-        public string? InvoiceItems { get; set; }
+        public required string InvoiceItems { get; set; }
 
+        [MaxLength(DomainConstants.MaxAddressLength)]
+        public required string BillingAddress { get; set; }
 
         // navigation properties
         [MaxLength(DomainConstants.MaxIdLength)]
