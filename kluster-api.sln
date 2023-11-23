@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8383AEF5-DA3D-4BCE-9F14-6304B7FCA425}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kluster.MessagingModule", "Kluster.MessagingModule\Kluster.MessagingModule.csproj", "{FB2B743B-DB2F-4129-B8D7-BBD84058B159}"
