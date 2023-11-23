@@ -1,4 +1,5 @@
-﻿using Kluster.NotificationModule.Models;
+﻿using System.Text;
+using Kluster.NotificationModule.Models;
 using Kluster.NotificationModule.Services.Contracts;
 using Kluster.Shared.Configuration;
 using MailKit.Security;
@@ -190,6 +191,30 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
     private SecureSocketOptions GetSecureSocketOptions()
     {
         return _settings.UseSsl ? SecureSocketOptions.SslOnConnect :
-               _settings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+            _settings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+    }
+    
+    /// <summary>
+    /// Templates are stored in Kluster.Host/Templates.
+    /// </summary>
+    /// <param name="emailTemplate">This can be the name of the file, or a path</param>
+    /// <remarks>Passing in "index", would return contents of a file called index.html, if any.
+    /// Passing in "test/new", would return new.html, from the folder named "test", inside the Templates folder.
+    /// </remarks>
+    /// <returns></returns>
+    public string LoadTemplate(string emailTemplate)
+    {
+        var baseDir = Directory.GetCurrentDirectory();
+        
+        var templateDir = Path.Combine(baseDir, "Templates");
+        var templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
+
+        using var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var streamReader = new StreamReader(fileStream, Encoding.Default);
+
+        var mailTemplate = streamReader.ReadToEnd();
+        streamReader.Close();
+
+        return mailTemplate;
     }
 }
