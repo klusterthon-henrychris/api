@@ -105,7 +105,7 @@ public class InvoiceService(
         }
         
         // delete related invoices
-        await bus.Send(PaymentModuleMapper.ToDeletePaymentForInvoice(invoice));
+        await bus.Publish(PaymentModuleMapper.ToDeletePaymentForInvoice(invoice));
         
         context.Remove(invoice);
         await context.SaveChangesAsync();
