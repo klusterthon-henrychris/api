@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Business;
 using Microsoft.AspNetCore.Mvc;

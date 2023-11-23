@@ -1,7 +1,6 @@
 ﻿using ErrorOr;
 using Kluster.BusinessModule.Data;
 using Kluster.BusinessModule.ServiceErrors;
-using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
 using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.Business;

@@ -1,7 +1,6 @@
 ﻿using ErrorOr;
 using Kluster.BusinessModule.Data;
 using Kluster.BusinessModule.ServiceErrors;
-using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
@@ -11,7 +10,6 @@ using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.ServiceErrors;
-using Kluster.Shared.SharedContracts;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
 using Microsoft.EntityFrameworkCore;
