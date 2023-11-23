@@ -23,100 +23,16 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
             #region Sender / Receiver
 
             // Sender
-            mail.From.Add(new MailboxAddress(_settings.DisplayName, mailData.From ?? _settings.From));
-            mail.Sender = new MailboxAddress(mailData.DisplayName ?? _settings.DisplayName,
-                mailData.From ?? _settings.From);
-
-            // Receiver
-            foreach (var mailAddress in mailData.To)
-                mail.To.Add(MailboxAddress.Parse(mailAddress));
-
-            // Set Reply to if specified in mail data
-            if (!string.IsNullOrEmpty(mailData.ReplyTo))
-            {
-                mail.ReplyTo.Add(new MailboxAddress(mailData.ReplyToName, mailData.ReplyTo));
-            }
-
-            // BCC
-            // Check if a BCC was supplied in the request
-            if (mailData.Bcc != null)
-            {
-                // Get only addresses where value is not null or with whitespace. x = value of address
-                foreach (var mailAddress in mailData.Bcc.Where(x => !string.IsNullOrWhiteSpace(x)))
-                    mail.Bcc.Add(MailboxAddress.Parse(mailAddress.Trim()));
-            }
-
-            // CC
-            // Check if a CC address was supplied in the request
-            if (mailData.Cc != null)
-            {
-                foreach (var mailAddress in mailData.Cc.Where(x => !string.IsNullOrWhiteSpace(x)))
-                    mail.Cc.Add(MailboxAddress.Parse(mailAddress.Trim()));
-            }
-
-            #endregion
-
-            #region Content
-
-            // Add Content to Mime Message
-            var body = new BodyBuilder();
-            mail.Subject = mailData.Subject;
-            body.HtmlBody = mailData.Body;
-            mail.Body = body.ToMessageBody();
-
-            #endregion
-
-            await Send(mail, ct);
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
-    public async Task<bool> SendWithAttachmentsAsync(MailDataWithAttachments mailData, CancellationToken ct)
-    {
-        try
-        {
-            // Initialize a new instance of the MimeKit.MimeMessage class
-            var mail = new MimeMessage();
-
-            #region Sender / Receiver
-
-            // Sender
-            mail.From.Add(new MailboxAddress(_settings.DisplayName, mailData.From ?? _settings.From));
-            mail.Sender = new MailboxAddress(mailData.DisplayName ?? _settings.DisplayName,
-                mailData.From ?? _settings.From);
+            mail.From.Add(new MailboxAddress(_settings.DisplayName, _settings.From));
+            mail.Sender = new MailboxAddress(_settings.DisplayName, _settings.From);
 
             // Receiver
             if (mailData.To != null)
+            {
                 foreach (var mailAddress in mailData.To)
                 {
                     mail.To.Add(MailboxAddress.Parse(mailAddress));
                 }
-
-            // Set Reply to if specified in mail data
-            if (!string.IsNullOrEmpty(mailData.ReplyTo))
-            {
-                mail.ReplyTo.Add(new MailboxAddress(mailData.ReplyToName, mailData.ReplyTo));
-            }
-
-            // BCC
-            // Check if a BCC was supplied in the request
-            if (mailData.Bcc != null)
-            {
-                // Get only addresses where value is not null or with whitespace. x = value of address
-                foreach (var mailAddress in mailData.Bcc.Where(x => !string.IsNullOrWhiteSpace(x)))
-                    mail.Bcc.Add(MailboxAddress.Parse(mailAddress.Trim()));
-            }
-
-            // CC
-            // Check if a CC address was supplied in the request
-            if (mailData.Cc != null)
-            {
-                foreach (var mailAddress in mailData.Cc.Where(x => !string.IsNullOrWhiteSpace(x)))
-                    mail.Cc.Add(MailboxAddress.Parse(mailAddress.Trim()));
             }
 
             #endregion
@@ -129,7 +45,10 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
             body.HtmlBody = mailData.Body;
             mail.Body = body.ToMessageBody();
 
+            #endregion
+
             // Check if we got any attachments and add the to the builder for our message
+            // todo: extract method
             if (mailData.Attachments != null)
             {
                 foreach (var attachment in mailData.Attachments)
@@ -155,20 +74,11 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
                 }
             }
 
-            #endregion
-
-            #region Send Mail
-
             await Send(mail, ct);
-
-            // log success
             return true;
-
-            #endregion
         }
         catch (Exception)
         {
-            // log error
             return false;
         }
     }
@@ -193,7 +103,7 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
         return _settings.UseSsl ? SecureSocketOptions.SslOnConnect :
             _settings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
     }
-    
+
     /// <summary>
     /// Templates are stored in Kluster.Host/Templates.
     /// </summary>
@@ -205,7 +115,7 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
     public string LoadTemplate(string emailTemplate)
     {
         var baseDir = Directory.GetCurrentDirectory();
-        
+
         var templateDir = Path.Combine(baseDir, "Templates");
         var templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
 

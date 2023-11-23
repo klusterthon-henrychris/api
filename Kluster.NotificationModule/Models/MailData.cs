@@ -1,35 +1,13 @@
 ﻿namespace Kluster.NotificationModule.Models;
 
-public class MailData(
-    List<string> to,
-    string subject,
-    string? body = null,
-    string? from = null,
-    string? displayName = null,
-    string? replyTo = null,
-    string? replyToName = null,
-    List<string>? bcc = null,
-    List<string>? cc = null)
+public class MailData
 {
     // Receiver
-    public List<string> To { get; } = to;
-    public List<string>? Bcc { get; } = bcc ?? [];
-
-    public List<string>? Cc { get; } = cc ?? [];
-
-    // Sender
-    public string? From { get; } = from;
-
-    public string? DisplayName { get; } = displayName;
-
-    public string? ReplyTo { get; } = replyTo;
-
-    public string? ReplyToName { get; } = replyToName;
+    public List<string>? To { get; set; }
 
     // Content
-    public string Subject { get; } = subject;
+    public required string Subject { get; set; }
+    public required string Body { get; set; }
 
-    public string? Body { get; } = body;
-    
     public IFormFileCollection? Attachments { get; set; }
 }
