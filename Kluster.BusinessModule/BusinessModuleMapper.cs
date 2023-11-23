@@ -86,4 +86,9 @@ public static class BusinessModuleMapper
         return new GetProductResponse(product.Name, product.Description, product.Price, product.Quantity,
             product.ImageUrl, product.ProductType);
     }
+
+    public static ClientAndBusinessResponse ToClientAndBusinessResponse(Client client, Business business)
+    {
+        return new ClientAndBusinessResponse(client.Id, business.Id, client.Address);
+    }
 }

@@ -2,7 +2,7 @@
 using Kluster.Shared.DTOs.Requests.Business;
 using Kluster.Shared.DTOs.Responses.Business;
 
-namespace Kluster.BusinessModule.Services.Contracts;
+namespace Kluster.Shared.SharedContracts.BusinessModule;
 
 public interface IBusinessService
 {

@@ -12,6 +12,7 @@ using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts;
+using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
 using Microsoft.EntityFrameworkCore;
 
@@ -162,5 +163,26 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
         context.Update(client);
         await context.SaveChangesAsync();
         return Result.Updated;
+    }
+
+    public async Task<ErrorOr<ClientAndBusinessResponse>> GetClientAndBusiness(string clientId)
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+
+        var client = await context.Clients
+            .Include(client => client.Business)
+            .FirstOrDefaultAsync(x => x.Id == clientId);
+
+        if (client is null)
+        {
+            return SharedErrors<Client>.NotFound;
+        }
+
+        if (client.Business.UserId != userId)
+        {
+            return Errors.Client.InvalidBusiness;
+        }
+
+        return BusinessModuleMapper.ToClientAndBusinessResponse(client, client.Business);
     }
 }
