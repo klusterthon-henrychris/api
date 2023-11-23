@@ -15,7 +15,7 @@ public class EmailOtpRequestedEventConsumer(
     public async Task Consume(ConsumeContext<EmailOtpRequestedEvent> context)
     {
         var otp = await userService.GenerateOtpForEmail(context.Message.UserId);
-        await notificationService.SendOtpEmail(new SendOtpEmailRequest(otp, context.Message.FirstName,
+        await notificationService.SendOtpEmail(new SendOtpEmailRequest(context.Message.UserId, otp, context.Message.FirstName,
             context.Message.LastName,
             context.Message.EmailAddress));
     }
