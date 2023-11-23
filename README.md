@@ -17,7 +17,7 @@ To set up and run the application locally, follow these steps:
 ```
 {
 "DatabaseSettings": {
-    "ConnectionString": "Server=kluster.database;Database=KlusterDB;User Id=SA;Password={PASSWORD};
+    "ConnectionString": "Server=kluster.database;Database=KlusterDB;User Id=SA;Password={Password};
             MultipleActiveResultSets=true;TrustServerCertificate=true;"
         },
     "JwtSettings": {
@@ -28,16 +28,16 @@ To set up and run the application locally, follow these steps:
         },
     "RabbitMqSettings": {
         "Host": "kluster.messaging",
-        "Password": "{password}",
-        "Username": "{password}"
+        "Password": "{Password}",
+        "Username": "{Password}"
     },
     "MailSettings": {
         "DisplayName": "{FirstName} {LastName}",
-        "From": "{EmailAddresss}",
-        "Host": "{host}",
+        "From": "{EmailAddress}",
+        "Host": "{Host}",
         "Password": "{Password}",
         "Port": {Port},
-        "UserName": "{UserName}",
+        "UserName": "{Username}",
         "UseSsl": false,
         "UseStartTls": true
     }
@@ -60,7 +60,6 @@ To set up and run the application locally, follow these steps:
 
 ## Important Notes
 - After running the command, three containers will start: `kluster-api`, `kluster-database` and `kluster.messaging`.
-- Restart the `kluster.api` container if needed, ensuring proper setup with the other containers.
 - Access the Swagger documentation at [Swagger](http://localhost:5000/swagger/index.html).
 - Send requests to the API at http://localhost:5000/api.
 - If required folders are missing, ensure to create them.
