@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using Kluster.BusinessModule.DTOs.Requests.Products;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Validators.Helpers;
 using Kluster.Shared.Constants;
+using Kluster.Shared.DTOs.Requests.Product;
 using Kluster.Shared.Validators;
 
 namespace Kluster.BusinessModule.Validators;

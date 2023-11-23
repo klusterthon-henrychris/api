@@ -1,6 +1,6 @@
 ﻿using Kluster.Shared.API;
+using Kluster.Shared.DTOs.Requests.User;
 using Kluster.Shared.Extensions;
-using Kluster.UserModule.DTOs.Requests;
 using Kluster.UserModule.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 

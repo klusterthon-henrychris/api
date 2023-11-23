@@ -1,16 +1,17 @@
 ﻿using ErrorOr;
-using Kluster.BusinessModule.Constants;
 using Kluster.BusinessModule.Data;
-using Kluster.BusinessModule.DTOs.Requests;
-using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
+using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
+using Kluster.Shared.DTOs.Requests.Client;
+using Kluster.Shared.DTOs.Responses.Client;
+using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
-using Kluster.Shared.Requests;
 using Kluster.Shared.ServiceErrors;
+using Kluster.Shared.SharedContracts;
 using Kluster.Shared.SharedContracts.UserModule;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +27,7 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
             .Where(c => c.Business.UserId == userId && c.Id == id)
             .FirstOrDefaultAsync();
 
-        return client is null ? SharedErrors<Client>.NotFound : Mapper.ToGetClientResponse(client);
+        return client is null ? SharedErrors<Client>.NotFound : BusinessModuleMapper.ToGetClientResponse(client);
     }
 
     public async Task<ErrorOr<CreateClientResponse>> CreateClientAsync(CreateClientRequest request)
@@ -48,7 +49,7 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
             return SharedErrors<Business>.NotFound;
         }
 
-        var client = Mapper.ToClient(request, businessId);
+        var client = BusinessModuleMapper.ToClient(request, businessId);
         await context.Clients.AddAsync(client);
         await context.SaveChangesAsync();
         return new CreateClientResponse(client.Id);

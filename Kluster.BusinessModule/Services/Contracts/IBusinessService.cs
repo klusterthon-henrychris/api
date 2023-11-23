@@ -1,6 +1,6 @@
-﻿using Kluster.BusinessModule.DTOs.Requests;
-using Kluster.BusinessModule.DTOs.Responses;
-using ErrorOr;
+﻿using ErrorOr;
+using Kluster.Shared.DTOs.Requests.Business;
+using Kluster.Shared.DTOs.Responses.Business;
 
 namespace Kluster.BusinessModule.Services.Contracts;
 

@@ -1,8 +1,7 @@
 ﻿using ErrorOr;
-using Kluster.BusinessModule.DTOs.Requests;
-using Kluster.BusinessModule.DTOs.Requests.Products;
-using Kluster.BusinessModule.DTOs.Responses.Products;
-using Kluster.Shared.Requests;
+using Kluster.Shared.DTOs.Requests.Product;
+using Kluster.Shared.DTOs.Responses.Product;
+using Kluster.Shared.DTOs.Responses.Requests;
 
 namespace Kluster.BusinessModule.Services.Contracts;
 

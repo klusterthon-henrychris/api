@@ -1,11 +1,11 @@
 ﻿using ErrorOr;
 using Kluster.BusinessModule.Data;
-using Kluster.BusinessModule.DTOs.Requests;
-using Kluster.BusinessModule.DTOs.Responses;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
 using Kluster.Shared.Domain;
+using Kluster.Shared.DTOs.Requests.Business;
+using Kluster.Shared.DTOs.Responses.Business;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.ServiceErrors;
@@ -31,7 +31,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         }
 
         var businessId = await GetBusinessIdFromDb();
-        var business = Mapper.ToBusiness(request, userId, businessId);
+        var business = BusinessModuleMapper.ToBusiness(request, userId, businessId);
         await context.AddAsync(business);
         await context.SaveChangesAsync();
         return new BusinessCreationResponse(business.Id);
@@ -71,7 +71,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return SharedErrors<Business>.NotFound;
         }
 
-        return Mapper.ToGetBusinessResponse(business);
+        return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
     public async Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser()
@@ -83,7 +83,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return SharedErrors<Business>.NotFound;
         }
 
-        return Mapper.ToGetBusinessResponse(business);
+        return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
     public async Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request)

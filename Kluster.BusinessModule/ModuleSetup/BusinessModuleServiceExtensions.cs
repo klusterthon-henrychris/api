@@ -2,6 +2,7 @@
 using Kluster.BusinessModule.Services;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.SharedContracts;
 
 namespace Kluster.BusinessModule.ModuleSetup
 {

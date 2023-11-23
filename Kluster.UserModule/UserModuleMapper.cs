@@ -1,5 +1,5 @@
 ﻿using Kluster.Shared.Domain;
-using Kluster.UserModule.DTOs.Responses;
+using Kluster.Shared.DTOs.Responses.User;
 
 namespace Kluster.UserModule;
 

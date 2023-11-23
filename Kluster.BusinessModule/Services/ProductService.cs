@@ -1,17 +1,16 @@
 ﻿using ErrorOr;
-using Kluster.BusinessModule.Constants;
 using Kluster.BusinessModule.Data;
-using Kluster.BusinessModule.DTOs.Requests.Products;
-using Kluster.BusinessModule.DTOs.Responses.Products;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.BusinessModule.Validators;
 using Kluster.BusinessModule.Validators.Helpers;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
+using Kluster.Shared.DTOs.Requests.Product;
+using Kluster.Shared.DTOs.Responses.Product;
+using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
-using Kluster.Shared.Requests;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.UserModule;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +40,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
 
         var imageUrl = await UploadImageToS3(request.ProductImage);
 
-        var product = Mapper.ToProduct(request, businessId, imageUrl!);
+        var product = BusinessModuleMapper.ToProduct(request, businessId, imageUrl!);
         await context.Products.AddAsync(product);
         await context.SaveChangesAsync();
         return new CreateProductResponse(product.ProductId);
@@ -63,7 +62,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
             .Where(c => c.Business.UserId == userId && c.ProductId == id)
             .FirstOrDefaultAsync();
 
-        return product is null ? SharedErrors<Product>.NotFound : Mapper.ToGetProductResponse(product);
+        return product is null ? SharedErrors<Product>.NotFound : BusinessModuleMapper.ToGetProductResponse(product);
     }
 
     public async Task<ErrorOr<Updated>> UpdateProduct(string productId, UpdateProductRequest request)

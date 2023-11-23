@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using ErrorOr;
 using Kluster.Shared.Domain;
+using Kluster.Shared.DTOs.Requests.Auth;
+using Kluster.Shared.DTOs.Responses.Auth;
 using Kluster.Shared.Extensions;
-using Kluster.UserModule.DTOs.Requests;
-using Kluster.UserModule.DTOs.Responses;
 using Kluster.UserModule.ServiceErrors;
 using Kluster.UserModule.Services.Contracts;
 using Kluster.UserModule.Validators;

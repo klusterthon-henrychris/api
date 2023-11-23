@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
-using Kluster.UserModule.DTOs.Requests;
-using Kluster.UserModule.DTOs.Responses;
+using Kluster.Shared.DTOs.Requests.User;
+using Kluster.Shared.DTOs.Responses.User;
 
 namespace Kluster.UserModule.Services.Contracts;
 

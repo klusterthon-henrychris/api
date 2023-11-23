@@ -1,10 +1,10 @@
 ﻿using ErrorOr;
+using Kluster.Shared.DTOs.Requests.User;
+using Kluster.Shared.DTOs.Responses.User;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.UserModule;
 using Kluster.UserModule.Data;
-using Kluster.UserModule.DTOs.Requests;
-using Kluster.UserModule.DTOs.Responses;
 using Kluster.UserModule.ServiceErrors;
 using Kluster.UserModule.Services.Contracts;
 using Kluster.UserModule.Validators;

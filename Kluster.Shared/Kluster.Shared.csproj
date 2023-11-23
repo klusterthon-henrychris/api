@@ -21,4 +21,9 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="DTOs\Requests\Payments\" />
+	  <Folder Include="DTOs\Responses\Payments\" />
+	</ItemGroup>
+
 </Project>

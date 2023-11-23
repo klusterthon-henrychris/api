@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Kluster.BusinessModule.DTOs.Requests.Products;
+using Kluster.Shared.DTOs.Requests.Product;
 using Kluster.Shared.Validators;
 
 namespace Kluster.BusinessModule.Validators.Helpers;
