@@ -25,6 +25,7 @@ namespace Kluster.Host
             RegisterSwagger(services);
             RegisterFilters(services);
             SetupAuthentication(services, environment);
+            SetupCors(services, environment);
         }
 
         private static void SetupControllers(IServiceCollection services)
@@ -68,11 +69,11 @@ namespace Kluster.Host
                 var configuration = new ConfigurationBuilder()
                     .AddUserSecrets<Program>()
                     .Build();
-                
+
                 // configure app wide
                 services.Configure<JwtSettings>(options =>
                     configuration.GetSection(nameof(JwtSettings)).Bind(options));
-                
+
                 jwtSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<JwtSettings>>()?.Value;
             }
 
@@ -118,12 +119,29 @@ namespace Kluster.Host
 
                 services.Configure<DatabaseSettings>(options =>
                     configuration?.GetSection(nameof(DatabaseSettings)).Bind(options));
-                
+
                 services.Configure<RabbitMqSettings>(options =>
                     configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
             }
 
             // todo: if not development, use key vault for appSettings.
+        }
+
+        private static void SetupCors(this IServiceCollection services, IWebHostEnvironment environment)
+        {
+            if (environment.IsDevelopment())
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowAnyOrigin",
+                        builder =>
+                        {
+                            builder.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                        });
+                });
+            }
         }
 
         private static void RegisterModules(IServiceCollection services)

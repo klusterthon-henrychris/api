@@ -42,6 +42,7 @@ namespace Kluster.Host
             app.UseAuthorization();
             app.MapControllers();
             app.UseMiddleware<ExceptionMiddleware>();
+            app.UseCors("AllowAnyOrigin");
         }
 
         private static void RegisterModules(WebApplication app)
