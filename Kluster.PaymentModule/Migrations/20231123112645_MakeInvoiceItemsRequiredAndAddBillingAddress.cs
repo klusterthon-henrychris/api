@@ -52,7 +52,7 @@ namespace Kluster.PaymentModule.Migrations
                 column: "ClientId",
                 principalTable: "Client",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Payments_Client_ClientId",
@@ -60,7 +60,7 @@ namespace Kluster.PaymentModule.Migrations
                 column: "ClientId",
                 principalTable: "Client",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Payments_Invoices_InvoiceId",
@@ -68,7 +68,7 @@ namespace Kluster.PaymentModule.Migrations
                 column: "InvoiceId",
                 principalTable: "Invoices",
                 principalColumn: "InvoiceNo",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />

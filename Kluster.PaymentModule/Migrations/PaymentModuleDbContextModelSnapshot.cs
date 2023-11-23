@@ -362,7 +362,7 @@ namespace Kluster.PaymentModule.Migrations
                     b.HasOne("Kluster.Shared.Domain.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Business");
