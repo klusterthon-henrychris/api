@@ -6,6 +6,7 @@ using Kluster.Shared.Configuration;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
+using Kluster.UserModule.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -33,6 +34,7 @@ namespace Kluster.Host
             services.AddControllers();
             services.AddRouting(options => options.LowercaseUrls = true);
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+            services.AddHealthChecks().AddCheck<CustomHealthCheck>("custom-health-check");
         }
 
         private static void RegisterSwagger(IServiceCollection services)
