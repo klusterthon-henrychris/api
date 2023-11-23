@@ -1,6 +1,5 @@
 ﻿using ErrorOr;
 using Kluster.PaymentModule.Data;
-using Kluster.PaymentModule.Services.Contracts;
 using Kluster.PaymentModule.Validators;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
@@ -9,11 +8,13 @@ using Kluster.Shared.DTOs.Responses.Invoices;
 using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
-using Kluster.Shared.Messaging.Commands;
-using Kluster.Shared.Messaging.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.ServiceErrors;
+using Kluster.Shared.SharedContracts;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.PaymentModule.Services;
@@ -21,6 +22,7 @@ namespace Kluster.PaymentModule.Services;
 public class InvoiceService(
     ICurrentUser currentUser,
     IClientService clientService,
+    IBus bus,
     PaymentModuleDbContext context)
     : IInvoiceService
 {
@@ -87,6 +89,8 @@ public class InvoiceService(
         return Task.FromResult<ErrorOr<PagedList<GetInvoiceResponse>>>(pagedResults);
     }
 
+    #region Delete Invoices
+
     public async Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
@@ -99,22 +103,20 @@ public class InvoiceService(
         {
             return SharedErrors<Invoice>.NotFound;
         }
-
-        // send request to queue: delete all payments
-
+        
+        // delete related invoices
+        await bus.Send(PaymentModuleMapper.ToDeletePaymentForInvoice(invoice));
+        
         context.Remove(invoice);
         await context.SaveChangesAsync();
         return Result.Deleted;
     }
-
-    // assume validation has been completed before this point and clientId's are for valid users.
+    
     public async Task DeleteAllInvoicesLinkedToClient(DeleteInvoicesForClient command)
     {
         var invoices = await context.Invoices
             .Where(x => x.ClientId == command.ClientId)
             .ToListAsync();
-
-        // send request to queue: delete all payments
 
         context.RemoveRange(invoices);
         await context.SaveChangesAsync();
@@ -126,11 +128,11 @@ public class InvoiceService(
             .Where(x => x.ClientId == command.BusinessId)
             .ToListAsync();
 
-        // send request to queue: delete all payments
-
         context.RemoveRange(invoices);
         await context.SaveChangesAsync();
     }
+
+    #endregion
 
     #region Filter and Query
 
