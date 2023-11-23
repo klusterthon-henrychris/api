@@ -22,7 +22,12 @@ Before starting the application:
         "Issuer": "{Issuer}",
         "SecretKey": "{SecretKey}",
         "TokenLifetimeInHours": 1
-    }
+    },
+    "RabbitMqSettings": {
+        "Host": "kluster.messaging",
+        "Password": "{password}",
+        "Username": "{password}"
+    }
 }
 ``` 
 
@@ -45,7 +50,12 @@ Before starting the application:
         "Issuer": "{Issuer}",
         "SecretKey": "{SecretKey}",
         "TokenLifetimeInHours": 1
-    }
+    },
+    "RabbitMqSettings": {
+        "Host": "kluster.messaging",
+        "Password": "{password}",
+        "Username": "{password}"
+    }
 }
 ```
 
