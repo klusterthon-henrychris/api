@@ -9,6 +9,8 @@ using Kluster.Shared.DTOs.Responses.Invoices;
 using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.Messaging.Commands;
+using Kluster.Shared.Messaging.Commands.Invoice;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
@@ -85,6 +87,53 @@ public class InvoiceService(
         return Task.FromResult<ErrorOr<PagedList<GetInvoiceResponse>>>(pagedResults);
     }
 
+    public async Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id)
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+
+        var invoice = await context.Invoices
+            .Where(c => c.Business.UserId == userId && c.InvoiceNo == id)
+            .FirstOrDefaultAsync();
+
+        if (invoice is null)
+        {
+            return SharedErrors<Invoice>.NotFound;
+        }
+
+        // send request to queue: delete all payments
+
+        context.Remove(invoice);
+        await context.SaveChangesAsync();
+        return Result.Deleted;
+    }
+
+    // assume validation has been completed before this point and clientId's are for valid users.
+    public async Task DeleteAllInvoicesLinkedToClient(DeleteInvoicesForClient command)
+    {
+        var invoices = await context.Invoices
+            .Where(x => x.ClientId == command.ClientId)
+            .ToListAsync();
+
+        // send request to queue: delete all payments
+
+        context.RemoveRange(invoices);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAllInvoicesLinkedToBusiness(DeleteInvoicesForBusiness command)
+    {
+        var invoices = await context.Invoices
+            .Where(x => x.ClientId == command.BusinessId)
+            .ToListAsync();
+
+        // send request to queue: delete all payments
+
+        context.RemoveRange(invoices);
+        await context.SaveChangesAsync();
+    }
+
+    #region Filter and Query
+
     private static IQueryable<Invoice> ApplyFilters(IQueryable<Invoice> query, GetInvoicesRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Status))
@@ -116,4 +165,6 @@ public class InvoiceService(
 
         return query;
     }
+
+    #endregion
 }
