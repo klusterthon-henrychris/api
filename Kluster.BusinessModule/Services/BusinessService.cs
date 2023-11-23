@@ -9,6 +9,7 @@ using Kluster.Shared.DTOs.Responses.Business;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.ServiceErrors;
+using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
 using Microsoft.EntityFrameworkCore;
 

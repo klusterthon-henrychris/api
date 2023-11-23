@@ -4,6 +4,7 @@ using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Business;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.SharedContracts.BusinessModule;
 
 namespace Kluster.BusinessModule.Controllers;
 
