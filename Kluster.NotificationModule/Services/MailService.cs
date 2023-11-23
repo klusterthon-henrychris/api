@@ -9,7 +9,7 @@ using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Kluster.NotificationModule.Services;
 
-public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
+public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailService> logger) : IMailService
 {
     private readonly MailSettings _settings = settings.Value;
 
@@ -77,8 +77,9 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
             await Send(mail, ct);
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex.ToString());
             return false;
         }
     }
