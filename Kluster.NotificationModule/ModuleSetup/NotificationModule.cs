@@ -1,6 +1,13 @@
-﻿namespace Kluster.NotificationModule.ModuleSetup
+﻿using Kluster.NotificationModule.Services;
+using Kluster.Shared.SharedContracts.NotificationModule;
+
+namespace Kluster.NotificationModule.ModuleSetup
 {
-    public class NotificationModule
+    public static class NotificationModule
     {
+        public static void AddNotificationModule(this IServiceCollection services)
+        {
+            services.AddTransient<INotificationService, NotificationService>();
+        }
     }
 }

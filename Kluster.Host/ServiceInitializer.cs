@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Kluster.BusinessModule.ModuleSetup;
 using Kluster.Messaging.ModuleSetup;
+using Kluster.NotificationModule.ModuleSetup;
 using Kluster.PaymentModule.ModuleSetup;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Constants;
@@ -152,6 +153,7 @@ namespace Kluster.Host
             services.AddBusinessModule();
             services.AddPaymentModule();
             services.AddMessagingModule();
+            services.AddNotificationModule();
         }
     }
 }
