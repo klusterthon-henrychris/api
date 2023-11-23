@@ -125,6 +125,9 @@ namespace Kluster.Host
 
                 services.Configure<RabbitMqSettings>(options =>
                     configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
+                
+                services.Configure<MailSettings>(options =>
+                    configuration?.GetSection(nameof(MailSettings)).Bind(options));
             }
 
             // todo: if not development, use key vault for appSettings.
