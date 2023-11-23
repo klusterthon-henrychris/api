@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Kluster.BusinessModule.ModuleSetup;
+using Kluster.Messaging.ModuleSetup;
 using Kluster.PaymentModule.ModuleSetup;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Constants;
@@ -117,6 +118,9 @@ namespace Kluster.Host
 
                 services.Configure<DatabaseSettings>(options =>
                     configuration?.GetSection(nameof(DatabaseSettings)).Bind(options));
+                
+                services.Configure<RabbitMqSettings>(options =>
+                    configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
             }
 
             // todo: if not development, use key vault for appSettings.
@@ -127,6 +131,7 @@ namespace Kluster.Host
             services.AddUserModule();
             services.AddBusinessModule();
             services.AddPaymentModule();
+            services.AddMessagingModule();
         }
     }
 }

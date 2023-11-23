@@ -22,7 +22,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Kluster.MessagingModule\Kluster.MessagingModule.csproj" />
 	  <ProjectReference Include="..\Kluster.Shared\Kluster.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Services\Contracts\" />
 	</ItemGroup>
 
 </Project>
