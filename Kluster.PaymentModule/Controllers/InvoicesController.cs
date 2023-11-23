@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ErrorOr;
-using Kluster.PaymentModule.Services.Contracts;
 using Kluster.Shared.API;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Constants;
 using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.SharedContracts;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Kluster.PaymentModule.Controllers;

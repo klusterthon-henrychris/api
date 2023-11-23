@@ -1,7 +1,7 @@
 ﻿using Kluster.PaymentModule.Data;
 using Kluster.PaymentModule.Services;
-using Kluster.PaymentModule.Services.Contracts;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.SharedContracts;
 
 namespace Kluster.PaymentModule.ModuleSetup
 {
