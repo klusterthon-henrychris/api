@@ -31,6 +31,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
             return Errors.Business.BusinessAlreadyExists;
         }
 
+        // todo: rename func
         var businessId = await GetBusinessIdFromDb();
         var business = BusinessModuleMapper.ToBusiness(request, userId, businessId);
         await context.AddAsync(business);
@@ -75,6 +76,17 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
+    public async Task<ErrorOr<string>> GetBusinessId()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+
+        var businessId = await context.Businesses.Where(x => x.UserId == userId)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync();
+
+        return businessId is null ? SharedErrors<Business>.NotFound : businessId;
+    }
+
     public async Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
@@ -113,7 +125,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         await context.SaveChangesAsync();
         return Result.Updated;
     }
-    
+
     // todo: delete business 
     // delete clients, delete invoices and delete payments.
 }
