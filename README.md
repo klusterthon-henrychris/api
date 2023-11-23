@@ -1,17 +1,18 @@
-# api
+# API
 
-The API backend for 'Simplifying Small Business Payments'.  
-Before starting the application:
+Welcome to the backend API for 'Simplifying Small Business Payments.'
 
-1. Install Docker Desktop and ensure it is running.
-2. Clone the repository
+## Before You Begin
 
-# Running Locally On Windows
+To set up and run the application locally, follow these steps:
 
-1. Navigate to `C:\%USER_PROFILE%\AppData\Roaming\Microsoft\UserSecrets` and create a folder
-   named `41019bab-28dd-41f1-a221-82ed1e906626`.
-2. Create a file named secrets.json.
-3. Add the following json to the file:
+### Windows Setup
+
+1. **Create User Secrets**
+    - Navigate to `C:\%USERPROFILE%\AppData\Roaming\Microsoft\UserSecrets` and create a folder
+      named `41019bab-28dd-41f1-a221-82ed1e906626`.
+    - Create a file named `secrets.json`.
+    - Add the following JSON to the file:
 
 ```
 {
@@ -43,27 +44,25 @@ Before starting the application:
 }
 ```
 
-4. Navigate to the Kluster.Host directory in the project.
-5. Run `docker compose up`.
+2. **Run the Application**
+    - Navigate to the `Kluster.Host/` directory in the project.
+    - Execute `docker compose up`.
 
-# Running Locally On Mac
+### macOS Setup
+1. **Create User Secrets**
+   - Navigate to `~/.microsoft/usersecrets` and create a folder named `41019bab-28dd-41f1-a221-82ed1e906626`.
+   - Create a file named `secrets.json`.
+   - Add the same JSON content provided earlier.
 
-1. Navigate to `~/.microsoft/usersecrets` and create a folder named `41019bab-28dd-41f1-a221-82ed1e906626`.
-2. Create a file named secrets.json.
-3. Add the JSON above to the secrets.json file.
-4. Navigate to the Kluster.Host directory in the project.
-5. Run `docker compose up`.
+2. **Run the Application**  
+   - Navigate to the Kluster.Host directory in the project.
+   - Run docker compose up.
 
-# Note
+## Important Notes
+- After running the command, three containers will start: `kluster-api`, `kluster-database` and `kluster.messaging`.
+- Restart the `kluster.api` container if needed, ensuring proper setup with the other containers.
+- Access the Swagger documentation at [Swagger](http://localhost:5000/swagger/index.html).
+- Send requests to the API at http://localhost:5000/api.
+- If required folders are missing, ensure to create them.
 
-- After the command is run, two containers will spin up. One is `kluster-api` and the other is `kluster-databse.` The
-  names are self explanatory.
-- You might need to restart the container named `kluster.api` as it requires the `kluster.database` container to be
-  fully setup to work.
-- Access the application's swagger documentation at [Swagger](http://localhost:5000/swagger/index.html). Requests can be
-  sent to the api at `http://localhost:5000/api`.
-- If the required folders do not exist, *create them*.
-
-# Postman Documentation
-
-You can access the postman collection here: [PostmanDoc](https://documenter.getpostman.com/view/22039666/2s9YeAAumQ).
+You can access the postman collection here, with examples: [PostmanDoc](https://documenter.getpostman.com/view/22039666/2s9YeAAumQ).
