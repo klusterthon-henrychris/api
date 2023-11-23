@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Kluster.BusinessModule\Kluster.BusinessModule.csproj"/>
+        <ProjectReference Include="..\Kluster.MessagingModule\Kluster.MessagingModule.csproj" />
         <ProjectReference Include="..\Kluster.NotificationModule\Kluster.NotificationModule.csproj"/>
         <ProjectReference Include="..\Kluster.PaymentModule\Kluster.PaymentModule.csproj"/>
         <ProjectReference Include="..\Kluster.Shared\Kluster.Shared.csproj"/>
