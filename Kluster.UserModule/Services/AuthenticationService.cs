@@ -4,7 +4,7 @@ using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.Auth;
 using Kluster.Shared.DTOs.Responses.Auth;
 using Kluster.Shared.Extensions;
-using Kluster.Shared.MessagingContracts.Events;
+using Kluster.Shared.MessagingContracts.Events.User;
 using Kluster.UserModule.ServiceErrors;
 using Kluster.UserModule.Services.Contracts;
 using Kluster.UserModule.Validators;
