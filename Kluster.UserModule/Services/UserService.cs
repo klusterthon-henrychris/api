@@ -1,18 +1,19 @@
-﻿using ErrorOr;
+﻿using System.Web;
+using ErrorOr;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.User;
 using Kluster.Shared.DTOs.Responses.User;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
-using Kluster.Shared.MessagingContracts.Events;
+using Kluster.Shared.MessagingContracts.Events.Notification;
+using Kluster.Shared.MessagingContracts.Events.User;
 using Kluster.Shared.SharedContracts.UserModule;
 using Kluster.UserModule.Data;
 using Kluster.UserModule.ServiceErrors;
 using Kluster.UserModule.Validators;
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.UserModule.Services;
 
@@ -68,7 +69,7 @@ public class UserService(
         }
 
         var otp = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        logger.LogInformation($"Generated OTP for {user.FirstName + " " + user.LastName} ");
+        logger.LogInformation($"Generated OTP for {user.Id}.");
         return otp;
     }
 
@@ -83,6 +84,7 @@ public class UserService(
         var result = await userManager.ConfirmEmailAsync(user, otp);
         if (result.Succeeded)
         {
+            await bus.Publish(new WelcomeUserEvent(user.Email!, user.FirstName, user.LastName));
             return Result.Success;
         }
 
