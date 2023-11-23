@@ -16,6 +16,7 @@ namespace Kluster.PaymentModule.ModuleSetup
         private static void RegisterDependencies(this IServiceCollection services)
         {
             services.AddTransient<IInvoiceService, InvoiceService>();
+            services.AddTransient<IPaymentService, PaymentService>();
         }
     }
 }
