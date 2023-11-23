@@ -15,11 +15,11 @@ public static class MessagingModule
         {
             x.SetKebabCaseEndpointNameFormatter();
             
-            var entryAssembly = Assembly.GetEntryAssembly();
-            x.AddConsumers(entryAssembly);
-            x.AddSagaStateMachines(entryAssembly);
-            x.AddSagas(entryAssembly);
-            x.AddActivities(entryAssembly);
+            var assembly = Assembly.GetAssembly(typeof(MessagingModule));
+            x.AddConsumers(assembly);
+            x.AddSagaStateMachines(assembly);
+            x.AddSagas(assembly);
+            x.AddActivities(assembly);
             
             x.UsingRabbitMq((context, cfg) =>
             {
