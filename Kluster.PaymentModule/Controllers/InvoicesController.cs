@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ErrorOr;
 using Kluster.PaymentModule.Services.Contracts;
 using Kluster.Shared.API;
 using Microsoft.AspNetCore.Mvc;
@@ -52,5 +53,12 @@ public class InvoicesController(IInvoiceService invoiceService) : BaseController
         return getInvoicesResult.Match(
             _ => Ok(getInvoicesResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteInvoice(string id)
+    {
+        ErrorOr<Deleted> deleteInvoiceResult = await invoiceService.DeleteSingleInvoice(id);
+        return deleteInvoiceResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }
