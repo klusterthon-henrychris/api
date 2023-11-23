@@ -3,6 +3,7 @@ using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.DTOs.Responses.Client;
 using Kluster.Shared.DTOs.Responses.Invoices;
+using Kluster.Shared.MessagingContracts.Commands.Payment;
 
 namespace Kluster.PaymentModule;
 
@@ -32,5 +33,10 @@ public static class PaymentModuleMapper
     public static CreateInvoiceResponse ToCreateInvoiceResponse(Invoice invoice)
     {
         return new CreateInvoiceResponse(invoice.InvoiceNo);
+    }
+
+    public static DeletePaymentsForInvoice ToDeletePaymentForInvoice(Invoice invoice)
+    {
+        return new DeletePaymentsForInvoice(invoice.InvoiceNo);
     }
 }
