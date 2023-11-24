@@ -7,14 +7,18 @@ using Kluster.Shared.DTOs.Requests.Business;
 using Kluster.Shared.DTOs.Responses.Business;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.MessagingContracts.Commands.Clients;
+using Kluster.Shared.MessagingContracts.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.BusinessModule.Services;
 
-public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext context) : IBusinessService
+public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleDbContext context) : IBusinessService
 {
     public async Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request)
     {
@@ -125,6 +129,21 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         return Result.Updated;
     }
 
-    // todo: delete business 
-    // delete clients, delete invoices and delete payments.
+    public async Task<ErrorOr<Deleted>> DeleteBusiness()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
+        if (business is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+
+        await bus.Publish(new DeletePaymentsForBusiness(business.Id));
+        await bus.Publish(new DeleteInvoicesForBusiness(business.Id));
+        await bus.Publish(new DeleteClientsForBusiness(business.Id));
+
+        context.Remove(business);
+        await context.SaveChangesAsync();
+        return Result.Deleted;
+    }
 }

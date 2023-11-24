@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ErrorOr;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Business;
 using Microsoft.AspNetCore.Mvc;
@@ -50,5 +51,12 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     {
         var updateBusinessResult = await businessService.UpdateBusiness(request);
         return updateBusinessResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteBusiness()
+    {
+        var deleteBusinessResult = await businessService.DeleteBusiness();
+        return deleteBusinessResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }
