@@ -36,11 +36,12 @@ public class UserController(IUserService userService) : BaseController
         return confirmEmailResult.Match(_ => Ok(), ReturnErrorResponse);
     }
     
-    [HttpPost("/{id}/resend-verification-message")]
+    [AllowAnonymous]
+    [HttpPost("{id}/resend-verification-message")]
     // route is email or phone
     public async Task<IActionResult> ResendVerificationMessage(string id, string verificationRoute)
     {
         var generateNewOtpResult = await userService.ResendVerificationMessage(id, verificationRoute);
-        return generateNewOtpResult.Match(_ => Ok(), ReturnErrorResponse);
+        return generateNewOtpResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }
