@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ErrorOr;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Product;
 using Microsoft.AspNetCore.Mvc;

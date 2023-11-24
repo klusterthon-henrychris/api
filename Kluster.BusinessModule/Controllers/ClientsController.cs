@@ -49,4 +49,11 @@ public class ClientsController(IClientService clientService) : BaseController
             _ => Ok(getClientsResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
     }
+    
+    [HttpDelete("{clientId}")]
+    public async Task<IActionResult> DeleteClient(string clientId)
+    {
+        var deleteClientResult = await clientService.DeleteClient(clientId);
+        return deleteClientResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
 }
