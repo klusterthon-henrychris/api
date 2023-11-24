@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ErrorOr;
 using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Product;
@@ -48,6 +49,13 @@ namespace Kluster.BusinessModule.Controllers
             return getProductsResult.Match(
                 _ => Ok(getProductsResult.ToSuccessfulApiResponse()),
                 ReturnErrorResponse);
+        }
+        
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteProduct(string productId)
+        {
+            var deleteProductResult = await productService.DeleteProduct(productId);
+            return deleteProductResult.Match(_ => NoContent(), ReturnErrorResponse);
         }
     }
 }

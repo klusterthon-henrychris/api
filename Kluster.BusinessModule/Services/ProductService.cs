@@ -130,6 +130,24 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         return Task.FromResult<ErrorOr<PagedList<GetProductResponse>>>(pagedResults);
     }
 
+    public async Task<ErrorOr<Deleted>> DeleteProduct(string productId)
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+
+        var product = await context.Products
+            .Where(c => c.Business.UserId == userId && c.ProductId == productId)
+            .FirstOrDefaultAsync();
+
+        if (product is null)
+        {
+            return SharedErrors<Product>.NotFound;
+        }
+
+        context.Remove(product);
+        await context.SaveChangesAsync();
+        return Result.Deleted;
+    }
+
     private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, GetProductsRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.ProductType))
