@@ -109,7 +109,7 @@ public class UserService(
             return Errors.User.NotFound;
         }
 
-        if (verificationRoute == OtpRoute.Email.ToString())
+        if (string.Equals(verificationRoute, OtpRoute.Email.ToString(), StringComparison.CurrentCultureIgnoreCase))
         {
             await bus.Publish(new EmailOtpRequestedEvent(user.FirstName, user.LastName, user.Email!, user.Id));
             return Result.Success;
