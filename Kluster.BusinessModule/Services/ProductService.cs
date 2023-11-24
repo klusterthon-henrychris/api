@@ -112,6 +112,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
             .Include(x => x.Business)
             .Where(x => x.Business.UserId == userId);
 
+        query = ApplySearch(query, request);
         query = ApplyFilters(query, request);
         query = Sort(query, sortOption);
 
@@ -128,6 +129,11 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
                 request.PageSize);
 
         return Task.FromResult<ErrorOr<PagedList<GetProductResponse>>>(pagedResults);
+    }
+
+    private static IQueryable<Product> ApplySearch(IQueryable<Product> query, GetProductsRequest request)
+    {
+        return request.Search is not null ? query.Where(x => x.Name.Contains(request.Search)) : query;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteProduct(string productId)
