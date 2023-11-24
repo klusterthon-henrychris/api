@@ -9,6 +9,7 @@ namespace Kluster.NotificationModule;
 [AllowAnonymous]
 public class MailController(IMailService mailService) : BaseController
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [HttpPost("sendmail")]
     public async Task<IActionResult> SendMailAsync([FromBody] MailData mailData)
     {

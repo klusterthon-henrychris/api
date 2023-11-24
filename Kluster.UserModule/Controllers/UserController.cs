@@ -1,9 +1,8 @@
 ﻿using Kluster.Shared.API;
-using Kluster.Shared.Constants;
 using Kluster.Shared.DTOs.Requests.User;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.UserModule;
-using Kluster.UserModule.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kluster.UserModule.Controllers;
@@ -29,14 +28,15 @@ public class UserController(IUserService userService) : BaseController
         return updateUserResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 
-    [HttpPost("confirm-email")]
+    [AllowAnonymous]
+    [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmailWithOtp(string userId, string otp)
     {
         var confirmEmailResult = await userService.ConfirmEmailWithOtp(userId, otp);
         return confirmEmailResult.Match(_ => Ok(), ReturnErrorResponse);
     }
 
-    [HttpPost("/{id}/new-otp")]
+    [HttpPost("{id}/new-otp")]
     // route is email or phone
     public async Task<IActionResult> GenerateNewOtp(string id, string otpRoute)
     {

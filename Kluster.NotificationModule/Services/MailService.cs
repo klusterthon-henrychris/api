@@ -9,7 +9,7 @@ using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Kluster.NotificationModule.Services;
 
-public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
+public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailService> logger) : IMailService
 {
     private readonly MailSettings _settings = settings.Value;
 
@@ -77,8 +77,9 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
             await Send(mail, ct);
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex.ToString());
             return false;
         }
     }
@@ -103,21 +104,14 @@ public class MailService(IOptionsSnapshot<MailSettings> settings) : IMailService
         return _settings.UseSsl ? SecureSocketOptions.SslOnConnect :
             _settings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
     }
-
-    /// <summary>
-    /// Templates are stored in Kluster.Host/Templates.
-    /// </summary>
-    /// <param name="emailTemplate">This can be the name of the file, or a path</param>
-    /// <remarks>Passing in "index", would return contents of a file called index.html, if any.
-    /// Passing in "test/new", would return new.html, from the folder named "test", inside the Templates folder.
-    /// </remarks>
-    /// <returns></returns>
-    public string LoadTemplate(string emailTemplate)
+    
+    /// <inheritdoc />
+    public string LoadTemplate(string pathToTemplate)
     {
         var baseDir = Directory.GetCurrentDirectory();
 
         var templateDir = Path.Combine(baseDir, "Templates");
-        var templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
+        var templatePath = Path.Combine(templateDir, $"{pathToTemplate}.html");
 
         using var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var streamReader = new StreamReader(fileStream, Encoding.Default);
