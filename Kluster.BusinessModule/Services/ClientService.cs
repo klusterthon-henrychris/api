@@ -71,7 +71,9 @@ public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbC
         var pagedResults = PagedList<GetClientResponse>
             .ToPagedList(
                 query.Select(x =>
-                    new GetClientResponse(x.FirstName,
+                    new GetClientResponse(
+                        x.Id,
+                        x.FirstName,
                         x.LastName,
                         x.EmailAddress,
                         x.BusinessName ?? string.Join(" ", x.FirstName, x.LastName),

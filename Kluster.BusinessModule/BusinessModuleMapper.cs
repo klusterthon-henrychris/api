@@ -59,7 +59,7 @@ public static class BusinessModuleMapper
 
     public static GetClientResponse ToGetClientResponse(Client client)
     {
-        return new GetClientResponse(client.FirstName, client.LastName, client.EmailAddress,
+        return new GetClientResponse(client.Id, client.FirstName, client.LastName, client.EmailAddress,
             client.BusinessName ?? string.Join(" ", client.FirstName, client.LastName),
             client.Address);
     }
