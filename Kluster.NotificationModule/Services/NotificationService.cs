@@ -2,7 +2,6 @@
 using Kluster.NotificationModule.Models;
 using Kluster.NotificationModule.Services.Contracts;
 using Kluster.Shared.DTOs.Requests.Notification;
-using Kluster.Shared.MessagingContracts.Events.Notification;
 using Kluster.Shared.SharedContracts.NotificationModule;
 
 namespace Kluster.NotificationModule.Services;

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ErrorOr;
 using Kluster.Shared.API;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Constants;
