@@ -183,4 +183,14 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
 
         return BusinessModuleMapper.ToClientAndBusinessResponse(client, client.Business);
     }
+
+    public async Task DeleteAllClientsRelatedToBusiness(string businessId)
+    {
+        var clients = await context.Clients
+            .Where(x => x.BusinessId == businessId)
+            .ToListAsync();
+
+        context.RemoveRange(clients);
+        await context.SaveChangesAsync();
+    }
 }
