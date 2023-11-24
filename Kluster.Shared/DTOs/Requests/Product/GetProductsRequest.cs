@@ -12,6 +12,7 @@ namespace Kluster.Shared.DTOs.Requests.Product;
 public class GetProductsRequest : QueryStringParameters
 {
     // todo: add name search
+    public string? Search { get; set; }
     public string? ProductType { get; set; }
     public string? SortOption { get; set; } = ProductSortStrings.NameAsc;
 }
