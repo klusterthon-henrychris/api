@@ -94,7 +94,14 @@ public class UserService(
         return errors;
     }
 
-    public async Task<ErrorOr<Success>> GenerateNewOtp(string id, string otpRoute)
+    /// <summary>
+    /// This resends the email or sms to the user trying to verify their email or phoneNumber
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="verificationRoute">Can be either Email or Phone.</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<ErrorOr<Success>> ResendVerificationMessage(string id, string verificationRoute)
     {
         var user = await userManager.FindByIdAsync(id);
         if (user is null)
@@ -102,7 +109,7 @@ public class UserService(
             return Errors.User.NotFound;
         }
 
-        if (otpRoute == OtpRoute.Email.ToString())
+        if (verificationRoute == OtpRoute.Email.ToString())
         {
             await bus.Publish(new EmailOtpRequestedEvent(user.FirstName, user.LastName, user.Email!, user.Id));
             return Result.Success;

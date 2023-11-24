@@ -11,5 +11,5 @@ public interface IUserService
 
     Task<string> GenerateOtpForEmail(string userId);
     Task<ErrorOr<Success>> ConfirmEmailWithOtp(string userId, string otp); // todo: create endpoint
-    Task<ErrorOr<Success>> GenerateNewOtp(string id, string otpRoute);
+    Task<ErrorOr<Success>> ResendVerificationMessage(string id, string verificationRoute);
 }

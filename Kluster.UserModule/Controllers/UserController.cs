@@ -35,12 +35,12 @@ public class UserController(IUserService userService) : BaseController
         var confirmEmailResult = await userService.ConfirmEmailWithOtp(userId, otp);
         return confirmEmailResult.Match(_ => Ok(), ReturnErrorResponse);
     }
-
-    [HttpPost("{id}/new-otp")]
+    
+    [HttpPost("/{id}/resend-verification-message")]
     // route is email or phone
-    public async Task<IActionResult> GenerateNewOtp(string id, string otpRoute)
+    public async Task<IActionResult> ResendVerificationMessage(string id, string verificationRoute)
     {
-        var generateNewOtpResult = await userService.GenerateNewOtp(id, otpRoute);
+        var generateNewOtpResult = await userService.ResendVerificationMessage(id, verificationRoute);
         return generateNewOtpResult.Match(_ => Ok(), ReturnErrorResponse);
     }
 }
