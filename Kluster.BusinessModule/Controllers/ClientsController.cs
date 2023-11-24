@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ErrorOr;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Client;
 using Microsoft.AspNetCore.Mvc;
@@ -48,5 +49,12 @@ public class ClientsController(IClientService clientService) : BaseController
         return getClientsResult.Match(
             _ => Ok(getClientsResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
+    }
+    
+    [HttpDelete("{clientId}")]
+    public async Task<IActionResult> DeleteClient(string clientId)
+    {
+        var deleteClientResult = await clientService.DeleteClient(clientId);
+        return deleteClientResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }

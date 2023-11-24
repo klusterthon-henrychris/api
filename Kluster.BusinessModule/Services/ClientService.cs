@@ -9,14 +9,17 @@ using Kluster.Shared.DTOs.Responses.Client;
 using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.MessagingContracts.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.BusinessModule.Services;
 
-public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext context) : IClientService
+public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbContext context) : IClientService
 {
     public async Task<ErrorOr<GetClientResponse>> GetClient(string id)
     {
@@ -192,5 +195,22 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
 
         context.RemoveRange(clients);
         await context.SaveChangesAsync();
+    }
+
+    public async Task<ErrorOr<Deleted>> DeleteClient(string clientId)
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var client = await context.Clients.FirstOrDefaultAsync(x => x.Id == clientId && x.Business.UserId == userId);
+        if (client is null)
+        {
+            return SharedErrors<Client>.NotFound;
+        }
+
+        await bus.Publish(new DeletePaymentsForClient(clientId));
+        await bus.Publish(new DeleteInvoicesForClient(clientId));
+        
+        context.Remove(client);
+        await context.SaveChangesAsync();
+        return Result.Deleted;
     }
 }
