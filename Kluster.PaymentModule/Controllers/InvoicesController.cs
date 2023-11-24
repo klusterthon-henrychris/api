@@ -58,7 +58,7 @@ public class InvoicesController(IInvoiceService invoiceService) : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteInvoice(string id)
     {
-        ErrorOr<Deleted> deleteInvoiceResult = await invoiceService.DeleteSingleInvoice(id);
+        var deleteInvoiceResult = await invoiceService.DeleteSingleInvoice(id);
         return deleteInvoiceResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }

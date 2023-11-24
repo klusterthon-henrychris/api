@@ -54,7 +54,7 @@ public class InvoiceService(
             .Where(c => c.Business.UserId == userId && c.InvoiceNo == id)
             .FirstOrDefaultAsync();
 
-        return invoice is null ? SharedErrors<Client>.NotFound : PaymentModuleMapper.ToGetInvoiceResponse(invoice);
+        return invoice is null ? SharedErrors<Invoice>.NotFound : PaymentModuleMapper.ToGetInvoiceResponse(invoice);
     }
 
     public async Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request)
@@ -103,7 +103,7 @@ public class InvoiceService(
             return SharedErrors<Invoice>.NotFound;
         }
         
-        // delete related invoices
+        // delete related payments
         await bus.Publish(PaymentModuleMapper.ToDeletePaymentForInvoice(invoice));
         
         context.Remove(invoice);
