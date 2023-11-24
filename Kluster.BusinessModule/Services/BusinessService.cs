@@ -10,6 +10,7 @@ using Kluster.Shared.Extensions;
 using Kluster.Shared.MessagingContracts.Commands.Clients;
 using Kluster.Shared.MessagingContracts.Commands.Invoice;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
+using Kluster.Shared.MessagingContracts.Commands.Products;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
@@ -141,6 +142,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         await bus.Publish(new DeletePaymentsForBusiness(business.Id));
         await bus.Publish(new DeleteInvoicesForBusiness(business.Id));
         await bus.Publish(new DeleteClientsForBusiness(business.Id));
+        await bus.Publish(new DeleteProductsForBusiness(business.Id));
 
         context.Remove(business);
         await context.SaveChangesAsync();
