@@ -73,7 +73,7 @@ public class UserService(
         return otp;
     }
 
-    public async Task<ErrorOr<Success>> ConfirmEmailWithOtp(string userId, string otp)
+    public async Task<ErrorOr<Success>> ConfirmEmailWithToken(string userId, string otp)
     {
         var user = await userManager.FindByIdAsync(userId);
         if (user is null)

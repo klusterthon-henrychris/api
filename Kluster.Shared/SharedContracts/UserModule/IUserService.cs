@@ -10,6 +10,6 @@ public interface IUserService
     Task<ErrorOr<Updated>> UpdateUser(UpdateUserRequest request);
 
     Task<string> GenerateOtpForEmail(string userId);
-    Task<ErrorOr<Success>> ConfirmEmailWithOtp(string userId, string otp); // todo: create endpoint
+    Task<ErrorOr<Success>> ConfirmEmailWithToken(string userId, string otp); // todo: create endpoint
     Task<ErrorOr<Success>> ResendVerificationMessage(string id, string verificationRoute);
 }
