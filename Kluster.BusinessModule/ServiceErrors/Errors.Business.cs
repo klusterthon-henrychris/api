@@ -15,16 +15,7 @@ public static partial class Errors
             code: $"{nameof(Business)}.InvalidRcNumber",
             description:
             $"{nameof(Business)} name must have at most {DomainConstants.MaxRcNumberLength} characters.");
-
-        public static Error MissingCacNumber => Error.Validation(
-            code: $"{nameof(Business)}.MissingCacNumber",
-            description: "The business has no CacNumber.");
-
-        public static Error InvalidCacNumber => Error.Validation(
-            code: $"{nameof(Business)}.InvalidCacNumber",
-            description:
-            $"{nameof(Business)} name must have at most {DomainConstants.MaxCacNumberLength} characters.");
-
+        
         public static Error MissingIndustry => Error.Validation(
             code: $"{nameof(Business)}.MissingIndustry",
             description: "The business has no industry.");

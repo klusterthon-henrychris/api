@@ -21,7 +21,6 @@ public static class BusinessModuleMapper
             Address = request.BusinessAddress,
             Industry = request.Industry,
             RcNumber = request.RcNumber,
-            CacNumber = request.CacNumber,
             Description = request.BusinessDescription
         };
 
@@ -32,7 +31,6 @@ public static class BusinessModuleMapper
     {
         return new GetBusinessResponse(business.Name,
             business.Address,
-            business.CacNumber ?? SearchConstants.NotFound,
             business.RcNumber ?? SearchConstants.NotFound,
             business.Description ?? SearchConstants.NotFound,
             business.Industry);

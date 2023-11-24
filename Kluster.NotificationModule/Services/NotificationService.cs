@@ -6,7 +6,7 @@ using Kluster.Shared.SharedContracts.NotificationModule;
 
 namespace Kluster.NotificationModule.Services;
 
-public class NotificationService(ILogger<NotificationService> logger, IMailService mailService) : INotificationService
+public class NotificationService(IMailService mailService) : INotificationService
 {
     public Task<bool> SendOtpEmail(SendOtpEmailRequest request)
     {

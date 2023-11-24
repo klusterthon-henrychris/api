@@ -120,7 +120,6 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
 
         business.Name = request.Name ?? business.Name;
         business.Address = request.Address ?? business.Address;
-        business.CacNumber = request.CacNumber ?? business.CacNumber;
         business.RcNumber = request.RcNumber ?? business.RcNumber;
         business.Description = request.Description ?? business.Description;
         business.Industry = request.Industry ?? business.Industry;

@@ -14,10 +14,7 @@ namespace Kluster.Shared.Domain
 
         [MaxLength(DomainConstants.MaxAddressLength)]
         public required string Address { get; set; }
-
-        [MaxLength(DomainConstants.MaxCacNumberLength)]
-        public string? CacNumber { get; set; }
-
+        
         [MaxLength(DomainConstants.MaxRcNumberLength)]
         public string? RcNumber { get; set; }
 
