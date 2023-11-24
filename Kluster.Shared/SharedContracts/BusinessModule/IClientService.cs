@@ -19,4 +19,5 @@ public interface IClientService
     /// <param name="clientId"></param>
     /// <returns></returns>
     Task<ErrorOr<ClientAndBusinessResponse>> GetClientAndBusiness(string clientId);
+    Task DeleteAllClientsRelatedToBusiness(string businessId);
 }

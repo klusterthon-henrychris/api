@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ErrorOr;
-using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Product;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.SharedContracts.BusinessModule;
 
 namespace Kluster.BusinessModule.Controllers
 {
