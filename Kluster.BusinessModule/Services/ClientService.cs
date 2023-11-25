@@ -57,7 +57,7 @@ public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbC
         return new CreateClientResponse(client.Id);
     }
 
-    public Task<ErrorOr<PagedList<GetClientResponse>>> GetAllClients(GetClientsRequest request)
+    public async Task<ErrorOr<PagedResponse<GetClientResponse>>> GetAllClients(GetClientsRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         Enum.TryParse<ClientSortOptions>(request.SortOption, out var sortOption);
@@ -68,21 +68,17 @@ public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbC
 
         query = ApplyFilters(query, request);
         query = SortClientsQuery(query, sortOption);
-        var pagedResults = PagedList<GetClientResponse>
-            .ToPagedList(
-                query.Select(x =>
-                    new GetClientResponse(
-                        x.Id,
-                        x.FirstName,
-                        x.LastName,
-                        x.EmailAddress,
-                        x.BusinessName ?? string.Join(" ", x.FirstName, x.LastName),
-                        x.Address)),
-                request.PageNumber,
-                request.PageSize
-            );
+        
+        var pagedResults =
+            query.Select(x => new GetClientResponse(
+                x.Id,
+                x.FirstName,
+                x.LastName,
+                x.EmailAddress,
+                x.BusinessName ?? string.Join(" ", x.FirstName, x.LastName),
+                x.Address));
 
-        return Task.FromResult<ErrorOr<PagedList<GetClientResponse>>>(pagedResults);
+        return await new PagedResponse<GetClientResponse>().ToPagedList(pagedResults, request.PageNumber, request.PageSize);
     }
 
     private static IQueryable<Client> ApplyFilters(IQueryable<Client> query, GetClientsRequest request)
@@ -210,7 +206,7 @@ public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbC
 
         await bus.Publish(new DeletePaymentsForClient(clientId));
         await bus.Publish(new DeleteInvoicesForClient(clientId));
-        
+
         context.Remove(client);
         await context.SaveChangesAsync();
         return Result.Deleted;
