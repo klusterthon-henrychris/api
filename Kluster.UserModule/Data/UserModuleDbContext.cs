@@ -5,5 +5,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Kluster.UserModule.Data
 {
     public class UserModuleDbContext(DbContextOptions<UserModuleDbContext> options)
-        : IdentityDbContext<ApplicationUser>(options);
+        : IdentityDbContext<ApplicationUser>(options)
+    {
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.HasDefaultSchema(nameof(UserModule));
+        }
+    }
 }

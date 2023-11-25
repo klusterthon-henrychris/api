@@ -12,15 +12,14 @@ using Kluster.Shared.MessagingContracts.Commands.Invoice;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.PaymentModule;
-using Kluster.Shared.SharedContracts.UserModule;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.PaymentModule.Services;
 
 public class InvoiceService(
-    ICurrentUser currentUser,
     IClientService clientService,
+    IBusinessService businessService,
     IBus bus,
     PaymentModuleDbContext context)
     : IInvoiceService
@@ -46,12 +45,16 @@ public class InvoiceService(
         return PaymentModuleMapper.ToCreateInvoiceResponse(invoice);
     }
 
-    public async Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string id)
+    public async Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string invoiceNo)
     {
-        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        if (businessIdOfCurrentUser.IsError)
+        {
+            return businessIdOfCurrentUser.Errors;
+        }
 
         var invoice = await context.Invoices
-            .Where(c => c.Business.UserId == userId && c.InvoiceNo == id)
+            .Where(i => i.BusinessId == businessIdOfCurrentUser.Value && i.InvoiceNo == invoiceNo)
             .FirstOrDefaultAsync();
 
         return invoice is null ? SharedErrors<Invoice>.NotFound : PaymentModuleMapper.ToGetInvoiceResponse(invoice);
@@ -62,14 +65,17 @@ public class InvoiceService(
         throw new NotImplementedException();
     }
 
-    public Task<ErrorOr<PagedList<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request)
+    public async Task<ErrorOr<PagedList<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request)
     {
-        var userId = currentUser.UserId ?? throw new UserNotSetException();
         Enum.TryParse<InvoiceSortOptions>(request.SortOption, out var sortOption);
 
-        var query = context.Invoices.Include(x => x.Business)
-            .Where(x => x.Business.UserId == userId);
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        if (businessIdOfCurrentUser.IsError)
+        {
+            return businessIdOfCurrentUser.Errors;
+        }
 
+        var query = context.Invoices.Where(x => x.BusinessId == businessIdOfCurrentUser.Value);
         query = ApplyFilters(query, request);
         query = SortQuery(query, sortOption);
 
@@ -85,32 +91,36 @@ public class InvoiceService(
                 )),
                 request.PageNumber, request.PageSize);
 
-        return Task.FromResult<ErrorOr<PagedList<GetInvoiceResponse>>>(pagedResults);
+        return pagedResults;
     }
 
     #region Delete Invoices
 
     public async Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id)
     {
-        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        if (businessIdOfCurrentUser.IsError)
+        {
+            return businessIdOfCurrentUser.Errors;
+        }
 
         var invoice = await context.Invoices
-            .Where(c => c.Business.UserId == userId && c.InvoiceNo == id)
+            .Where(c => c.BusinessId == businessIdOfCurrentUser.Value && c.InvoiceNo == id)
             .FirstOrDefaultAsync();
 
         if (invoice is null)
         {
             return SharedErrors<Invoice>.NotFound;
         }
-        
+
         // delete related payments
         await bus.Publish(PaymentModuleMapper.ToDeletePaymentForInvoice(invoice));
-        
+
         context.Remove(invoice);
         await context.SaveChangesAsync();
         return Result.Deleted;
     }
-    
+
     public async Task DeleteAllInvoicesLinkedToClient(DeleteInvoicesForClient command)
     {
         var invoices = await context.Invoices

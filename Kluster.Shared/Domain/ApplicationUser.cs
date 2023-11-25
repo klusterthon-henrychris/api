@@ -5,13 +5,17 @@ namespace Kluster.Shared.Domain
 {
     public class ApplicationUser : IdentityUser
     {
+        [Key, MaxLength(DomainConstants.MaxIdLength)]
+        public override string Id { get; set; } = Guid.NewGuid().ToString();
+
         [MaxLength(DomainConstants.MaxNameLength)]
         public required string FirstName { get; set; }
 
         [MaxLength(DomainConstants.MaxNameLength)]
         public required string LastName { get; set; }
 
-        [MaxLength(DomainConstants.MaxAddressLength)] public required string Address { get; set; }
+        [MaxLength(DomainConstants.MaxAddressLength)]
+        public required string Address { get; set; }
         // ensure phone number and email are never null.
 
         /// <summary>
