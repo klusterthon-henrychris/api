@@ -1,5 +1,6 @@
 ﻿using Kluster.PaymentModule.Data;
 using Kluster.PaymentModule.Services;
+using Kluster.PaymentModule.Services.Contracts;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.PaymentModule;
 
@@ -17,6 +18,7 @@ namespace Kluster.PaymentModule.ModuleSetup
         {
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<IPaystackService, PaystackService>();
         }
     }
 }
