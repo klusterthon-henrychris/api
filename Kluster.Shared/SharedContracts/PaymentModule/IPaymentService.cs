@@ -1,6 +1,7 @@
 ﻿using ErrorOr;
 using Kluster.Shared.DTOs.Responses.Payments;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
+using Kluster.Shared.MessagingContracts.Events.Invoices;
 
 namespace Kluster.Shared.SharedContracts.PaymentModule;
 
@@ -10,4 +11,6 @@ public interface IPaymentService
     Task DeleteAllPaymentsLinkedToClient(DeletePaymentsForClient command);
     Task DeleteAllPaymentsLinkedToInvoice(DeletePaymentsForInvoice command);
     Task<ErrorOr<PaymentDetailsResponse>> GetPaymentDetails(string invoiceNo);
+
+    Task CreatePayment(InvoiceCreatedEvent invoiceCreatedEvent);
 }
