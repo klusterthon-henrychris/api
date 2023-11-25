@@ -9,7 +9,7 @@ namespace Kluster.Shared.Domain
         public string PaymentReference { get; set; } = SharedLogic.GenerateReference("PAY");
 
         [Column(TypeName = "decimal(18,2)")] public required decimal Amount { get; set; }
-        public required DateTime DateOfPayment { get; set; }
+        public DateTime? DateOfPayment { get; set; }
 
         [MaxLength(DomainConstants.MaxJsonLength)]
         public string? OtherDetails { get; set; }
