@@ -17,6 +17,8 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxEnumLength)]
         public string? PaymentChannel { get; set; }
 
+        public bool IsCompleted { get; set; }
+
         // navigation properties
         [MaxLength(DomainConstants.MaxIdLength)]
         public required string BusinessId { get; set; }
