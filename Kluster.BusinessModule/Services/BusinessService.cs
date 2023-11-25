@@ -4,6 +4,7 @@ using Kluster.BusinessModule.ServiceErrors;
 using Kluster.BusinessModule.Validators;
 using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.Business;
+using Kluster.Shared.DTOs.Requests.Wallet;
 using Kluster.Shared.DTOs.Responses.Business;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
@@ -35,7 +36,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         {
             return Errors.Business.BusinessAlreadyExists;
         }
-        
+
         var businessId = await GetBusinessIdFromDb();
         var business = BusinessModuleMapper.ToBusiness(request, userId, businessId);
         await context.AddAsync(business);
@@ -152,5 +153,25 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         context.Remove(business);
         await context.SaveChangesAsync();
         return Result.Deleted;
+    }
+
+    public async Task<ErrorOr<GetWalletBalanceResponse>> GetBusinessWalletBalance()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var business = await context.Businesses
+            .Include(business => business.Wallet)
+            .FirstOrDefaultAsync(x => x.UserId == userId);
+        
+        if (business is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+
+        if (business.Wallet is null)
+        {
+            return Errors.Business.WalletNotCreated;
+        }
+        
+        return new GetWalletBalanceResponse(business.Id, business.Name, business.Wallet.Balance);
     }
 }

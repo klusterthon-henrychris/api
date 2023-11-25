@@ -33,5 +33,9 @@ public static partial class Errors
         public static Error BusinessAlreadyExists => Error.Unexpected(
             code: $"{nameof(Business)}.BusinessAlreadyExists",
             description: "The user has already created a business.");
+        
+        public static Error WalletNotCreated => Error.Unexpected(
+            code: $"{nameof(Business)}.WalletNotCreated",
+            description: "The user does not have a wallet.");
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Business;
+using Kluster.Shared.DTOs.Requests.Wallet;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.BusinessModule;
@@ -57,5 +58,17 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     {
         var deleteBusinessResult = await businessService.DeleteBusinessForCurrentUser();
         return deleteBusinessResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
+
+    [HttpGet("wallet/balance")]
+    public async Task<IActionResult> GetBusinessWalletBalance()
+    {
+        var getBalanceResult = await businessService.GetBusinessWalletBalance();
+
+        // If successful, return the event data in an ApiResponse.
+        // If an error occurs, return an error response using the ReturnErrorResponse method.
+        return getBalanceResult.Match(
+            _ => Ok(getBalanceResult.ToSuccessfulApiResponse()),
+            ReturnErrorResponse);
     }
 }
