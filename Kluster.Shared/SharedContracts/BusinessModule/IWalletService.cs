@@ -8,4 +8,5 @@ public interface IWalletService
     Task CreateWallet(CreateWalletCommand createWalletCommand);
 
     void CreditWallet(CreditWalletRequest request);
+    void DebitWallet(DebitWalletRequest request);
 }

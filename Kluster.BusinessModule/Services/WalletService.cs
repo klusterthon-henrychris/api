@@ -9,7 +9,8 @@ namespace Kluster.BusinessModule.Services;
 
 public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContext context) : IWalletService
 {
-    private object _creditLock = new { };
+    private readonly object _creditLock = new { };
+    private readonly object _debitLock = new { };
 
     public async Task CreateWallet(CreateWalletCommand createWalletCommand)
     {
@@ -41,7 +42,31 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
             wallet.Balance += request.Amount;
             context.SaveChanges();
             logger.LogInformation(
-                $"Wallet for business: {request.BusinessId}, credited with {wallet.Currency}{request.Amount}");
+                $"CREDIT: {wallet.Currency}{request.Amount}. Wallet: {wallet.WalletId}.");
+        }
+    }
+
+    public void DebitWallet(DebitWalletRequest request)
+    {
+        // todo: enqueue the method that calls this, so that it can retry in case of exception.
+        // the caller method is that in the webhook that verifies the transaction, etc, etc.
+        lock (_debitLock)
+        {
+            var wallet = context.Wallets.FirstOrDefault(x => x.BusinessId == request.BusinessId);
+            if (wallet is null)
+            {
+                throw new InvalidOperationException("Wallet does not exist for credit.");
+            }
+
+            if (wallet.Balance - request.Amount < 0)
+            {
+                throw new InvalidOperationException("Wallet lacks sufficient balance.");
+            }
+
+            wallet.Balance -= request.Amount;
+            context.SaveChanges();
+            logger.LogInformation(
+                $"DEBIT: {wallet.Currency}{request.Amount}. Wallet: {wallet.WalletId}.");
         }
     }
 }
