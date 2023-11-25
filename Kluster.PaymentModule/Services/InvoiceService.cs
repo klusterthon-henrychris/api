@@ -47,7 +47,7 @@ public class InvoiceService(
 
     public async Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string invoiceNo)
     {
-        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
             return businessIdOfCurrentUser.Errors;
@@ -69,7 +69,7 @@ public class InvoiceService(
     {
         Enum.TryParse<InvoiceSortOptions>(request.SortOption, out var sortOption);
 
-        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
             return businessIdOfCurrentUser.Errors;
@@ -98,7 +98,7 @@ public class InvoiceService(
 
     public async Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id)
     {
-        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
             return businessIdOfCurrentUser.Errors;

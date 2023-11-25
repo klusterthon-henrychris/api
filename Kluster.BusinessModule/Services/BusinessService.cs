@@ -21,7 +21,7 @@ namespace Kluster.BusinessModule.Services;
 
 public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleDbContext context) : IBusinessService
 {
-    public async Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request)
+    public async Task<ErrorOr<BusinessCreationResponse>> CreateBusinessForCurrentUser(CreateBusinessRequest request)
     {
         var validateResult = await new CreateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
@@ -80,7 +80,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
-    public async Task<ErrorOr<string>> GetBusinessIdOnly()
+    public async Task<ErrorOr<string>> GetBusinessIdOnlyForCurrentUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
 
@@ -91,7 +91,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         return businessId is null ? SharedErrors<Business>.NotFound : businessId;
     }
 
-    public async Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser()
+    public async Task<ErrorOr<GetBusinessResponse>> GetBusinessForCurrentUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
@@ -103,7 +103,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
-    public async Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request)
+    public async Task<ErrorOr<Updated>> UpdateBusinessForCurrentUser(UpdateBusinessRequest request)
     {
         var validateResult = await new UpdateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
@@ -129,7 +129,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         return Result.Updated;
     }
 
-    public async Task<ErrorOr<Deleted>> DeleteBusiness()
+    public async Task<ErrorOr<Deleted>> DeleteBusinessForCurrentUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
