@@ -1,6 +1,7 @@
 ﻿namespace Kluster.Shared.DTOs.Responses.Product;
 
 public record GetProductResponse(
+    string Id,
     string Name,
     string Description,
     decimal Price,

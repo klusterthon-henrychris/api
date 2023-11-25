@@ -119,6 +119,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         var pagedResults = PagedList<GetProductResponse>
             .ToPagedList(query.Select(x =>
                     new GetProductResponse(
+                        x.ProductId,
                         x.Name,
                         x.Description,
                         x.Price,

@@ -80,7 +80,7 @@ public static class BusinessModuleMapper
 
     public static GetProductResponse ToGetProductResponse(Product product)
     {
-        return new GetProductResponse(product.Name, product.Description, product.Price, product.Quantity,
+        return new GetProductResponse(product.ProductId, product.Name, product.Description, product.Price, product.Quantity,
             product.ImageUrl, product.ProductType);
     }
 
