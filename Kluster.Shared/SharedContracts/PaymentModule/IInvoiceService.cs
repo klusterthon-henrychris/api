@@ -15,5 +15,6 @@ public interface IInvoiceService
     Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id);
     Task DeleteAllInvoicesLinkedToClient(DeleteInvoicesForClient command);
     Task DeleteAllInvoicesLinkedToBusiness(DeleteInvoicesForBusiness command);
-    
+
+    Task<ErrorOr<int>> GetInvoiceCountForCurrentUserBusiness(string? filter);
 }

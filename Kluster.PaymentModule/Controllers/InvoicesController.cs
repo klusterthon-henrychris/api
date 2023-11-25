@@ -60,4 +60,18 @@ public class InvoicesController(IInvoiceService invoiceService) : BaseController
         var deleteInvoiceResult = await invoiceService.DeleteSingleInvoice(id);
         return deleteInvoiceResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
+    
+    [HttpGet("count")]
+    public async Task<IActionResult> GetInvoiceCountForCurrentUserBusiness(string? filter = null)
+    {
+        // just return 0 and log errors.
+        // todo: add logs along all request paths.
+        var getInvoiceResult = await invoiceService.GetInvoiceCountForCurrentUserBusiness(filter);
+
+        // If successful, return the event data in an ApiResponse.
+        // If an error occurs, return an error response using the ReturnErrorResponse method.
+        return getInvoiceResult.Match(
+            _ => Ok(getInvoiceResult.ToSuccessfulApiResponse()),
+            ReturnErrorResponse);
+    }
 }
