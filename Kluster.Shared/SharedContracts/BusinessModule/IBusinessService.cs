@@ -8,7 +8,14 @@ public interface IBusinessService
 {
     Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request);
     Task<ErrorOr<GetBusinessResponse>> GetBusinessById(string id);
-    Task<ErrorOr<string>> GetBusinessId();
+
+    /// <summary>
+    /// Calls ICurrentUser to get the userId behind the current request.
+    /// Uses that to fetch their businessId. Returns error if not found.
+    /// </summary>
+    /// <returns></returns>
+    Task<ErrorOr<string>> GetBusinessIdOnly();
+
     Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser();
     Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request);
     Task<ErrorOr<Deleted>> DeleteBusiness();

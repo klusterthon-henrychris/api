@@ -9,7 +9,7 @@ namespace Kluster.Shared.SharedContracts.PaymentModule;
 public interface IInvoiceService
 {
     Task<ErrorOr<CreateInvoiceResponse>> CreateInvoiceAsync(CreateInvoiceRequest request);
-    Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string id);
+    Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string invoiceNo);
     Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request);
     Task<ErrorOr<PagedList<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request);
     Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id);
