@@ -29,7 +29,7 @@ public static class BusinessModuleMapper
 
     public static GetBusinessResponse ToGetBusinessResponse(Business business)
     {
-        return new GetBusinessResponse(business.Name,
+        return new GetBusinessResponse(business.Id, business.Name,
             business.Address,
             business.RcNumber ?? SearchConstants.NotFound,
             business.Description ?? SearchConstants.NotFound,
