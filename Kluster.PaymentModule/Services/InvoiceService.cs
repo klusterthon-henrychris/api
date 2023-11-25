@@ -175,7 +175,7 @@ public class InvoiceService(
         }
 
         Enum.TryParse<InvoiceStatus>(invoiceStatus, out var invoiceStatusEnum);
-        query = query.Where(x => x.Status.Contains(invoiceStatusEnum.ToString()));
+        query = query.Where(x => x.Status.Equals(invoiceStatusEnum.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
         return query;
     }

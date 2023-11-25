@@ -181,7 +181,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         }
 
         Enum.TryParse<ProductType>(request.ProductType, out var productType);
-        query = query.Where(x => x.ProductType.Contains(productType.ToString()));
+        query = query.Where(x => x.ProductType.Equals(productType.ToString(), StringComparison.CurrentCultureIgnoreCase));
         return query;
     }
 
