@@ -1,6 +1,7 @@
 ﻿using Kluster.BusinessModule.Data;
 using Kluster.BusinessModule.ServiceErrors;
 using Kluster.Shared.DTOs.Requests.Wallet;
+using Kluster.Shared.Exceptions;
 using Kluster.Shared.MessagingContracts.Commands.Wallet;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
             if (wallet is null)
             {
                 // create custom exception with message that allows credit to be changed with debit.
-                throw new InvalidOperationException("Wallet does not exist for credit.");
+                throw new InsufficientWalletBalance("Wallet does not exist for credit.");
             }
 
             wallet.Balance += request.Amount;
@@ -55,12 +56,12 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
             var wallet = context.Wallets.FirstOrDefault(x => x.BusinessId == request.BusinessId);
             if (wallet is null)
             {
-                throw new InvalidOperationException("Wallet does not exist for credit.");
+                throw new WalletDoesNotExistException("Wallet does not exist for debit.");
             }
 
             if (wallet.Balance - request.Amount < 0)
             {
-                throw new InvalidOperationException("Wallet lacks sufficient balance.");
+                throw new InsufficientWalletBalance("Wallet lacks sufficient balance.");
             }
 
             wallet.Balance -= request.Amount;
