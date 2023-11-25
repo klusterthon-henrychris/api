@@ -6,7 +6,7 @@ using Kluster.Shared.DTOs.Requests.Product;
 using Kluster.Shared.DTOs.Responses.Business;
 using Kluster.Shared.DTOs.Responses.Client;
 using Kluster.Shared.DTOs.Responses.Product;
-using Kluster.Shared.MessagingContracts.Events.Wallet;
+using Kluster.Shared.MessagingContracts.Commands.Wallet;
 
 namespace Kluster.BusinessModule;
 
@@ -91,12 +91,12 @@ public static class BusinessModuleMapper
         return new ClientAndBusinessResponse(client.Id, business.Id, client.Address);
     }
 
-    public static Wallet ToWallet(CreateWalletEvent walletEvent)
+    public static Wallet ToWallet(CreateWalletCommand walletCommand)
     {
         return new Wallet
         {
-            BusinessId = walletEvent.BusinessId,
-            Balance = walletEvent.Balance
+            BusinessId = walletCommand.BusinessId,
+            Balance = walletCommand.Balance
         };
     }
 }

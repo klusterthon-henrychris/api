@@ -1,8 +1,8 @@
-﻿using Kluster.Shared.MessagingContracts.Events.Wallet;
+﻿using Kluster.Shared.MessagingContracts.Commands.Wallet;
 
 namespace Kluster.Shared.SharedContracts.BusinessModule;
 
 public interface IWalletService
 {
-    Task CreateWallet(CreateWalletEvent createWalletEvent);
+    Task CreateWallet(CreateWalletCommand createWalletCommand);
 }
