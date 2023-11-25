@@ -6,9 +6,9 @@ using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.DTOs.Responses.Invoices;
 using Kluster.Shared.DTOs.Responses.Requests;
-using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.MessagingContracts.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Events.Invoices;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.PaymentModule;
@@ -43,6 +43,10 @@ public class InvoiceService(
         var invoice = PaymentModuleMapper.ToInvoice(request, clientAndBusinessResponse.Value);
         await context.Invoices.AddAsync(invoice);
         await context.SaveChangesAsync();
+        
+        // create incomplete payment
+        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId, invoice.ClientId, invoice.InvoiceNo, invoice.Amount));
+        
         return PaymentModuleMapper.ToCreateInvoiceResponse(invoice);
     }
 
@@ -61,7 +65,7 @@ public class InvoiceService(
         return invoice is null ? SharedErrors<Invoice>.NotFound : PaymentModuleMapper.ToGetInvoiceResponse(invoice);
     }
 
-    public async Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request)
+    public Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request)
     {
         throw new NotImplementedException();
     }
