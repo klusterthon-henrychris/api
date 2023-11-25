@@ -80,7 +80,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
-    public async Task<ErrorOr<string>> GetBusinessId()
+    public async Task<ErrorOr<string>> GetBusinessIdOnly()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
 
