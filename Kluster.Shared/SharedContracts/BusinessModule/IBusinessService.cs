@@ -6,7 +6,7 @@ namespace Kluster.Shared.SharedContracts.BusinessModule;
 
 public interface IBusinessService
 {
-    Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request);
+    Task<ErrorOr<BusinessCreationResponse>> CreateBusinessForCurrentUser(CreateBusinessRequest request);
     Task<ErrorOr<GetBusinessResponse>> GetBusinessById(string id);
 
     /// <summary>
@@ -14,9 +14,9 @@ public interface IBusinessService
     /// Uses that to fetch their businessId. Returns error if not found.
     /// </summary>
     /// <returns></returns>
-    Task<ErrorOr<string>> GetBusinessIdOnly();
+    Task<ErrorOr<string>> GetBusinessIdOnlyForCurrentUser();
 
-    Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser();
-    Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request);
-    Task<ErrorOr<Deleted>> DeleteBusiness();
+    Task<ErrorOr<GetBusinessResponse>> GetBusinessForCurrentUser();
+    Task<ErrorOr<Updated>> UpdateBusinessForCurrentUser(UpdateBusinessRequest request);
+    Task<ErrorOr<Deleted>> DeleteBusinessForCurrentUser();
 }

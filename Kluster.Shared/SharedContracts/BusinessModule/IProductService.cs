@@ -14,4 +14,5 @@ public interface IProductService
     Task<ErrorOr<Deleted>> DeleteProduct(string productId);
     Task DeleteAllProductsRelatedToBusiness(string businessId);
 
+    Task<ErrorOr<int>> GetTotalProductsForCurrentUserBusiness();
 }

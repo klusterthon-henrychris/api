@@ -21,6 +21,7 @@ public class InvoiceService(
     IClientService clientService,
     IBusinessService businessService,
     IBus bus,
+    ILogger<InvoiceService> logger,
     PaymentModuleDbContext context)
     : IInvoiceService
 {
@@ -47,7 +48,7 @@ public class InvoiceService(
 
     public async Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string invoiceNo)
     {
-        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
             return businessIdOfCurrentUser.Errors;
@@ -69,14 +70,14 @@ public class InvoiceService(
     {
         Enum.TryParse<InvoiceSortOptions>(request.SortOption, out var sortOption);
 
-        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
             return businessIdOfCurrentUser.Errors;
         }
 
         var query = context.Invoices.Where(x => x.BusinessId == businessIdOfCurrentUser.Value);
-        query = ApplyFilters(query, request);
+        query = ApplyStatusFilters(query, request.Status);
         query = SortQuery(query, sortOption);
 
         var pagedResults = PagedList<GetInvoiceResponse>
@@ -98,7 +99,7 @@ public class InvoiceService(
 
     public async Task<ErrorOr<Deleted>> DeleteSingleInvoice(string id)
     {
-        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnly();
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
             return businessIdOfCurrentUser.Errors;
@@ -141,19 +142,40 @@ public class InvoiceService(
         await context.SaveChangesAsync();
     }
 
+    public async Task<ErrorOr<int>> GetInvoiceCountForCurrentUserBusiness(string? filter)
+    {
+        var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
+        if (businessIdOfCurrentUser.IsError)
+        {
+            logger.LogError(
+                $"Request: {nameof(GetInvoiceCountForCurrentUserBusiness)}. Unable to fetch businessId, returning 0.");
+            return 0;
+        }
+
+        var invoicesQuery = context.Invoices
+            .Where(c => c.BusinessId == businessIdOfCurrentUser.Value);
+
+        if (filter is not null)
+        {
+            invoicesQuery = ApplyStatusFilters(invoicesQuery, filter);
+        }
+
+        return await invoicesQuery.CountAsync();
+    }
+
     #endregion
 
     #region Filter and Query
 
-    private static IQueryable<Invoice> ApplyFilters(IQueryable<Invoice> query, GetInvoicesRequest request)
+    private static IQueryable<Invoice> ApplyStatusFilters(IQueryable<Invoice> query, string? invoiceStatus)
     {
-        if (string.IsNullOrWhiteSpace(request.Status))
+        if (string.IsNullOrWhiteSpace(invoiceStatus))
         {
             return query;
         }
 
-        Enum.TryParse<InvoiceStatus>(request.Status, out var invoiceStatus);
-        query = query.Where(x => x.Status.Contains(invoiceStatus.ToString()));
+        Enum.TryParse<InvoiceStatus>(invoiceStatus, out var invoiceStatusEnum);
+        query = query.Where(x => x.Status.Equals(invoiceStatusEnum.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
         return query;
     }
