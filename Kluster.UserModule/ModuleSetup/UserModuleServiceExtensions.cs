@@ -41,6 +41,7 @@ namespace Kluster.UserModule.ModuleSetup
                 options.Lockout.AllowedForNewUsers = true;
 
                 options.User.RequireUniqueEmail = true;
+                // options.SignIn.RequireConfirmedEmail = true;
             }).AddEntityFrameworkStores<UserModuleDbContext>()
                 .AddDefaultTokenProviders();
         }
