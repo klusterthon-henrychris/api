@@ -22,5 +22,9 @@ public static partial class Errors
         public static Error ClientNotSelected => Error.Validation(
             code: $"{nameof(Invoice)}.ClientNotSelected",
             description: "No client has been selected for this invoice.");
+        
+        public static Error PaymentAlreadyCompleted => Error.Validation(
+            code: $"{nameof(Invoice)}.PaymentAlreadyCompleted",
+            description: "This invoice has already been paid for.");
     }
 }
