@@ -11,6 +11,7 @@ using Kluster.Shared.MessagingContracts.Commands.Clients;
 using Kluster.Shared.MessagingContracts.Commands.Invoice;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.MessagingContracts.Commands.Products;
+using Kluster.Shared.MessagingContracts.Commands.Wallet;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
@@ -34,15 +35,20 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         {
             return Errors.Business.BusinessAlreadyExists;
         }
-
-        // todo: rename func
+        
         var businessId = await GetBusinessIdFromDb();
         var business = BusinessModuleMapper.ToBusiness(request, userId, businessId);
         await context.AddAsync(business);
         await context.SaveChangesAsync();
+
+        await bus.Publish(new CreateWalletRequest(businessId, 0));
         return new BusinessCreationResponse(business.Id);
     }
 
+    /// <summary>
+    /// Gets a new business ID, based on the last one in the database.
+    /// </summary>
+    /// <returns></returns>
     private async Task<string> GetBusinessIdFromDb()
     {
         var lastBusiness = await context.Businesses
@@ -66,7 +72,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
             return numericId;
         }
 
-        throw new InvalidOperationException("Invalid Business Id");
+        throw new InvalidOperationException("Invalid Business Id.");
     }
 
     public async Task<ErrorOr<GetBusinessResponse>> GetBusinessById(string id)
