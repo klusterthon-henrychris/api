@@ -165,6 +165,15 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         await context.SaveChangesAsync();
     }
 
+    public async Task<ErrorOr<int>> GetTotalProductsForCurrentUserBusiness()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+
+        return await context.Products
+            .Where(c => c.Business.UserId == userId)
+            .CountAsync();
+    }
+
     private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, GetProductsRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.ProductType))
@@ -173,7 +182,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         }
 
         Enum.TryParse<ProductType>(request.ProductType, out var productType);
-        query = query.Where(x => x.ProductType.Contains(productType.ToString()));
+        query = query.Where(x => x.ProductType.Equals(productType.ToString(), StringComparison.CurrentCultureIgnoreCase));
         return query;
     }
 

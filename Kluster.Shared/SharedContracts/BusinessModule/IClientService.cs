@@ -21,4 +21,5 @@ public interface IClientService
     Task<ErrorOr<ClientAndBusinessResponse>> GetClientAndBusiness(string clientId);
     Task DeleteAllClientsRelatedToBusiness(string businessId);
     Task<ErrorOr<Deleted>> DeleteClient(string clientId);
+    Task<ErrorOr<int>> GetTotalClientsForCurrentUserBusiness();
 }

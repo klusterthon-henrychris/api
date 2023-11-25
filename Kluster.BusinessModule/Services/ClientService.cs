@@ -215,4 +215,10 @@ public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbC
         await context.SaveChangesAsync();
         return Result.Deleted;
     }
+
+    public async Task<ErrorOr<int>> GetTotalClientsForCurrentUserBusiness()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        return await context.Clients.Where(x => x.Business.UserId == userId).CountAsync();
+    }
 }
