@@ -97,7 +97,7 @@ namespace Kluster.UserModule.ModuleSetup
                 var hashedPassword = passwordHasher.HashPassword(user, password);
                 user.PasswordHash = hashedPassword;
 
-                await userManager.CreateAsync(user);
+                var result = await userManager.CreateAsync(user);
                 await userManager.AddToRoleAsync(user, user.Role);
             }
         }
