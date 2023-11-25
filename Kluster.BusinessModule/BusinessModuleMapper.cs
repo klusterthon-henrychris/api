@@ -88,7 +88,7 @@ public static class BusinessModuleMapper
 
     public static ClientAndBusinessResponse ToClientAndBusinessResponse(Client client, Business business)
     {
-        return new ClientAndBusinessResponse(client.Id, business.Id, client.Address);
+        return new ClientAndBusinessResponse(client.Id, business.Id, client.Address, client.EmailAddress);
     }
 
     public static Wallet ToWallet(CreateWalletCommand walletCommand)

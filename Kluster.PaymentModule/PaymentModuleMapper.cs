@@ -22,9 +22,10 @@ public static class PaymentModuleMapper
             Amount = request.Amount,
             DueDate = request.DueDate,
             Status = InvoiceStatus.Due.ToString(),
-            BillingAddress = clientAndBusinessResponse.ClientAddress,
+            BillingAddress = clientAndBusinessResponse.ClientBillingAddress,
             DateOfIssuance = DateTime.Now,
             InvoiceItems = request.InvoiceItems,
+            ClientEmailAddress = clientAndBusinessResponse.ClientEmailAddress,
             ClientId = clientAndBusinessResponse.ClientId,
             BusinessId = clientAndBusinessResponse.BusinessId
         };
