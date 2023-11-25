@@ -12,7 +12,7 @@ using Kluster.Shared.MessagingContracts.Commands.Clients;
 using Kluster.Shared.MessagingContracts.Commands.Invoice;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.MessagingContracts.Commands.Products;
-using Kluster.Shared.MessagingContracts.Commands.Wallet;
+using Kluster.Shared.MessagingContracts.Events.Wallet;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
@@ -42,7 +42,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         await context.AddAsync(business);
         await context.SaveChangesAsync();
 
-        await bus.Publish(new CreateWalletRequest(businessId, 0));
+        await bus.Publish(new CreateWalletEvent(businessId, 0));
         return new BusinessCreationResponse(business.Id);
     }
 
