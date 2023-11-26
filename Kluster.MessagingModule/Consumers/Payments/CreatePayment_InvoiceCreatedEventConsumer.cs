@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace Kluster.Messaging.Consumers.Payments;
 
-public class InvoiceCreatedEventConsumer(IPaymentService paymentService, ILogger<InvoiceCreatedEventConsumer> logger)
+public class CreatePaymentInvoiceCreatedEventConsumer(IPaymentService paymentService, ILogger<CreatePaymentInvoiceCreatedEventConsumer> logger)
     : IConsumer<InvoiceCreatedEvent>
 {
     public Task Consume(ConsumeContext<InvoiceCreatedEvent> context)
