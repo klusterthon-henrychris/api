@@ -25,6 +25,6 @@ public static partial class Errors
         
         public static Error PaymentAlreadyCompleted => Error.Validation(
             code: $"{nameof(Invoice)}.PaymentAlreadyCompleted",
-            description: "This invoice has already been paid for.");
+            description: "This invoice has already been paid.");
     }
 }
