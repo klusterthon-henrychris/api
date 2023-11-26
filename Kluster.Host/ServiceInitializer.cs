@@ -9,15 +9,35 @@ using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
 using Kluster.UserModule.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
 
 namespace Kluster.Host
 {
     public static class ServiceInitializer
     {
+        public static void ConfigureSerilog(this WebApplicationBuilder builder)
+        {
+            using var scope = builder.Services.BuildServiceProvider().CreateScope();
+            var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+            var seqSettings = configuration?.GetSection(nameof(SeqSettings)).Get<SeqSettings>();
+
+            builder.Host.UseSerilog((ctx, lc) => lc
+                .WriteTo.Console(new JsonFormatter())
+                .WriteTo.Seq(seqSettings?.BaseUrl ?? "http://localhost:5341")
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+            );
+        }
+
         public static void RegisterApplicationServices(this IServiceCollection services,
             IWebHostEnvironment environment)
         {
@@ -125,10 +145,10 @@ namespace Kluster.Host
 
                 services.Configure<RabbitMqSettings>(options =>
                     configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
-                
+
                 services.Configure<MailSettings>(options =>
                     configuration?.GetSection(nameof(MailSettings)).Bind(options));
-                
+
                 services.Configure<PaystackSettings>(options =>
                     configuration?.GetSection(nameof(PaystackSettings)).Bind(options));
             }
