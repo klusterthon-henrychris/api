@@ -21,19 +21,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.BusinessModule.Services;
 
-public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleDbContext context) : IBusinessService
+public class BusinessService(
+    ICurrentUser currentUser,
+    ILogger<BusinessService> logger,
+    IBus bus,
+    BusinessModuleDbContext context) : IBusinessService
 {
     public async Task<ErrorOr<BusinessCreationResponse>> CreateBusinessForCurrentUser(CreateBusinessRequest request)
     {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+
+        logger.LogInformation($"Received request to create business. Request: {request}");
         var validateResult = await new CreateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
+            logger.LogError("CreateBusinessRequest failed - A validation error occured.");
             return validateResult.ToErrorList();
         }
 
-        var userId = currentUser.UserId ?? throw new UserNotSetException();
         if (await context.Businesses.AnyAsync(x => x.UserId == userId))
         {
+            logger.LogError($"CreateBusinessRequest failed - {Errors.Business.BusinessAlreadyExists.Description}");
             return Errors.Business.BusinessAlreadyExists;
         }
 
@@ -42,6 +50,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         await context.AddAsync(business);
         await context.SaveChangesAsync();
 
+        logger.LogInformation($"Successfully created business {business.Id} for {userId}.");
         await bus.Publish(new CreateWalletCommand(businessId, 0));
         return new BusinessCreationResponse(business.Id);
     }
@@ -161,7 +170,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         var business = await context.Businesses
             .Include(business => business.Wallet)
             .FirstOrDefaultAsync(x => x.UserId == userId);
-        
+
         if (business is null)
         {
             return SharedErrors<Business>.NotFound;
@@ -171,7 +180,7 @@ public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleD
         {
             return Errors.Business.WalletNotCreated;
         }
-        
+
         return new GetWalletBalanceResponse(business.Id, business.Name, business.Wallet.Balance);
     }
 }
