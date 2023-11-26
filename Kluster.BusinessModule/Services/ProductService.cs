@@ -17,17 +17,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.BusinessModule.Services;
 
-public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext context) : IProductService
+public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext context, ILogger<ProductService> logger)
+    : IProductService
 {
     public async Task<ErrorOr<CreateProductResponse>> CreateProductAsync(CreateProductRequest request)
     {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        logger.LogInformation($"Received request to create product from {userId}.\n" +
+                              $"Request: {request}");
         var validateResult = await new CreateProductRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
+            logger.LogError("Validation failed for CreateProductRequest");
             return validateResult.ToErrorList();
         }
 
-        var userId = currentUser.UserId ?? throw new UserNotSetException();
         var businessId = await context.Businesses
             .Where(x => x.UserId == userId)
             .Select(x => x.Id)
@@ -35,6 +39,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
 
         if (businessId is null)
         {
+            logger.LogError($"Business not found for user: {userId}");
             return SharedErrors<Business>.NotFound;
         }
 
@@ -43,10 +48,13 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         var product = BusinessModuleMapper.ToProduct(request, businessId, imageUrl!);
         await context.Products.AddAsync(product);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"Product created successfully. ProductId: {product.ProductId}.");
+
         return new CreateProductResponse(product.ProductId);
     }
 
-    public Task<string?> UploadImageToS3(IFormFile requestProductImage)
+    private Task<string?> UploadImageToS3(IFormFile requestProductImage)
     {
         // todo: find a place to upload images.
         // todo: remove nullable suppressor later
@@ -57,34 +65,47 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
     public async Task<ErrorOr<GetProductResponse>> GetProduct(string id)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
+        logger.LogInformation($"Received request to get product {id} for user {userId}.");
 
         var product = await context.Products
             .Where(c => c.Business.UserId == userId && c.ProductId == id)
             .FirstOrDefaultAsync();
 
-        return product is null ? SharedErrors<Product>.NotFound : BusinessModuleMapper.ToGetProductResponse(product);
+        if (product is null)
+        {
+            logger.LogError($"Product {id} not found for user {userId}.");
+            return SharedErrors<Product>.NotFound;
+        }
+
+        logger.LogInformation($"Product {id} retrieved successfully for user {userId}.");
+
+        return BusinessModuleMapper.ToGetProductResponse(product);
     }
 
     public async Task<ErrorOr<Updated>> UpdateProduct(string productId, UpdateProductRequest request)
     {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        logger.LogInformation($"Received request to update product {productId} for user {userId}.");
         var validateResult = await new UpdateProductRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
+            logger.LogError("Validation failed for UpdateProductRequest.");
             return validateResult.ToErrorList();
         }
 
-        var userId = currentUser.UserId ?? throw new UserNotSetException();
         var product = await context.Products
             .Where(c => c.Business.UserId == userId && c.ProductId == productId).Include(product => product.Business)
             .FirstOrDefaultAsync();
 
         if (product is null)
         {
+            logger.LogError($"Product {productId} not found for user {userId}.");
             return SharedErrors<Product>.NotFound;
         }
 
         if (product.Business.UserId != userId)
         {
+            logger.LogError($"Invalid business for product {productId}.");
             return Errors.Product.InvalidBusiness;
         }
 
@@ -100,6 +121,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
 
         context.Update(product);
         await context.SaveChangesAsync();
+        logger.LogInformation($"Product {productId} updated successfully for user {userId}.");
         return Result.Updated;
     }
 
@@ -107,6 +129,8 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         Enum.TryParse<ProductSortOptions>(request.SortOption, out var sortOption);
+
+        logger.LogInformation($"Received request to get all products for user {userId}.");
 
         var query = context.Products
             .Include(x => x.Business)
@@ -126,6 +150,8 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
                 x.ImageUrl,
                 x.ProductType));
 
+        logger.LogInformation($"All products retrieved successfully for user {userId}.");
+
         return await new PagedResponse<GetProductResponse>().ToPagedList(pagedResults, request.PageNumber,
             request.PageSize);
     }
@@ -138,6 +164,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
     public async Task<ErrorOr<Deleted>> DeleteProduct(string productId)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
+        logger.LogInformation($"Received request to delete product {productId} from user {userId}.");
 
         var product = await context.Products
             .Where(c => c.Business.UserId == userId && c.ProductId == productId)
@@ -145,34 +172,46 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
 
         if (product is null)
         {
+            logger.LogError($"Product {productId} not found for user {userId}.");
             return SharedErrors<Product>.NotFound;
         }
 
         context.Remove(product);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"Product {productId} deleted successfully for user {userId}.");
+
         return Result.Deleted;
     }
 
     public async Task DeleteAllProductsRelatedToBusiness(string businessId)
     {
+        logger.LogInformation($"Received request to delete all products related to business {businessId}.");
+
         var products = await context.Products
             .Where(x => x.BusinessId == businessId)
             .ToListAsync();
 
         context.RemoveRange(products);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"All products related to business {businessId} deleted successfully.");
     }
 
     public async Task<ErrorOr<int>> GetTotalProductsForCurrentUserBusiness()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
+        logger.LogInformation($"Received request to get total products for user {userId}.");
 
-        return await context.Products
+        var count = await context.Products
             .Where(c => c.Business.UserId == userId)
             .CountAsync();
+
+        logger.LogInformation($"Total products for user {userId}: {count}.");
+        return count;
     }
 
-    private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, GetProductsRequest request)
+    private IQueryable<Product> ApplyFilters(IQueryable<Product> query, GetProductsRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.ProductType))
         {
@@ -182,10 +221,13 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         Enum.TryParse<ProductType>(request.ProductType, out var productType);
         query = query.Where(
             x => x.ProductType.Equals(productType.ToString(), StringComparison.CurrentCultureIgnoreCase));
+
+        logger.LogInformation($"Applied filters: ProductType = {request.ProductType}");
+
         return query;
     }
 
-    private static IQueryable<Product> Sort(IQueryable<Product> query, ProductSortOptions sortOption)
+    private IQueryable<Product> Sort(IQueryable<Product> query, ProductSortOptions sortOption)
     {
         query = sortOption switch
         {
@@ -200,6 +242,8 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
 
             _ => query.OrderBy(x => x.Name)
         };
+
+        logger.LogInformation($"Sorted query by: {sortOption}");
 
         return query;
     }
