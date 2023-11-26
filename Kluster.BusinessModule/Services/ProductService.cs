@@ -85,7 +85,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
     public async Task<ErrorOr<Updated>> UpdateProduct(string productId, UpdateProductRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Received request to update product {productId} for user {userId}.");
+        logger.LogInformation($"Received request to update product {productId} for user {userId}.\nRequest: {request}");
         var validateResult = await new UpdateProductRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
