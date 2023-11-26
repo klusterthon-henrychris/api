@@ -9,14 +9,43 @@ public static class DbExtensions
 {
     public static void AddDatabase<T>(IServiceCollection services) where T : DbContext
     {
-        var dbSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>()?.Value;
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        string connectionString;
+
+        if (env == "Development")
+        {
+            var dbSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>()?.Value;
+            connectionString = dbSettings!.ConnectionString!;
+        }
+        else
+        {
+            // Use connection string provided at runtime by Fly.
+            var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+            // Parse connection URL to connection string for Npgsql
+            connUrl = connUrl.Replace("postgres://", string.Empty);
+            var pgUserPass = connUrl.Split("@")[0];
+            var pgHostPortDb = connUrl.Split("@")[1];
+            var pgHostPort = pgHostPortDb.Split("/")[0];
+            var pgDb = pgHostPortDb.Split("/")[1];
+            var pgUser = pgUserPass.Split(":")[0];
+            var pgPass = pgUserPass.Split(":")[1];
+            var pgHost = pgHostPort.Split(":")[0];
+            var pgPort = pgHostPort.Split(":")[1];
+            var updatedHost = pgHost.Replace("flycast", "internal");
+
+            connectionString =
+                $"Server={updatedHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};";
+        }
+
         services.AddDbContext<T>(options =>
         {
-            options.UseNpgsql(dbSettings!.ConnectionString, o => o.MigrationsHistoryTable(
+            options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable(
                 tableName: HistoryRepository.DefaultTableName, typeof(T).Name));
         });
 
-        using var scope = services.BuildServiceProvider().CreateScope();
+
         var dbContext = scope.ServiceProvider.GetRequiredService<T>();
         dbContext.Database.Migrate();
     }
