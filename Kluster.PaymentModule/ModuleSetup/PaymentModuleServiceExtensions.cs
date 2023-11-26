@@ -1,8 +1,12 @@
-﻿using Kluster.PaymentModule.Data;
+﻿using System.Net.Http.Headers;
+using Kluster.PaymentModule.Data;
 using Kluster.PaymentModule.Services;
 using Kluster.PaymentModule.Services.Contracts;
+using Kluster.Shared.Configuration;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.PaymentModule;
+using Microsoft.Extensions.Options;
+using Refit;
 
 namespace Kluster.PaymentModule.ModuleSetup
 {
@@ -19,6 +23,16 @@ namespace Kluster.PaymentModule.ModuleSetup
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<IPaymentService, PaymentService>();
             services.AddTransient<IPaystackService, PaystackService>();
+
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var options = scope.ServiceProvider.GetService<IOptions<PaystackSettings>>();
+            services.AddRefitClient<IPayStackClient>()
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(options!.Value.BaseUrl!);
+                    c.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", options!.Value.SecretKey);
+                });
         }
     }
 }
