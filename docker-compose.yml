@@ -24,10 +24,12 @@
     image: "postgres"
     container_name: kluster.database
     ports:
-      - "1433:1433"
+      - "5432:5432"
     environment:
       - ACCEPT_EULA=y
-      - POSTGRES_PASSWORD=testPassword123@
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=testPassword123
+      - POSTGRES_DB=KlusterDB
   
   messaging:
     image: "rabbitmq:3-management"
