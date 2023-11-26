@@ -40,10 +40,10 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
                 throw new InsufficientWalletBalance("Wallet does not exist for credit.");
             }
 
-            wallet.Balance += request.Amount;
+            wallet.Balance += request.AmountInNaira;
             context.SaveChanges();
             logger.LogInformation(
-                $"CREDIT: {wallet.Currency}{request.Amount}. Wallet: {wallet.WalletId}.");
+                $"CREDIT: {wallet.Currency}{request.AmountInNaira}. Wallet: {wallet.WalletId}.");
         }
     }
 
