@@ -31,9 +31,9 @@ public class UserController(IUserService userService) : BaseController
 
     [AllowAnonymous]
     [HttpGet("confirm-email")]
-    public async Task<IActionResult> ConfirmEmailWithToken(string userId, string token)
+    public async Task<IActionResult> ConfirmEmailWithToken(string emailAddress, string token)
     {
-        var confirmEmailResult = await userService.ConfirmEmailWithToken(userId, token);
+        var confirmEmailResult = await userService.ConfirmEmailWithToken(emailAddress, token);
         return confirmEmailResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
     

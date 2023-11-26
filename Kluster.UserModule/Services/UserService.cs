@@ -82,12 +82,12 @@ public class UserService(
         return HttpUtility.UrlEncode(otp);
     }
 
-    public async Task<ErrorOr<Success>> ConfirmEmailWithToken(string userId, string otp)
+    public async Task<ErrorOr<Success>> ConfirmEmailWithToken(string emailAddress, string otp)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.FindByEmailAsync(emailAddress);
         if (user is null)
         {
-            logger.LogInformation($"User not found for ID: {userId}");
+            logger.LogInformation($"User not found for email: {emailAddress}");
             return Errors.User.NotFound;
         }
 
