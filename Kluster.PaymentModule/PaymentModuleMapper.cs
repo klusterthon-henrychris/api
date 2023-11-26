@@ -4,6 +4,7 @@ using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.DTOs.Responses.Client;
 using Kluster.Shared.DTOs.Responses.Invoices;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
+using Kluster.Shared.MessagingContracts.Events.Invoices;
 
 namespace Kluster.PaymentModule;
 
@@ -22,9 +23,10 @@ public static class PaymentModuleMapper
             Amount = request.Amount,
             DueDate = request.DueDate,
             Status = InvoiceStatus.Due.ToString(),
-            BillingAddress = clientAndBusinessResponse.ClientAddress,
+            BillingAddress = clientAndBusinessResponse.ClientBillingAddress,
             DateOfIssuance = DateTime.Now,
             InvoiceItems = request.InvoiceItems,
+            ClientEmailAddress = clientAndBusinessResponse.ClientEmailAddress,
             ClientId = clientAndBusinessResponse.ClientId,
             BusinessId = clientAndBusinessResponse.BusinessId
         };
@@ -38,5 +40,17 @@ public static class PaymentModuleMapper
     public static DeletePaymentsForInvoice ToDeletePaymentForInvoice(Invoice invoice)
     {
         return new DeletePaymentsForInvoice(invoice.InvoiceNo);
+    }
+
+    public static Payment ToPayment(InvoiceCreatedEvent invoiceCreatedEvent)
+    {
+        return new Payment
+        {
+            Amount = invoiceCreatedEvent.Amount,
+            IsCompleted = false,
+            BusinessId = invoiceCreatedEvent.BusinessId,
+            InvoiceId = invoiceCreatedEvent.InvoiceId,
+            ClientId = invoiceCreatedEvent.ClientId
+        };
     }
 }

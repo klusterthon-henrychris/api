@@ -1,3 +1,3 @@
 ﻿namespace Kluster.Shared.DTOs.Responses.Client;
 
-public record ClientAndBusinessResponse(string ClientId, string BusinessId, string ClientAddress);
+public record ClientAndBusinessResponse(string ClientId, string BusinessId, string ClientBillingAddress, string ClientEmailAddress);

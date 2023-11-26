@@ -1,39 +1,178 @@
-﻿using Kluster.PaymentModule.Data;
+﻿using System.Text.Json;
+using ErrorOr;
+using Kluster.PaymentModule.Data;
+using Kluster.PaymentModule.ServiceErrors;
+using Kluster.PaymentModule.Services.Contracts;
+using Kluster.Shared.Constants;
+using Kluster.Shared.Domain;
+using Kluster.Shared.DTOs.Requests.Payments;
+using Kluster.Shared.DTOs.Requests.Wallet;
+using Kluster.Shared.DTOs.Responses.Payments;
+using Kluster.Shared.Exceptions;
 using Kluster.Shared.MessagingContracts.Commands.Payment;
+using Kluster.Shared.MessagingContracts.Events;
+using Kluster.Shared.MessagingContracts.Events.Invoices;
+using Kluster.Shared.ServiceErrors;
+using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.PaymentModule;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.PaymentModule.Services;
 
-public class PaymentService(PaymentModuleDbContext context) : IPaymentService
+public class PaymentService(
+    PaymentModuleDbContext context,
+    IPaystackService paystackService,
+    IBus bus,
+    IPayStackClient payStackClient,
+    IWalletService walletService,
+    ILogger<PaymentService> logger) : IPaymentService
 {
     public async Task DeleteAllPaymentsLinkedToBusiness(DeletePaymentsForBusiness command)
     {
         var payments = await context.Payments
             .Where(x => x.BusinessId == command.BusinessId)
             .ToListAsync();
-        
+
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
     }
-    
+
     public async Task DeleteAllPaymentsLinkedToClient(DeletePaymentsForClient command)
     {
         var payments = await context.Payments
             .Where(x => x.ClientId == command.ClientId)
             .ToListAsync();
-        
+
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
     }
-    
+
     public async Task DeleteAllPaymentsLinkedToInvoice(DeletePaymentsForInvoice command)
     {
         var payments = await context.Payments
             .Where(x => x.InvoiceId == command.InvoiceId)
             .ToListAsync();
-        
+
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
+    }
+
+    public async Task<ErrorOr<PaymentDetailsResponse>> GetPaymentDetails(string invoiceNo)
+    {
+        var invoice = await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == invoiceNo);
+        if (invoice is null)
+        {
+            return SharedErrors<Invoice>.NotFound;
+        }
+
+
+        var payment = await context.Payments.FirstOrDefaultAsync(x => x.InvoiceId == invoiceNo);
+        if (payment is null)
+        {
+            return SharedErrors<Payment>.NotFound;
+        }
+
+        // we only want incomplete payments
+        if (!payment.IsCompleted)
+        {
+            return Errors.Invoice.PaymentAlreadyCompleted;
+        }
+
+        return new PaymentDetailsResponse(invoice.ClientEmailAddress, invoice.Amount * 100);
+    }
+
+    public async Task CreatePayment(InvoiceCreatedEvent invoiceCreatedEvent)
+    {
+        if (await context.Payments.AnyAsync(x => x.InvoiceId == invoiceCreatedEvent.InvoiceId))
+        {
+            logger.LogError($"Payment already exists for invoice: {invoiceCreatedEvent.InvoiceId}.");
+            throw new PaymentAlreadyExistsException(
+                $"Payment already exists for invoice: {invoiceCreatedEvent.InvoiceId}.");
+        }
+
+        var payment = PaymentModuleMapper.ToPayment(invoiceCreatedEvent);
+        await context.AddAsync(payment);
+        await context.SaveChangesAsync();
+        logger.LogInformation($"Created payment for: {invoiceCreatedEvent.InvoiceId}.");
+    }
+
+    public async Task<ErrorOr<Success>> ProcessPaymentNotification(PaystackNotification request, string ipAddress)
+    {
+        // temporary. in prod, use IP address here to verify source, then add to queue to complete transaction
+        var isTransactionValid = await paystackService.VerifyTransaction(request.data.reference);
+        if (!isTransactionValid)
+        {
+            return Errors.Payment.NotValid;
+        }
+
+        await bus.Publish(new PaymentNotificationReceived(request.data.status, request.data.amount, request.data.reference));
+        return Result.Success;
+    }
+
+    public async Task<ErrorOr<InvoicePaymentValidated>> IsPaystackTransactionValid(
+        PaymentNotificationReceived contextMessage)
+    {
+        var notification = await payStackClient.VerifyTransaction(contextMessage.DataReference);
+        if (notification is null)
+        {
+            logger.LogError($"Could not find transaction with reference: {contextMessage.DataReference}.");
+            return Errors.Payment.NotValid;
+        }
+
+        var invoice = await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == contextMessage.DataReference);
+        if (invoice is null)
+        {
+            logger.LogError($"Could not find invoice with reference: {contextMessage.DataReference}.");
+            return SharedErrors<Invoice>.NotFound;
+        }
+
+        if ((notification.data.amount * 100 == invoice.Amount) && notification.data.status == "success")
+        {
+            logger.LogInformation($"Validated invoice payment with reference: {contextMessage.DataReference}.");
+            return new InvoicePaymentValidated(invoice.InvoiceNo, notification.data.amount, notification.data.channel);
+        }
+
+        logger.LogError($"Could not validate invoice with reference: {contextMessage.DataReference}." +
+                        $"\nNotification: {JsonSerializer.Serialize(notification)}");
+        return Errors.Payment.NotValid;
+    }
+
+    public async Task<ErrorOr<Success>> CompletePayment(InvoicePaymentValidated invoiceCreatedEvent)
+    {
+        var payment = await context.Payments.FirstOrDefaultAsync(c => c.InvoiceId == invoiceCreatedEvent.InvoiceId);
+        if (payment is null)
+        {
+            return SharedErrors<Payment>.NotFound;
+        }
+
+        if (payment.IsCompleted)
+        {
+            return Errors.Payment.AlreadyCompleted;
+        }
+
+        var invoice = await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == invoiceCreatedEvent.InvoiceId);
+        if (invoice is null)
+        {
+            return SharedErrors<Invoice>.NotFound;
+        }
+
+        if (invoice.Status == InvoiceStatus.Paid.ToString())
+        {
+            return Errors.Invoice.PaymentAlreadyCompleted;
+        }
+
+        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, invoiceCreatedEvent.Amount * 100));
+
+        invoice.Status = InvoiceStatus.Paid.ToString();
+
+        payment.PaymentChannel = invoiceCreatedEvent.PaymentChannel;
+        payment.IsCompleted = true;
+        payment.DateOfPayment = DateTime.Now;
+
+        context.Update(invoice);
+        context.Update(payment);
+        await context.SaveChangesAsync();
+        return Result.Success;
     }
 }

@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using System.Web;
+using ErrorOr;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.User;
@@ -71,7 +72,7 @@ public class UserService(
 
         var otp = await userManager.GenerateEmailConfirmationTokenAsync(user);
         logger.LogInformation($"Generated OTP for {user.Id}.");
-        return otp;
+        return HttpUtility.UrlEncode(otp);
     }
 
     public async Task<ErrorOr<Success>> ConfirmEmailWithToken(string userId, string otp)

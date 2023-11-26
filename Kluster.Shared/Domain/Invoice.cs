@@ -32,6 +32,9 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxAddressLength)]
         public required string BillingAddress { get; set; }
 
+        [MaxLength(DomainConstants.MaxEmailAddressLength)]
+        public required string ClientEmailAddress { get; set; }
+
         // navigation properties
         [MaxLength(DomainConstants.MaxIdLength)]
         public required string ClientId { get; set; }
