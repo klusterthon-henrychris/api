@@ -1,3 +1,3 @@
 ﻿namespace Kluster.Shared.DTOs.Requests.Wallet;
 
-public record CreditWalletRequest(string BusinessId, decimal Amount);
+public record CreditWalletRequest(string BusinessId, decimal AmountInNaira);

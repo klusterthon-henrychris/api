@@ -10,4 +10,7 @@ public interface IPaystackService
     /// <param name="ipAddress"></param>
     /// <returns></returns>
     bool IsRequestFromPaystack(string ipAddress);
+
+    bool IsRequestFromPaystack(string xPaystackHeader, PaystackNotification response);
+    Task<bool> VerifyTransaction(string reference);
 }

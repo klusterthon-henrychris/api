@@ -25,7 +25,6 @@
 
 	<ItemGroup>
 	  <Folder Include="DTOs\Requests\Notification\" />
-	  <Folder Include="MessagingContracts\Commands\Notification\" />
 	</ItemGroup>
 
 </Project>
