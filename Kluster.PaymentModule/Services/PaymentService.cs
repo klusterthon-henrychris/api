@@ -113,7 +113,8 @@ public class PaymentService(
             return Errors.Payment.NotValid;
         }
 
-        await bus.Publish(new PaymentNotificationReceived(request.data.status, request.data.amount, request.data.reference));
+        await bus.Publish(new PaymentNotificationReceived(request.data.status, request.data.amount,
+            request.data.reference));
         logger.LogInformation($"Payment notification processed for reference: {request.data.reference}.");
         return Result.Success;
     }
@@ -135,7 +136,7 @@ public class PaymentService(
             return SharedErrors<Invoice>.NotFound;
         }
 
-        if ((notification.data.amount * 100 == invoice.Amount) && notification.data.status == "success")
+        if ((decimal) notification.data.amount * 100 == invoice.Amount && notification.data.status == "success")
         {
             logger.LogInformation($"Validated invoice payment with reference: {contextMessage.DataReference}.");
             return new InvoicePaymentValidated(invoice.InvoiceNo, notification.data.amount, notification.data.channel);
@@ -174,8 +175,10 @@ public class PaymentService(
             return Errors.Invoice.PaymentAlreadyCompleted;
         }
 
-        logger.LogInformation($"Crediting wallet for BusinessId: {payment.BusinessId} with amount: {invoiceCreatedEvent.Amount / 100}.");
-        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, invoiceCreatedEvent.Amount / 100));
+        var amountInNaira = (decimal)invoiceCreatedEvent.AmountInKobo / 100;
+        logger.LogInformation(
+            $"Crediting wallet for BusinessId: {payment.BusinessId} with amount: NGN{amountInNaira}.");
+        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, amountInNaira));
 
         invoice.Status = InvoiceStatus.Paid.ToString();
 
