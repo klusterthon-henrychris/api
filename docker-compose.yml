@@ -21,13 +21,13 @@
   
   
   database:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    image: "postgres"
     container_name: kluster.database
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=y
-      - SA_PASSWORD=testPassword123@
+      - POSTGRES_PASSWORD=testPassword123@
   
   messaging:
     image: "rabbitmq:3-management"

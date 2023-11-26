@@ -11,8 +11,10 @@ public static class DbExtensions
     {
         var dbSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>()?.Value;
         services.AddDbContext<T>(options =>
-            options.UseSqlServer(dbSettings!.ConnectionString, o => o.MigrationsHistoryTable(
-                tableName: HistoryRepository.DefaultTableName, typeof(T).Name)));
+        {
+            options.UseNpgsql(dbSettings!.ConnectionString, o => o.MigrationsHistoryTable(
+                tableName: HistoryRepository.DefaultTableName, typeof(T).Name));
+        });
 
         using var scope = services.BuildServiceProvider().CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<T>();
