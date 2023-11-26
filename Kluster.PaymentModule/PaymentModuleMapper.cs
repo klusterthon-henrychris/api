@@ -12,7 +12,7 @@ public static class PaymentModuleMapper
 {
     public static GetInvoiceResponse ToGetInvoiceResponse(Invoice invoice)
     {
-        return new GetInvoiceResponse(invoice.InvoiceNo, invoice.Amount, invoice.DueDate, invoice.DateOfIssuance,
+        return new GetInvoiceResponse(invoice.InvoiceNo, invoice.InvoiceNo, invoice.Amount, invoice.DueDate, invoice.DateOfIssuance,
             invoice.Status, invoice.InvoiceItems);
     }
 

@@ -112,6 +112,7 @@ public class InvoiceService(
         var pagedResults =
             query.Select(x => new GetInvoiceResponse(
                 x.InvoiceNo,
+                x.InvoiceNo,
                 x.Amount,
                 x.DueDate,
                 x.DateOfIssuance,
