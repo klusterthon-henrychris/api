@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.DTOs.Requests.Notification;
 using Kluster.Shared.DTOs.Requests.User;
 using Kluster.Shared.MessagingContracts.Commands.Notification;
@@ -11,4 +12,5 @@ public interface INotificationService
 
     Task<bool> SendWelcomeMail(string emailAddress, string firstName, string lastName);
     Task<ErrorOr<Success>> SendForgotPasswordMail(SendForgotPasswordEmailCommand request);
+    Task<ErrorOr<Success>> SendInitialInvoiceMail(SendInitialInvoiceEmailRequest request);
 }

@@ -39,14 +39,22 @@ public class InvoiceService(
         {
             return clientAndBusinessResponse.FirstError;
         }
-
+        
         var invoice = PaymentModuleMapper.ToInvoice(request, clientAndBusinessResponse.Value);
         await context.Invoices.AddAsync(invoice);
         await context.SaveChangesAsync();
-        
-        // create incomplete payment
-        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId, invoice.ClientId, invoice.InvoiceNo, invoice.Amount));
-        
+
+        // create incomplete payment and send invoice email.
+        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId,
+            invoice.ClientId,
+            invoice.InvoiceNo,
+            invoice.Amount,
+            clientAndBusinessResponse.Value.FirstName,
+            clientAndBusinessResponse.Value.LastName,
+            clientAndBusinessResponse.Value.ClientEmailAddress,
+            invoice.DueDate,
+            clientAndBusinessResponse.Value.BusinessName));
+
         return PaymentModuleMapper.ToCreateInvoiceResponse(invoice);
     }
 
