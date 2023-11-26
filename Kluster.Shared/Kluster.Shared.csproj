@@ -25,6 +25,8 @@
 
 	<ItemGroup>
 	  <Folder Include="DTOs\Requests\Notification\" />
+	  <Folder Include="DTOs\Requests\Payments\" />
+	  <Folder Include="DTOs\Responses\Payments\" />
 	</ItemGroup>
 
 </Project>

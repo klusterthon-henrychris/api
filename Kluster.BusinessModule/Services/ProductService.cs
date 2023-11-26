@@ -103,7 +103,7 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         return Result.Updated;
     }
 
-    public Task<ErrorOr<PagedList<GetProductResponse>>> GetAllProducts(GetProductsRequest request)
+    public async Task<ErrorOr<PagedResponse<GetProductResponse>>> GetAllProducts(GetProductsRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         Enum.TryParse<ProductSortOptions>(request.SortOption, out var sortOption);
@@ -116,20 +116,18 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         query = ApplyFilters(query, request);
         query = Sort(query, sortOption);
 
-        var pagedResults = PagedList<GetProductResponse>
-            .ToPagedList(query.Select(x =>
-                    new GetProductResponse(
-                        x.ProductId,
-                        x.Name,
-                        x.Description,
-                        x.Price,
-                        x.Quantity,
-                        x.ImageUrl,
-                        x.ProductType)),
-                request.PageNumber,
-                request.PageSize);
+        var pagedResults = query.Select(x =>
+            new GetProductResponse(
+                x.ProductId,
+                x.Name,
+                x.Description,
+                x.Price,
+                x.Quantity,
+                x.ImageUrl,
+                x.ProductType));
 
-        return Task.FromResult<ErrorOr<PagedList<GetProductResponse>>>(pagedResults);
+        return await new PagedResponse<GetProductResponse>().ToPagedList(pagedResults, request.PageNumber,
+            request.PageSize);
     }
 
     private static IQueryable<Product> ApplySearch(IQueryable<Product> query, GetProductsRequest request)
@@ -182,7 +180,8 @@ public class ProductService(ICurrentUser currentUser, BusinessModuleDbContext co
         }
 
         Enum.TryParse<ProductType>(request.ProductType, out var productType);
-        query = query.Where(x => x.ProductType.Equals(productType.ToString(), StringComparison.CurrentCultureIgnoreCase));
+        query = query.Where(
+            x => x.ProductType.Equals(productType.ToString(), StringComparison.CurrentCultureIgnoreCase));
         return query;
     }
 

@@ -10,7 +10,7 @@ public interface IProductService
     Task<ErrorOr<CreateProductResponse>> CreateProductAsync(CreateProductRequest request);
     Task<ErrorOr<GetProductResponse>> GetProduct(string id);
     Task<ErrorOr<Updated>> UpdateProduct(string productId, UpdateProductRequest request);
-    Task<ErrorOr<PagedList<GetProductResponse>>> GetAllProducts(GetProductsRequest request);
+    Task<ErrorOr<PagedResponse<GetProductResponse>>> GetAllProducts(GetProductsRequest request);
     Task<ErrorOr<Deleted>> DeleteProduct(string productId);
     Task DeleteAllProductsRelatedToBusiness(string businessId);
 

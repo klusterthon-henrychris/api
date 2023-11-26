@@ -70,7 +70,7 @@ public class InvoiceService(
         throw new NotImplementedException();
     }
 
-    public async Task<ErrorOr<PagedList<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request)
+    public async Task<ErrorOr<PagedResponse<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request)
     {
         Enum.TryParse<InvoiceSortOptions>(request.SortOption, out var sortOption);
 
@@ -84,19 +84,18 @@ public class InvoiceService(
         query = ApplyStatusFilters(query, request.Status);
         query = SortQuery(query, sortOption);
 
-        var pagedResults = PagedList<GetInvoiceResponse>
-            .ToPagedList(
-                query.Select(x => new GetInvoiceResponse(
-                    x.InvoiceNo,
-                    x.Amount,
-                    x.DueDate,
-                    x.DateOfIssuance,
-                    x.Status,
-                    x.InvoiceItems
-                )),
-                request.PageNumber, request.PageSize);
+        var pagedResults =
+            query.Select(x => new GetInvoiceResponse(
+                x.InvoiceNo,
+                x.Amount,
+                x.DueDate,
+                x.DateOfIssuance,
+                x.Status,
+                x.InvoiceItems
+            ));
 
-        return pagedResults;
+        return await new PagedResponse<GetInvoiceResponse>().ToPagedList(pagedResults, request.PageNumber,
+            request.PageSize);
     }
 
     #region Delete Invoices
@@ -179,7 +178,8 @@ public class InvoiceService(
         }
 
         Enum.TryParse<InvoiceStatus>(invoiceStatus, out var invoiceStatusEnum);
-        query = query.Where(x => x.Status.Equals(invoiceStatusEnum.ToString(), StringComparison.CurrentCultureIgnoreCase));
+        query = query.Where(x =>
+            x.Status.Equals(invoiceStatusEnum.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
         return query;
     }
