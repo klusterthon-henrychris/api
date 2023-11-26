@@ -91,6 +91,7 @@ namespace Kluster.Host
             {
                 var configuration = new ConfigurationBuilder()
                     .AddUserSecrets<Program>()
+                    .AddEnvironmentVariables()
                     .Build();
 
                 // configure app wide
@@ -135,24 +136,20 @@ namespace Kluster.Host
         // bind config files here and use them through all modules.
         private static void BindConfigFiles(this IServiceCollection services, IWebHostEnvironment environment)
         {
-            if (environment.IsDevelopment())
-            {
-                using var scope = services.BuildServiceProvider().CreateScope();
-                var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var configuration = scope.ServiceProvider.GetService<IConfiguration>();
 
-                services.Configure<DatabaseSettings>(options =>
-                    configuration?.GetSection(nameof(DatabaseSettings)).Bind(options));
+            services.Configure<DatabaseSettings>(options =>
+                configuration?.GetSection(nameof(DatabaseSettings)).Bind(options));
 
-                services.Configure<RabbitMqSettings>(options =>
-                    configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
+            services.Configure<RabbitMqSettings>(options =>
+                configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
 
-                services.Configure<MailSettings>(options =>
-                    configuration?.GetSection(nameof(MailSettings)).Bind(options));
+            services.Configure<MailSettings>(options =>
+                configuration?.GetSection(nameof(MailSettings)).Bind(options));
 
-                services.Configure<PaystackSettings>(options =>
-                    configuration?.GetSection(nameof(PaystackSettings)).Bind(options));
-            }
-
+            services.Configure<PaystackSettings>(options =>
+                configuration?.GetSection(nameof(PaystackSettings)).Bind(options));
             // todo: if not development, use key vault for appSettings.
         }
 
