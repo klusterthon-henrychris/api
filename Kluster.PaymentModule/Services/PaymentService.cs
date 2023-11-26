@@ -162,7 +162,7 @@ public class PaymentService(
             return Errors.Invoice.PaymentAlreadyCompleted;
         }
 
-        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, invoiceCreatedEvent.Amount * 100));
+        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, invoiceCreatedEvent.Amount / 100));
 
         invoice.Status = InvoiceStatus.Paid.ToString();
 
