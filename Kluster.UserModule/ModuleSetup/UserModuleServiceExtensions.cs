@@ -29,20 +29,24 @@ namespace Kluster.UserModule.ModuleSetup
         private static void AddMsIdentity(IServiceCollection services)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-            {
-                options.Password.RequireDigit = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequiredLength = 6;
+                {
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequiredLength = 6;
 
-                // Lockout settings.
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
+                    // Lockout settings.
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+                    options.Lockout.AllowedForNewUsers = true;
 
-                options.User.RequireUniqueEmail = true;
-            }).AddEntityFrameworkStores<UserModuleDbContext>()
+                    options.User.RequireUniqueEmail = true;
+                }).AddEntityFrameworkStores<UserModuleDbContext>()
                 .AddDefaultTokenProviders();
+
+            // passwords only last 2 hours.
+            services.Configure<DataProtectionTokenProviderOptions>(opt =>
+                opt.TokenLifespan = TimeSpan.FromHours(2));
         }
     }
 }

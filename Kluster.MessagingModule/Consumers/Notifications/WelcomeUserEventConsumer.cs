@@ -10,6 +10,7 @@ public class WelcomeUserEventConsumer(
 {
     public async Task Consume(ConsumeContext<WelcomeUserEvent> context)
     {
+        logger.LogInformation($"Received WELCOME EMAIL request for: {context.Message.EmailAddress}.");
         var success = await notificationService.SendWelcomeMail(context.Message.EmailAddress, context.Message.FirstName,
             context.Message.LastName);
         if (!success)
@@ -18,6 +19,6 @@ public class WelcomeUserEventConsumer(
         }
 
         // todo: don't log email address
-        logger.LogInformation($"Sent welcome email for: {context.Message.EmailAddress}.");
+        logger.LogInformation($"Sent WELCOME EMAIL to: {context.Message.EmailAddress}.");
     }
 }

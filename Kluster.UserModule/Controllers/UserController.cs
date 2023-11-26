@@ -1,4 +1,5 @@
-﻿using Kluster.Shared.API;
+﻿using ErrorOr;
+using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.User;
 using Kluster.Shared.Extensions;
 using Kluster.Shared.SharedContracts.UserModule;
@@ -43,5 +44,21 @@ public class UserController(IUserService userService) : BaseController
     {
         var generateNewOtpResult = await userService.ResendVerificationMessage(id, verificationRoute);
         return generateNewOtpResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("request-password-rest")]
+    public async Task<IActionResult> SendForgotPasswordMail(ForgotPasswordRequest request)
+    {
+        var sendForgotPasswordMail = await userService.SendForgotPasswordMail(request);
+        return sendForgotPasswordMail.Match(_ => Ok(), ReturnErrorResponse);
+    }
+    
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+    {
+        var resetPasswordRequest = await userService.ResetPassword(request);
+        return resetPasswordRequest.Match(_ => Ok(), ReturnErrorResponse);
     }
 }
