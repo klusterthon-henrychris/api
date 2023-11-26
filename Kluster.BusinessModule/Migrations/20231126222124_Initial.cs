@@ -19,13 +19,13 @@ namespace Kluster.BusinessModule.Migrations
                 schema: "BusinessModule",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    RcNumber = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Industry = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
+                    Id = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Address = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    RcNumber = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
+                    Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Industry = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -37,14 +37,14 @@ namespace Kluster.BusinessModule.Migrations
                 schema: "BusinessModule",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    BusinessName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    EmailAddress = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BusinessId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
+                    Id = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    BusinessName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Address = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    EmailAddress = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    BusinessId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -63,14 +63,14 @@ namespace Kluster.BusinessModule.Migrations
                 schema: "BusinessModule",
                 columns: table => new
                 {
-                    ProductId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    ProductType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    BusinessId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
+                    ProductId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    ProductType = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    BusinessId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,10 +89,10 @@ namespace Kluster.BusinessModule.Migrations
                 schema: "BusinessModule",
                 columns: table => new
                 {
-                    WalletId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
-                    BusinessId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
+                    WalletId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    Balance = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Currency = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false),
+                    BusinessId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
