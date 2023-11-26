@@ -18,15 +18,16 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
 {
     private readonly MailSettings _mailSettings = options.Value;
 
-    public Task<bool> SendOtpEmail(SendOtpEmailRequest request)
+    public Task<bool> SendOtpMail(SendOtpEmailRequest request)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendOtpEmail));
+        var emailTemplate = mailService.LoadTemplate(nameof(SendOtpMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
             .Replace("{LastName}", request.LastName)
             .Replace("{Token}", HttpUtility.UrlEncode(request.Otp))
-            .Replace("{UserId}", request.UserId);
+            // todo: remove userId from SendOtpEmailRequest
+            .Replace("{BaseUrl}", _mailSettings.BaseWebsiteUrl);
 
         return mailService.SendAsync(new MailData
         {
@@ -83,7 +84,8 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
             .Replace("{LastName}", request.LastName)
             .Replace("{DueDate}", request.DueDate.ToShortDateString())
             .Replace("{InvoiceNo}", request.InvoiceNo)
-            .Replace("{ReplyToMail}", _mailSettings.From);
+            .Replace("{ReplyToMail}", _mailSettings.From)
+            .Replace("{BaseUrl}", _mailSettings.BaseWebsiteUrl);
 
         var success = await mailService.SendAsync(new MailData
         {
