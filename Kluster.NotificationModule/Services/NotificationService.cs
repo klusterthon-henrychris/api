@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Web;
 using ErrorOr;
 using Kluster.NotificationModule.Models;
 using Kluster.NotificationModule.ServiceErrors;
@@ -93,5 +94,29 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
         }, new CancellationToken());
 
         return success ? Result.Success : Errors.Notification.InitialInvoiceEmailFailed;
+    }
+
+    public async Task<ErrorOr<Success>> SendInvoiceReminderMail(SendInvoiceReminderRequest request)
+    {
+        var emailTemplate = mailService.LoadTemplate(nameof(SendInitialInvoiceMail));
+        List<string> to = [request.EmailAddress];
+        emailTemplate = emailTemplate
+            .Replace("{FirstName}", request.FirstName)
+            .Replace("{DueDate}", request.DueDate.ToShortDateString())
+            .Replace("{IssuedDate}", request.IssuedDate.ToShortDateString())
+            .Replace("{InvoiceNo}", request.InvoiceNo)
+            .Replace("{Amount}", request.Amount.ToString(CultureInfo.CurrentCulture))
+            .Replace("{ReplyToMail}", _mailSettings.From);
+        
+        var success = await mailService.SendAsync(new MailData
+        {
+            Attachments = null,
+            Body = emailTemplate,
+            Subject =
+                $"Invoice Reminder From {request.BusinessName}. Payment {request.InvoiceStatus} - ₦{request.Amount}.",
+            To = to
+        }, new CancellationToken());
+
+        return success ? Result.Success : Errors.Notification.InitialReminderEmailFailed;
     }
 }
