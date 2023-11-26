@@ -36,6 +36,8 @@ public class PaymentService(
 
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"Deleted {payments.Count} payments linked to business: {command.BusinessId}.");
     }
 
     public async Task DeleteAllPaymentsLinkedToClient(DeletePaymentsForClient command)
@@ -46,6 +48,8 @@ public class PaymentService(
 
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"Deleted {payments.Count} payments linked to client: {command.ClientId}.");
     }
 
     public async Task DeleteAllPaymentsLinkedToInvoice(DeletePaymentsForInvoice command)
@@ -56,6 +60,8 @@ public class PaymentService(
 
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"Deleted {payments.Count} payments linked to invoice: {command.InvoiceId}.");
     }
 
     public async Task<ErrorOr<PaymentDetailsResponse>> GetPaymentDetails(string invoiceNo)
@@ -103,14 +109,17 @@ public class PaymentService(
         var isTransactionValid = await paystackService.VerifyTransaction(request.data.reference);
         if (!isTransactionValid)
         {
+            logger.LogError($"Payment notification not valid for reference: {request.data.reference}.");
             return Errors.Payment.NotValid;
         }
 
-        await bus.Publish(new PaymentNotificationReceived(request.data.status, request.data.amount, request.data.reference));
+        await bus.Publish(new PaymentNotificationReceived(request.data.status, request.data.amount,
+            request.data.reference));
+        logger.LogInformation($"Payment notification processed for reference: {request.data.reference}.");
         return Result.Success;
     }
 
-    public async Task<ErrorOr<InvoicePaymentValidated>> IsPaystackTransactionValid(
+    public async Task<ErrorOr<InvoicePaymentValidated>> IsPaystackTransactionNotificationValid(
         PaymentNotificationReceived contextMessage)
     {
         var notification = await payStackClient.VerifyTransaction(contextMessage.DataReference);
@@ -127,7 +136,7 @@ public class PaymentService(
             return SharedErrors<Invoice>.NotFound;
         }
 
-        if ((notification.data.amount * 100 == invoice.Amount) && notification.data.status == "success")
+        if ((decimal) notification.data.amount * 100 == invoice.Amount && notification.data.status == "success")
         {
             logger.LogInformation($"Validated invoice payment with reference: {contextMessage.DataReference}.");
             return new InvoicePaymentValidated(invoice.InvoiceNo, notification.data.amount, notification.data.channel);
@@ -143,26 +152,33 @@ public class PaymentService(
         var payment = await context.Payments.FirstOrDefaultAsync(c => c.InvoiceId == invoiceCreatedEvent.InvoiceId);
         if (payment is null)
         {
+            logger.LogError($"Could not find payment with InvoiceId: {invoiceCreatedEvent.InvoiceId}.");
             return SharedErrors<Payment>.NotFound;
         }
 
         if (payment.IsCompleted)
         {
+            logger.LogInformation($"Payment with InvoiceId: {invoiceCreatedEvent.InvoiceId} is already completed.");
             return Errors.Payment.AlreadyCompleted;
         }
 
         var invoice = await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == invoiceCreatedEvent.InvoiceId);
         if (invoice is null)
         {
+            logger.LogError($"Could not find invoice with InvoiceId: {invoiceCreatedEvent.InvoiceId}.");
             return SharedErrors<Invoice>.NotFound;
         }
 
         if (invoice.Status == InvoiceStatus.Paid.ToString())
         {
+            logger.LogInformation($"Invoice with InvoiceId: {invoiceCreatedEvent.InvoiceId} is already paid.");
             return Errors.Invoice.PaymentAlreadyCompleted;
         }
 
-        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, invoiceCreatedEvent.Amount * 100));
+        var amountInNaira = (decimal)invoiceCreatedEvent.AmountInKobo / 100;
+        logger.LogInformation(
+            $"Crediting wallet for BusinessId: {payment.BusinessId} with amount: NGN{amountInNaira}.");
+        walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, amountInNaira));
 
         invoice.Status = InvoiceStatus.Paid.ToString();
 
@@ -173,6 +189,8 @@ public class PaymentService(
         context.Update(invoice);
         context.Update(payment);
         await context.SaveChangesAsync();
+
+        logger.LogInformation($"Payment completed for InvoiceId: {invoiceCreatedEvent.InvoiceId}.");
         return Result.Success;
     }
 }

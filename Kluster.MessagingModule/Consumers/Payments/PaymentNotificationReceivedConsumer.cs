@@ -15,7 +15,7 @@ public class PaymentNotificationReceivedConsumer(
     {
         logger.LogInformation(
             $"Received transaction webhook from Paystack for reference: {context.Message.DataReference}.");
-        var isTransactionValid = await paymentService.IsPaystackTransactionValid(context.Message);
+        var isTransactionValid = await paymentService.IsPaystackTransactionNotificationValid(context.Message);
         if (isTransactionValid.IsError)
         {
             throw new InvalidOperationException(isTransactionValid.FirstError.Code);

@@ -1,3 +1,3 @@
 ﻿namespace Kluster.Shared.MessagingContracts.Events;
 
-public record InvoicePaymentValidated(string InvoiceId, int Amount, string PaymentChannel);
+public record InvoicePaymentValidated(string InvoiceId, int AmountInKobo, string PaymentChannel);
