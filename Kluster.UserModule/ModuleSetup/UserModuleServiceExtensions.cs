@@ -40,8 +40,9 @@ namespace Kluster.UserModule.ModuleSetup
                     options.Lockout.MaxFailedAccessAttempts = 5;
                     options.Lockout.AllowedForNewUsers = true;
 
-                    options.User.RequireUniqueEmail = true;
-                }).AddEntityFrameworkStores<UserModuleDbContext>()
+                options.User.RequireUniqueEmail = true;
+                // options.SignIn.RequireConfirmedEmail = true;
+            }).AddEntityFrameworkStores<UserModuleDbContext>()
                 .AddDefaultTokenProviders();
 
             // passwords only last 2 hours.

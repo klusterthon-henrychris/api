@@ -128,6 +128,9 @@ namespace Kluster.Host
                 
                 services.Configure<MailSettings>(options =>
                     configuration?.GetSection(nameof(MailSettings)).Bind(options));
+                
+                services.Configure<PaystackSettings>(options =>
+                    configuration?.GetSection(nameof(PaystackSettings)).Bind(options));
             }
 
             // todo: if not development, use key vault for appSettings.

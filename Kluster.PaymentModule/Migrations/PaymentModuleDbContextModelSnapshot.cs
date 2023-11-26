@@ -42,6 +42,11 @@ namespace Kluster.PaymentModule.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ClientEmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("ClientId")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -87,13 +92,16 @@ namespace Kluster.PaymentModule.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("DateOfPayment")
+                    b.Property<DateTime?>("DateOfPayment")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("InvoiceId")
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("OtherDetails")
                         .HasMaxLength(450)

@@ -4,7 +4,7 @@ namespace Kluster.Shared.DTOs.Responses.Requests;
 
 public class PagedResponse<T>
 {
-    public IEnumerable<T> Items { get; set; }
+    public IEnumerable<T> Items { get; set; } = null!;
     public int CurrentPage { get; set; }
     public int TotalPages { get; set; }
     public int PageSize { get; set; }
