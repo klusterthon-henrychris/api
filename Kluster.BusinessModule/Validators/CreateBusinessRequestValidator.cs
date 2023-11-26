@@ -13,7 +13,6 @@ public class CreateBusinessRequestValidator : AbstractValidator<CreateBusinessRe
         RuleFor(x => x.BusinessName).ValidateName();
         RuleFor(x => x.BusinessAddress).ValidateAddress();
         RuleFor(x => x.RcNumber).ValidateRcNumber();
-        RuleFor(x => x.CacNumber).ValidateCacNumber();
         RuleFor(x => x.Industry).ValidateIndustry();
         RuleFor(x => x.BusinessDescription).ValidateBusinessDescription();
     }

@@ -49,4 +49,23 @@ public class ClientsController(IClientService clientService) : BaseController
             _ => Ok(getClientsResult.ToSuccessfulApiResponse()),
             ReturnErrorResponse);
     }
+    
+    [HttpDelete("{clientId}")]
+    public async Task<IActionResult> DeleteClient(string clientId)
+    {
+        var deleteClientResult = await clientService.DeleteClient(clientId);
+        return deleteClientResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
+    
+    [HttpGet("count")]
+    public async Task<IActionResult> GetTotalClientsForCurrentUserBusiness()
+    {
+        var getClientsResult = await clientService.GetTotalClientsForCurrentUserBusiness();
+
+        // If successful, return the event data in an ApiResponse.
+        // If an error occurs, return an error response using the ReturnErrorResponse method.
+        return getClientsResult.Match(
+            _ => Ok(getClientsResult.ToSuccessfulApiResponse()),
+            ReturnErrorResponse);
+    }
 }

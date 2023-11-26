@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Kluster.BusinessModule.Services.Contracts;
 using Kluster.Shared.API;
 using Kluster.Shared.DTOs.Requests.Product;
 using Microsoft.AspNetCore.Mvc;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.SharedContracts.BusinessModule;
 
 namespace Kluster.BusinessModule.Controllers
 {
@@ -32,16 +32,36 @@ namespace Kluster.BusinessModule.Controllers
         }
 
         [HttpPut("{productId}/update")]
-        public async Task<IActionResult> UpdateProduct(string productId, [Required, FromForm] UpdateProductRequest request)
+        public async Task<IActionResult> UpdateProduct(string productId,
+            [Required, FromForm] UpdateProductRequest request)
         {
             var updateUserResult = await productService.UpdateProduct(productId, request);
             return updateUserResult.Match(_ => NoContent(), ReturnErrorResponse);
         }
-        
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAllProducts([FromQuery] GetProductsRequest request)
         {
             var getProductsResult = await productService.GetAllProducts(request);
+
+            // If successful, return the event data in an ApiResponse.
+            // If an error occurs, return an error response using the ReturnErrorResponse method.
+            return getProductsResult.Match(
+                _ => Ok(getProductsResult.ToSuccessfulApiResponse()),
+                ReturnErrorResponse);
+        }
+
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteProduct(string productId)
+        {
+            var deleteProductResult = await productService.DeleteProduct(productId);
+            return deleteProductResult.Match(_ => NoContent(), ReturnErrorResponse);
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> GetTotalProductsForCurrentUserBusiness()
+        {
+            var getProductsResult = await productService.GetTotalProductsForCurrentUserBusiness();
 
             // If successful, return the event data in an ApiResponse.
             // If an error occurs, return an error response using the ReturnErrorResponse method.

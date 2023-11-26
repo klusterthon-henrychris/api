@@ -10,9 +10,9 @@ namespace Kluster.BusinessModule.Controllers;
 public class BusinessController(IBusinessService businessService) : BaseController
 {
     [HttpPost]
-    public async Task<IActionResult> CreateBusiness([Required, FromBody] CreateBusinessRequest request)
+    public async Task<IActionResult> CreateBusinessForCurrentUser([Required, FromBody] CreateBusinessRequest request)
     {
-        var createBusinessResult = await businessService.CreateBusinessAsync(request);
+        var createBusinessResult = await businessService.CreateBusinessForCurrentUser(request);
 
         return createBusinessResult.Match(
             businessResponse => CreatedAtAction(nameof(GetBusinessById), routeValues: new { id = businessResponse.Id },
@@ -34,9 +34,9 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetBusinessOfLoggedInUser()
+    public async Task<IActionResult> GetBusinessForCurrentUser()
     {
-        var getBusinessResult = await businessService.GetBusinessOfLoggedInUser();
+        var getBusinessResult = await businessService.GetBusinessForCurrentUser();
 
         // If successful, return the event data in an ApiResponse.
         // If an error occurs, return an error response using the ReturnErrorResponse method.
@@ -46,9 +46,16 @@ public class BusinessController(IBusinessService businessService) : BaseControll
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateBusiness(UpdateBusinessRequest request)
+    public async Task<IActionResult> UpdateBusinessForCurrentUser(UpdateBusinessRequest request)
     {
-        var updateBusinessResult = await businessService.UpdateBusiness(request);
+        var updateBusinessResult = await businessService.UpdateBusinessForCurrentUser(request);
         return updateBusinessResult.Match(_ => NoContent(), ReturnErrorResponse);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteBusinessForCurrentUser()
+    {
+        var deleteBusinessResult = await businessService.DeleteBusinessForCurrentUser();
+        return deleteBusinessResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 }

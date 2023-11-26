@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kluster.BusinessModule.Migrations
 {
     [DbContext(typeof(BusinessModuleDbContext))]
-    [Migration("20231121150715_Initial")]
+    [Migration("20231125113622_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,85 +20,11 @@ namespace Kluster.BusinessModule.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("BusinessModule")
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Kluster.Shared.Domain.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AspNetUsers", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
-                });
 
             modelBuilder.Entity("Kluster.Shared.Domain.Business", b =>
                 {
@@ -110,10 +36,6 @@ namespace Kluster.BusinessModule.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("CacNumber")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(200)
@@ -140,9 +62,7 @@ namespace Kluster.BusinessModule.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Businesses");
+                    b.ToTable("Businesses", "BusinessModule");
                 });
 
             modelBuilder.Entity("Kluster.Shared.Domain.Client", b =>
@@ -173,9 +93,6 @@ namespace Kluster.BusinessModule.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -190,7 +107,7 @@ namespace Kluster.BusinessModule.Migrations
 
                     b.HasIndex("BusinessId");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Clients", "BusinessModule");
                 });
 
             modelBuilder.Entity("Kluster.Shared.Domain.Product", b =>
@@ -234,18 +151,34 @@ namespace Kluster.BusinessModule.Migrations
 
                     b.HasIndex("BusinessId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", "BusinessModule");
                 });
 
-            modelBuilder.Entity("Kluster.Shared.Domain.Business", b =>
+            modelBuilder.Entity("Kluster.Shared.Domain.Wallet", b =>
                 {
-                    b.HasOne("Kluster.Shared.Domain.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<string>("WalletId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Navigation("User");
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BusinessId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.HasKey("WalletId");
+
+                    b.HasIndex("BusinessId")
+                        .IsUnique();
+
+                    b.ToTable("Wallets", "BusinessModule");
                 });
 
             modelBuilder.Entity("Kluster.Shared.Domain.Client", b =>
@@ -270,11 +203,24 @@ namespace Kluster.BusinessModule.Migrations
                     b.Navigation("Business");
                 });
 
+            modelBuilder.Entity("Kluster.Shared.Domain.Wallet", b =>
+                {
+                    b.HasOne("Kluster.Shared.Domain.Business", "Business")
+                        .WithOne("Wallet")
+                        .HasForeignKey("Kluster.Shared.Domain.Wallet", "BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Business");
+                });
+
             modelBuilder.Entity("Kluster.Shared.Domain.Business", b =>
                 {
                     b.Navigation("Clients");
 
                     b.Navigation("Products");
+
+                    b.Navigation("Wallet");
                 });
 #pragma warning restore 612, 618
         }

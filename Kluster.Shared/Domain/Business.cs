@@ -15,9 +15,6 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxAddressLength)]
         public required string Address { get; set; }
 
-        [MaxLength(DomainConstants.MaxCacNumberLength)]
-        public string? CacNumber { get; set; }
-
         [MaxLength(DomainConstants.MaxRcNumberLength)]
         public string? RcNumber { get; set; }
 
@@ -31,7 +28,7 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxIdLength)]
         public required string UserId { get; set; }
 
-        public ApplicationUser User { get; set; } = null!;
+        public Wallet? Wallet { get; set; }
         public List<Product> Products { get; set; } = [];
         public List<Client> Clients { get; set; } = [];
     }

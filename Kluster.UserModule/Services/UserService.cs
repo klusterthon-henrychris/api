@@ -1,13 +1,14 @@
-﻿using System.Web;
-using ErrorOr;
+﻿using ErrorOr;
 using Kluster.Shared.Constants;
 using Kluster.Shared.Domain;
 using Kluster.Shared.DTOs.Requests.User;
 using Kluster.Shared.DTOs.Responses.User;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.MessagingContracts.Commands.Notification;
 using Kluster.Shared.MessagingContracts.Events.Notification;
 using Kluster.Shared.MessagingContracts.Events.User;
+using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.UserModule;
 using Kluster.UserModule.Data;
 using Kluster.UserModule.ServiceErrors;
@@ -100,15 +101,17 @@ public class UserService(
     /// <param name="id"></param>
     /// <param name="verificationRoute">Can be either Email or Phone.</param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <exception cref="NotImplementedException">Throws an exception when the choice isn't email.</exception>
     public async Task<ErrorOr<Success>> ResendVerificationMessage(string id, string verificationRoute)
     {
         var user = await userManager.FindByIdAsync(id);
         if (user is null)
         {
-            return Errors.User.NotFound;
+            // for security reasons, don't say User not found.
+            return Errors.User.ReconfirmEmail;
         }
 
+        // todo: if there's time, use the email instead of the id above ^. email more secure than displaying ID.
         if (string.Equals(verificationRoute, OtpRoute.Email.ToString(), StringComparison.CurrentCultureIgnoreCase))
         {
             await bus.Publish(new EmailOtpRequestedEvent(user.FirstName, user.LastName, user.Email!, user.Id));
@@ -116,5 +119,41 @@ public class UserService(
         }
 
         throw new NotImplementedException("SMS Validation not available.");
+    }
+
+    public async Task<ErrorOr<Success>> SendForgotPasswordMail(ForgotPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.EmailAddress);
+        if (user is null)
+        {
+            // for security reasons, don't say User not found.
+            // say email will be sent.
+            return Result.Success;
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        await bus.Publish(new SendForgotPasswordEmailCommand(user.Email!, token, user.FirstName, user.LastName));
+        return Result.Success;
+    }
+
+    public async Task<ErrorOr<Success>> ResetPassword(ResetPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.EmailAddress);
+        if (user is null)
+        {
+            // ask to reconfirm email
+            return Errors.User.ReconfirmEmail;
+        }
+
+        var resetPassResult = await userManager.ResetPasswordAsync(user, request.Token, request.Password);
+        if (!resetPassResult.Succeeded)
+        {
+            logger.LogError($"ResetPassword failed for user {user.Id}.");
+            return resetPassResult.Errors
+                .Select(error => Error.Validation("User." + error.Code, error.Description))
+                .ToList();
+        }
+
+        return Result.Success;
     }
 }

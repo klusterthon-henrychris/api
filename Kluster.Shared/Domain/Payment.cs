@@ -14,7 +14,8 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxJsonLength)]
         public string? OtherDetails { get; set; }
 
-        [MaxLength(DomainConstants.MaxEnumLength)] public string? PaymentChannel { get; set; }
+        [MaxLength(DomainConstants.MaxEnumLength)]
+        public string? PaymentChannel { get; set; }
 
         // navigation properties
         [MaxLength(DomainConstants.MaxIdLength)]
@@ -26,8 +27,6 @@ namespace Kluster.Shared.Domain
         [MaxLength(DomainConstants.MaxIdLength)]
         public required string ClientId { get; set; }
 
-        public Business Business { get; set; } = null!;
         public Invoice Invoice { get; set; } = null!;
-        public Client Client { get; set; } = null!;
     }
 }

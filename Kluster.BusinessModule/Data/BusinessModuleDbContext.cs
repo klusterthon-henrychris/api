@@ -7,10 +7,11 @@ public class BusinessModuleDbContext(DbContextOptions<BusinessModuleDbContext> o
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
+        modelBuilder.HasDefaultSchema(nameof(BusinessModule));
     }
-    
+
     public DbSet<Business> Businesses { get; set; } = null!;
     public DbSet<Client> Clients { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Wallet> Wallets { get; set; } = null!;
 }

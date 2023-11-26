@@ -9,7 +9,7 @@ public interface IClientService
 {
     Task<ErrorOr<GetClientResponse>> GetClient(string id);
     Task<ErrorOr<CreateClientResponse>> CreateClientAsync(CreateClientRequest request);
-    Task<ErrorOr<PagedList<GetClientResponse>>> GetAllClients(GetClientsRequest request);
+    Task<ErrorOr<PagedResponse<GetClientResponse>>> GetAllClients(GetClientsRequest request);
     Task<ErrorOr<Updated>> UpdateClient(string clientId, UpdateClientRequest request);
 
     /// <summary>
@@ -19,4 +19,7 @@ public interface IClientService
     /// <param name="clientId"></param>
     /// <returns></returns>
     Task<ErrorOr<ClientAndBusinessResponse>> GetClientAndBusiness(string clientId);
+    Task DeleteAllClientsRelatedToBusiness(string businessId);
+    Task<ErrorOr<Deleted>> DeleteClient(string clientId);
+    Task<ErrorOr<int>> GetTotalClientsForCurrentUserBusiness();
 }

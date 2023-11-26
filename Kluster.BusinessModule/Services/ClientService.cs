@@ -9,14 +9,17 @@ using Kluster.Shared.DTOs.Responses.Client;
 using Kluster.Shared.DTOs.Responses.Requests;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.MessagingContracts.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Commands.Payment;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.BusinessModule.Services;
 
-public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext context) : IClientService
+public class ClientService(ICurrentUser currentUser, IBus bus, BusinessModuleDbContext context) : IClientService
 {
     public async Task<ErrorOr<GetClientResponse>> GetClient(string id)
     {
@@ -54,7 +57,7 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
         return new CreateClientResponse(client.Id);
     }
 
-    public Task<ErrorOr<PagedList<GetClientResponse>>> GetAllClients(GetClientsRequest request)
+    public async Task<ErrorOr<PagedResponse<GetClientResponse>>> GetAllClients(GetClientsRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         Enum.TryParse<ClientSortOptions>(request.SortOption, out var sortOption);
@@ -65,19 +68,17 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
 
         query = ApplyFilters(query, request);
         query = SortClientsQuery(query, sortOption);
-        var pagedResults = PagedList<GetClientResponse>
-            .ToPagedList(
-                query.Select(x =>
-                    new GetClientResponse(x.FirstName,
-                        x.LastName,
-                        x.EmailAddress,
-                        x.BusinessName ?? string.Join(" ", x.FirstName, x.LastName),
-                        x.Address)),
-                request.PageNumber,
-                request.PageSize
-            );
+        
+        var pagedResults =
+            query.Select(x => new GetClientResponse(
+                x.Id,
+                x.FirstName,
+                x.LastName,
+                x.EmailAddress,
+                x.BusinessName ?? string.Join(" ", x.FirstName, x.LastName),
+                x.Address));
 
-        return Task.FromResult<ErrorOr<PagedList<GetClientResponse>>>(pagedResults);
+        return await new PagedResponse<GetClientResponse>().ToPagedList(pagedResults, request.PageNumber, request.PageSize);
     }
 
     private static IQueryable<Client> ApplyFilters(IQueryable<Client> query, GetClientsRequest request)
@@ -182,5 +183,38 @@ public class ClientService(ICurrentUser currentUser, BusinessModuleDbContext con
         }
 
         return BusinessModuleMapper.ToClientAndBusinessResponse(client, client.Business);
+    }
+
+    public async Task DeleteAllClientsRelatedToBusiness(string businessId)
+    {
+        var clients = await context.Clients
+            .Where(x => x.BusinessId == businessId)
+            .ToListAsync();
+
+        context.RemoveRange(clients);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<ErrorOr<Deleted>> DeleteClient(string clientId)
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var client = await context.Clients.FirstOrDefaultAsync(x => x.Id == clientId && x.Business.UserId == userId);
+        if (client is null)
+        {
+            return SharedErrors<Client>.NotFound;
+        }
+
+        await bus.Publish(new DeletePaymentsForClient(clientId));
+        await bus.Publish(new DeleteInvoicesForClient(clientId));
+
+        context.Remove(client);
+        await context.SaveChangesAsync();
+        return Result.Deleted;
+    }
+
+    public async Task<ErrorOr<int>> GetTotalClientsForCurrentUserBusiness()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        return await context.Clients.Where(x => x.Business.UserId == userId).CountAsync();
     }
 }

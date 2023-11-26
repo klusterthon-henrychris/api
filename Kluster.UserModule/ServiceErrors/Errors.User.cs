@@ -21,5 +21,9 @@ public static partial class Errors
         public static Error IsNotAllowed => Error.Unauthorized(
             code: "User.IsNotAllowed",
             description: "User is not allowed to access the system. Please contact admin.");
+        
+        public static Error ReconfirmEmail => Error.Validation(
+            code: "User.ReconfirmEmail",
+            description: "Something isn't right. Please confirm your details.");
     }
 }

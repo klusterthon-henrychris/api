@@ -16,7 +16,7 @@ namespace Kluster.Shared.Filters
                 context.ModelState
                     .Where(x => x.Value is { Errors.Count: > 0 })
                     .SelectMany(kvp =>
-                        kvp.Value?.Errors.Select(e => new { Code = kvp.Key, Description = e.ErrorMessage }))
+                        kvp.Value?.Errors.Select(e => new { Code = kvp.Key, Description = e.ErrorMessage })!)
                     .ToList(),
                 "One or more validation errors occured."
             );

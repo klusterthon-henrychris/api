@@ -21,7 +21,6 @@ public static class BusinessModuleMapper
             Address = request.BusinessAddress,
             Industry = request.Industry,
             RcNumber = request.RcNumber,
-            CacNumber = request.CacNumber,
             Description = request.BusinessDescription
         };
 
@@ -30,9 +29,8 @@ public static class BusinessModuleMapper
 
     public static GetBusinessResponse ToGetBusinessResponse(Business business)
     {
-        return new GetBusinessResponse(business.Name,
+        return new GetBusinessResponse(business.Id, business.Name,
             business.Address,
-            business.CacNumber ?? SearchConstants.NotFound,
             business.RcNumber ?? SearchConstants.NotFound,
             business.Description ?? SearchConstants.NotFound,
             business.Industry);
@@ -61,7 +59,7 @@ public static class BusinessModuleMapper
 
     public static GetClientResponse ToGetClientResponse(Client client)
     {
-        return new GetClientResponse(client.FirstName, client.LastName, client.EmailAddress,
+        return new GetClientResponse(client.Id, client.FirstName, client.LastName, client.EmailAddress,
             client.BusinessName ?? string.Join(" ", client.FirstName, client.LastName),
             client.Address);
     }
@@ -82,7 +80,7 @@ public static class BusinessModuleMapper
 
     public static GetProductResponse ToGetProductResponse(Product product)
     {
-        return new GetProductResponse(product.Name, product.Description, product.Price, product.Quantity,
+        return new GetProductResponse(product.ProductId, product.Name, product.Description, product.Price, product.Quantity,
             product.ImageUrl, product.ProductType);
     }
 

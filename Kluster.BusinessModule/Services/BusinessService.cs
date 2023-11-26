@@ -7,16 +7,21 @@ using Kluster.Shared.DTOs.Requests.Business;
 using Kluster.Shared.DTOs.Responses.Business;
 using Kluster.Shared.Exceptions;
 using Kluster.Shared.Extensions;
+using Kluster.Shared.MessagingContracts.Commands.Clients;
+using Kluster.Shared.MessagingContracts.Commands.Invoice;
+using Kluster.Shared.MessagingContracts.Commands.Payment;
+using Kluster.Shared.MessagingContracts.Commands.Products;
 using Kluster.Shared.ServiceErrors;
 using Kluster.Shared.SharedContracts.BusinessModule;
 using Kluster.Shared.SharedContracts.UserModule;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kluster.BusinessModule.Services;
 
-public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext context) : IBusinessService
+public class BusinessService(ICurrentUser currentUser, IBus bus, BusinessModuleDbContext context) : IBusinessService
 {
-    public async Task<ErrorOr<BusinessCreationResponse>> CreateBusinessAsync(CreateBusinessRequest request)
+    public async Task<ErrorOr<BusinessCreationResponse>> CreateBusinessForCurrentUser(CreateBusinessRequest request)
     {
         var validateResult = await new CreateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
@@ -75,7 +80,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
-    public async Task<ErrorOr<string>> GetBusinessId()
+    public async Task<ErrorOr<string>> GetBusinessIdOnlyForCurrentUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
 
@@ -86,7 +91,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         return businessId is null ? SharedErrors<Business>.NotFound : businessId;
     }
 
-    public async Task<ErrorOr<GetBusinessResponse>> GetBusinessOfLoggedInUser()
+    public async Task<ErrorOr<GetBusinessResponse>> GetBusinessForCurrentUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
@@ -98,7 +103,7 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
-    public async Task<ErrorOr<Updated>> UpdateBusiness(UpdateBusinessRequest request)
+    public async Task<ErrorOr<Updated>> UpdateBusinessForCurrentUser(UpdateBusinessRequest request)
     {
         var validateResult = await new UpdateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
@@ -115,7 +120,6 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
 
         business.Name = request.Name ?? business.Name;
         business.Address = request.Address ?? business.Address;
-        business.CacNumber = request.CacNumber ?? business.CacNumber;
         business.RcNumber = request.RcNumber ?? business.RcNumber;
         business.Description = request.Description ?? business.Description;
         business.Industry = request.Industry ?? business.Industry;
@@ -125,6 +129,22 @@ public class BusinessService(ICurrentUser currentUser, BusinessModuleDbContext c
         return Result.Updated;
     }
 
-    // todo: delete business 
-    // delete clients, delete invoices and delete payments.
+    public async Task<ErrorOr<Deleted>> DeleteBusinessForCurrentUser()
+    {
+        var userId = currentUser.UserId ?? throw new UserNotSetException();
+        var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
+        if (business is null)
+        {
+            return SharedErrors<Business>.NotFound;
+        }
+
+        await bus.Publish(new DeletePaymentsForBusiness(business.Id));
+        await bus.Publish(new DeleteInvoicesForBusiness(business.Id));
+        await bus.Publish(new DeleteClientsForBusiness(business.Id));
+        await bus.Publish(new DeleteProductsForBusiness(business.Id));
+
+        context.Remove(business);
+        await context.SaveChangesAsync();
+        return Result.Deleted;
+    }
 }

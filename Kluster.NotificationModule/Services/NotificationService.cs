@@ -1,13 +1,15 @@
 ﻿using System.Web;
+using ErrorOr;
 using Kluster.NotificationModule.Models;
+using Kluster.NotificationModule.ServiceErrors;
 using Kluster.NotificationModule.Services.Contracts;
 using Kluster.Shared.DTOs.Requests.Notification;
-using Kluster.Shared.MessagingContracts.Events.Notification;
+using Kluster.Shared.MessagingContracts.Commands.Notification;
 using Kluster.Shared.SharedContracts.NotificationModule;
 
 namespace Kluster.NotificationModule.Services;
 
-public class NotificationService(ILogger<NotificationService> logger, IMailService mailService) : INotificationService
+public class NotificationService(IMailService mailService) : INotificationService
 {
     public Task<bool> SendOtpEmail(SendOtpEmailRequest request)
     {
@@ -43,5 +45,25 @@ public class NotificationService(ILogger<NotificationService> logger, IMailServi
             Subject = "Welcome To SimpleBiz",
             To = to
         }, new CancellationToken());
+    }
+
+    public async Task<ErrorOr<Success>> SendForgotPasswordMail(SendForgotPasswordEmailCommand request)
+    {
+        var emailTemplate = mailService.LoadTemplate(nameof(SendWelcomeMail));
+        List<string> to = [request.EmailAddress];
+        emailTemplate = emailTemplate
+            .Replace("{FirstName}", request.FirstName)
+            .Replace("{LastName}", request.LastName)
+            .Replace("{Token}", request.Token);
+
+        var success = await mailService.SendAsync(new MailData
+        {
+            Attachments = null,
+            Body = emailTemplate,
+            Subject = "Reset Your Password.",
+            To = to
+        }, new CancellationToken());
+
+        return success ? Result.Success : Errors.Notification.ForgotPasswordEmailFailed;
     }
 }

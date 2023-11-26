@@ -14,10 +14,7 @@ public class UpdateBusinessRequestValidator : AbstractValidator<UpdateBusinessRe
 
         When(x => x.Address is not null, () =>
             RuleFor(x => x.Address)!.ValidateAddress());
-
-        When(x => x.CacNumber is not null, () =>
-            RuleFor(x => x.CacNumber)!.ValidateCacNumber());
-
+        
         When(x => x.RcNumber is not null, () =>
             RuleFor(x => x.RcNumber)!.ValidateRcNumber());
 

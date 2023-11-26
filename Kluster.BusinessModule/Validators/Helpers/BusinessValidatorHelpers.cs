@@ -17,17 +17,6 @@ public static class BusinessValidatorHelpers
             .WithErrorCode(Errors.Business.InvalidRcNumber.Code);
     }
 
-    public static void ValidateCacNumber<T>(this IRuleBuilder<T, string> ruleBuilder)
-    {
-        ruleBuilder
-            .NotEmpty()
-            .WithMessage(Errors.Business.MissingCacNumber.Description)
-            .WithErrorCode(Errors.Business.MissingCacNumber.Code)
-            .MaximumLength(DomainConstants.MaxCacNumberLength)
-            .WithMessage(Errors.Business.InvalidCacNumber.Description)
-            .WithErrorCode(Errors.Business.InvalidCacNumber.Code);
-    }
-
     public static void ValidateIndustry<T>(this IRuleBuilder<T, string> ruleBuilder)
     {
         ruleBuilder
