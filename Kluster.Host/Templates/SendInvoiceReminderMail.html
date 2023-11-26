@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Reminder</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        table {
+            margin: auto;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        td {
+            padding: 20px;
+            text-align: center;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #666666;
+        }
+
+        .invoice-details {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<table role="presentation" cellspacing="0" cellpadding="0">
+    <tr>
+        <td>
+            <!--            todo: use 'Invoice Reminder From {BusinessName}: Payment Due - ₦{Amount}' as subject-->
+            <!--            todo: Consider the Invoice Status and change the template accordingly-->
+            <p>Dear {FirstName},</p>
+            <p>This is a gentle reminder regarding the pending payment of ₦{Amount} for Invoice {InvoiceNo}, scheduled
+                for payment
+                by {DueDate}. The initial invoice was sent on {IssuedDate}. Attached is a copy of the
+                invoice for your reference in case it was misplaced or not received.</p>
+            <p>If you've already settled the payment, please disregard this reminder. For any queries or assistance with
+                the payment process, feel free to reach out to us.</p>
+            <p>Your prompt attention to this matter is greatly appreciated.</p>
+
+            <p style="color: #666666;">Warm regards,</p>
+            <p style="color: #666666;">Support</p>
+            <p style="color: #666666;">SimpleBiz</p>
+            <p><a href="mailto:{ReplyToEmail}" style="text-decoration: none; color: #3498db;">{ReplyToEmail}</a>
+            </p>
+            <button class="button">Pay Invoice</button>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

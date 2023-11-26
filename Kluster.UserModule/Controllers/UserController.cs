@@ -38,7 +38,7 @@ public class UserController(IUserService userService) : BaseController
     }
     
     [AllowAnonymous]
-    [HttpPost("{id}/resend-verification-message")]
+    [HttpPost("{id}/resend-email-verification")]
     // route is email or phone
     public async Task<IActionResult> ResendVerificationMessage(string id, string verificationRoute)
     {
@@ -47,7 +47,7 @@ public class UserController(IUserService userService) : BaseController
     }
 
     [AllowAnonymous]
-    [HttpPost("request-password-rest")]
+    [HttpPost("request-password-reset")]
     public async Task<IActionResult> SendForgotPasswordMail(ForgotPasswordRequest request)
     {
         var sendForgotPasswordMail = await userService.SendForgotPasswordMail(request);

@@ -17,7 +17,7 @@
     depends_on:
       - database
       - messaging
-    restart: always
+    restart: on-failure
   
   
   database:
@@ -37,3 +37,12 @@
       - "5672:5672"
       - "15672:15672"
       - "15692:15692"
+  
+  logging:
+    image: "datalust/seq"
+    container_name: kluster.logs
+    ports:
+      - "80:80"
+      - "5341:5341"
+    environment:
+      - ACCEPT_EULA=y

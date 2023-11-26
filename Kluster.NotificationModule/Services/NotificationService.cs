@@ -1,25 +1,33 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Web;
 using ErrorOr;
 using Kluster.NotificationModule.Models;
 using Kluster.NotificationModule.ServiceErrors;
 using Kluster.NotificationModule.Services.Contracts;
+using Kluster.Shared.Configuration;
+using Kluster.Shared.DTOs.Requests.Invoices;
 using Kluster.Shared.DTOs.Requests.Notification;
 using Kluster.Shared.MessagingContracts.Commands.Notification;
 using Kluster.Shared.SharedContracts.NotificationModule;
+using Microsoft.Extensions.Options;
 
 namespace Kluster.NotificationModule.Services;
 
-public class NotificationService(IMailService mailService) : INotificationService
+public class NotificationService(IMailService mailService, IOptionsSnapshot<MailSettings> options)
+    : INotificationService
 {
-    public Task<bool> SendOtpEmail(SendOtpEmailRequest request)
+    private readonly MailSettings _mailSettings = options.Value;
+
+    public Task<bool> SendOtpMail(SendOtpEmailRequest request)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendOtpEmail));
+        var emailTemplate = mailService.LoadTemplate(nameof(SendOtpMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
             .Replace("{LastName}", request.LastName)
             .Replace("{Token}", HttpUtility.UrlEncode(request.Otp))
-            .Replace("{UserId}", request.UserId);
+            // todo: remove userId from SendOtpEmailRequest
+            .Replace("{BaseUrl}", _mailSettings.BaseWebsiteUrl);
 
         return mailService.SendAsync(new MailData
         {
@@ -65,5 +73,52 @@ public class NotificationService(IMailService mailService) : INotificationServic
         }, new CancellationToken());
 
         return success ? Result.Success : Errors.Notification.ForgotPasswordEmailFailed;
+    }
+
+    public async Task<ErrorOr<Success>> SendInitialInvoiceMail(SendInitialInvoiceEmailRequest request)
+    {
+        var emailTemplate = mailService.LoadTemplate(nameof(SendInitialInvoiceMail));
+        List<string> to = [request.EmailAddress];
+        emailTemplate = emailTemplate
+            .Replace("{FirstName}", request.FirstName)
+            .Replace("{LastName}", request.LastName)
+            .Replace("{DueDate}", request.DueDate.ToShortDateString())
+            .Replace("{InvoiceNo}", request.InvoiceNo)
+            .Replace("{ReplyToMail}", _mailSettings.From)
+            .Replace("{BaseUrl}", _mailSettings.BaseWebsiteUrl);
+
+        var success = await mailService.SendAsync(new MailData
+        {
+            Attachments = null,
+            Body = emailTemplate,
+            Subject = $"Invoice from {request.BusinessName}. Due on {request.DueDate.ToShortDateString()}.",
+            To = to
+        }, new CancellationToken());
+
+        return success ? Result.Success : Errors.Notification.InitialInvoiceEmailFailed;
+    }
+
+    public async Task<ErrorOr<Success>> SendInvoiceReminderMail(SendInvoiceReminderRequest request)
+    {
+        var emailTemplate = mailService.LoadTemplate(nameof(SendInitialInvoiceMail));
+        List<string> to = [request.EmailAddress];
+        emailTemplate = emailTemplate
+            .Replace("{FirstName}", request.FirstName)
+            .Replace("{DueDate}", request.DueDate.ToShortDateString())
+            .Replace("{IssuedDate}", request.IssuedDate.ToShortDateString())
+            .Replace("{InvoiceNo}", request.InvoiceNo)
+            .Replace("{Amount}", request.Amount.ToString(CultureInfo.CurrentCulture))
+            .Replace("{ReplyToMail}", _mailSettings.From);
+        
+        var success = await mailService.SendAsync(new MailData
+        {
+            Attachments = null,
+            Body = emailTemplate,
+            Subject =
+                $"Invoice Reminder From {request.BusinessName}. Payment {request.InvoiceStatus} - ₦{request.Amount}.",
+            To = to
+        }, new CancellationToken());
+
+        return success ? Result.Success : Errors.Notification.InitialReminderEmailFailed;
     }
 }

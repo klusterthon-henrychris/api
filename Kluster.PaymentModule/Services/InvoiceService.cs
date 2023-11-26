@@ -49,10 +49,16 @@ public class InvoiceService(
         await context.Invoices.AddAsync(invoice);
         await context.SaveChangesAsync();
 
-        // create incomplete payment
-        logger.LogInformation("Published InvoiceCreatedEvent");
-        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId, invoice.ClientId, invoice.InvoiceNo,
-            invoice.Amount));
+        // create incomplete payment and send invoice email.
+        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId,
+            invoice.ClientId,
+            invoice.InvoiceNo,
+            invoice.Amount,
+            clientAndBusinessResponse.Value.FirstName,
+            clientAndBusinessResponse.Value.LastName,
+            clientAndBusinessResponse.Value.ClientEmailAddress,
+            invoice.DueDate,
+            clientAndBusinessResponse.Value.BusinessName));
 
         // Log successful invoice creation
         logger.LogInformation($"Invoice created successfully: {invoice.InvoiceNo}");
