@@ -15,3 +15,6 @@ primary_region = "ams"
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
+
+[env]
+ASPNETCORE_ENVIRONMENT = "Production"
