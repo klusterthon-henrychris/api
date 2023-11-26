@@ -24,6 +24,7 @@ public class AuthenticationService(
 {
     public async Task<ErrorOr<UserAuthResponse>> RegisterAsync(RegisterRequest request)
     {
+        logger.LogInformation($"Registration request received for email: {request.EmailAddress}.");
         var validateResult = await new RegisterRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
@@ -33,6 +34,7 @@ public class AuthenticationService(
         var user = await userManager.FindByEmailAsync(request.EmailAddress);
         if (user is not null)
         {
+            logger.LogWarning($"Duplicate email found during registration: {request.EmailAddress}");
             return Errors.User.DuplicateEmail;
         }
 
@@ -41,8 +43,10 @@ public class AuthenticationService(
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(newUser, newUser.Role);
-            await bus.Publish(new EmailOtpRequestedEvent(newUser.FirstName, newUser.LastName, newUser.Email!, newUser.Id));
-            
+            await bus.Publish(new EmailOtpRequestedEvent(newUser.FirstName, newUser.LastName, newUser.Email!,
+                newUser.Id));
+
+            logger.LogInformation($"User registered successfully: {request.EmailAddress}.");
             return new UserAuthResponse(Id: newUser.Id,
                 Role: newUser.Role,
                 AccessToken: tokenService.CreateUserJwt(newUser.Email!, newUser.Role, newUser.Id));
@@ -51,7 +55,10 @@ public class AuthenticationService(
         var errors = result.Errors
             .Select(error => Error.Validation("User." + error.Code, error.Description))
             .ToList();
-
+        logger.LogError(
+            $"User registration failed for email: {request.EmailAddress}." +
+            $"\nErrors: {string.Join(", ", errors.Select(e => $"{e.Code}: {e.Description}"))}"
+        );
         return errors;
     }
 
@@ -60,6 +67,7 @@ public class AuthenticationService(
         var user = await userManager.FindByEmailAsync(request.EmailAddress);
         if (user is null)
         {
+            logger.LogWarning($"Email not found during login: {request.EmailAddress}.");
             return Errors.Auth.LoginFailed;
         }
 

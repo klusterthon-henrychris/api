@@ -24,6 +24,18 @@ public interface IPaymentService
     /// <returns></returns>
     Task<ErrorOr<Success>> ProcessPaymentNotification(PaystackNotification notification, string ipAddress);
 
-    Task<ErrorOr<InvoicePaymentValidated>> IsPaystackTransactionValid(PaymentNotificationReceived contextMessage);
+    /// <summary>
+    /// Checks if a Paystack transaction notification is valid by comparing it to the existing invoice.
+    /// </summary>
+    /// <param name="contextMessage">The payment notification received.</param>
+    /// <returns>An asynchronous task that represents the operation and contains the result of the validation.</returns>
+    Task<ErrorOr<InvoicePaymentValidated>> IsPaystackTransactionNotificationValid(PaymentNotificationReceived contextMessage);
+
+    /// <summary>
+    /// Completes a payment process. It validates the payment and invoice details, credits the wallet, 
+    /// updates the payment and invoice status, and saves the changes in the database.
+    /// </summary>
+    /// <param name="invoiceCreatedEvent">The invoice payment validated event.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains either an Error or Success.</returns>
     Task<ErrorOr<Success>> CompletePayment(InvoicePaymentValidated invoiceCreatedEvent);
 }

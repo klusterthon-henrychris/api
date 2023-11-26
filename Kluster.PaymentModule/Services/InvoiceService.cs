@@ -30,24 +30,39 @@ public class InvoiceService(
         var validateResult = await new CreateInvoiceRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
+            // Log validation errors
+            logger.LogError($"Validation errors occurred while creating invoice: {validateResult.Errors}");
             return validateResult.ToErrorList();
         }
 
-        // check that the client exists and is register to the business of the authenticated user
+        // check that the client exists and is registered to the business of the authenticated user
         var clientAndBusinessResponse = await clientService.GetClientAndBusiness(request.ClientId);
         if (clientAndBusinessResponse.IsError)
         {
+            // Log client and business retrieval error
+            logger.LogError(
+                $"Error occurred while retrieving client and business: {clientAndBusinessResponse.FirstError}");
             return clientAndBusinessResponse.FirstError;
         }
 
         var invoice = PaymentModuleMapper.ToInvoice(request, clientAndBusinessResponse.Value);
         await context.Invoices.AddAsync(invoice);
         await context.SaveChangesAsync();
-        
+
         // create incomplete payment
-        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId, invoice.ClientId, invoice.InvoiceNo, invoice.Amount));
-        
+        logger.LogInformation("Published InvoiceCreatedEvent");
+        await bus.Publish(new InvoiceCreatedEvent(invoice.BusinessId, invoice.ClientId, invoice.InvoiceNo,
+            invoice.Amount));
+
+        // Log successful invoice creation
+        logger.LogInformation($"Invoice created successfully: {invoice.InvoiceNo}");
+
         return PaymentModuleMapper.ToCreateInvoiceResponse(invoice);
+    }
+
+    public Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<ErrorOr<GetInvoiceResponse>> GetInvoice(string invoiceNo)
@@ -55,6 +70,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
+            logger.LogError($"Error occurred while getting business ID: {businessIdOfCurrentUser.Errors}");
             return businessIdOfCurrentUser.Errors;
         }
 
@@ -62,12 +78,14 @@ public class InvoiceService(
             .Where(i => i.BusinessId == businessIdOfCurrentUser.Value && i.InvoiceNo == invoiceNo)
             .FirstOrDefaultAsync();
 
-        return invoice is null ? SharedErrors<Invoice>.NotFound : PaymentModuleMapper.ToGetInvoiceResponse(invoice);
-    }
+        if (invoice is null)
+        {
+            logger.LogInformation($"Invoice not found for invoice number: {invoiceNo}");
+            return SharedErrors<Invoice>.NotFound;
+        }
 
-    public Task<ErrorOr<Updated>> UpdateInvoice(string invoiceId, UpdateInvoiceRequest request)
-    {
-        throw new NotImplementedException();
+        logger.LogInformation($"Retrieved invoice successfully: {invoice.InvoiceNo}");
+        return PaymentModuleMapper.ToGetInvoiceResponse(invoice);
     }
 
     public async Task<ErrorOr<PagedResponse<GetInvoiceResponse>>> GetAllInvoices(GetInvoicesRequest request)
@@ -77,6 +95,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
+            logger.LogError($"Error occurred while getting business ID: {businessIdOfCurrentUser.Errors}");
             return businessIdOfCurrentUser.Errors;
         }
 
@@ -94,6 +113,7 @@ public class InvoiceService(
                 x.InvoiceItems
             ));
 
+        logger.LogInformation("Retrieved all invoices successfully");
         return await new PagedResponse<GetInvoiceResponse>().ToPagedList(pagedResults, request.PageNumber,
             request.PageSize);
     }
@@ -105,6 +125,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
+            logger.LogError($"Error occurred while getting business ID: {businessIdOfCurrentUser.Errors}");
             return businessIdOfCurrentUser.Errors;
         }
 
@@ -114,6 +135,7 @@ public class InvoiceService(
 
         if (invoice is null)
         {
+            logger.LogInformation($"Invoice not found for invoice number: {id}");
             return SharedErrors<Invoice>.NotFound;
         }
 
@@ -122,6 +144,7 @@ public class InvoiceService(
 
         context.Remove(invoice);
         await context.SaveChangesAsync();
+        logger.LogInformation($"Deleted invoice successfully: {id}");
         return Result.Deleted;
     }
 
@@ -133,6 +156,7 @@ public class InvoiceService(
 
         context.RemoveRange(invoices);
         await context.SaveChangesAsync();
+        logger.LogInformation($"Deleted all invoices linked to client: {command.ClientId}");
     }
 
     public async Task DeleteAllInvoicesLinkedToBusiness(DeleteInvoicesForBusiness command)
@@ -143,6 +167,7 @@ public class InvoiceService(
 
         context.RemoveRange(invoices);
         await context.SaveChangesAsync();
+        logger.LogInformation($"Deleted all invoices linked to business: {command.BusinessId}");
     }
 
     public async Task<ErrorOr<int>> GetInvoiceCountForCurrentUserBusiness(string? filter)
@@ -163,14 +188,16 @@ public class InvoiceService(
             invoicesQuery = ApplyStatusFilters(invoicesQuery, filter);
         }
 
-        return await invoicesQuery.CountAsync();
+        var count = await invoicesQuery.CountAsync();
+        logger.LogInformation($"Retrieved invoice total for business {businessIdOfCurrentUser.Value}: {count}");
+        return count;
     }
 
     #endregion
 
     #region Filter and Query
 
-    private static IQueryable<Invoice> ApplyStatusFilters(IQueryable<Invoice> query, string? invoiceStatus)
+    private IQueryable<Invoice> ApplyStatusFilters(IQueryable<Invoice> query, string? invoiceStatus)
     {
         if (string.IsNullOrWhiteSpace(invoiceStatus))
         {
@@ -181,10 +208,13 @@ public class InvoiceService(
         query = query.Where(x =>
             x.Status.Equals(invoiceStatusEnum.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
+        // Log the applied status filters
+        logger.LogInformation($"Applied status filters: InvoiceStatus = {invoiceStatus}");
+
         return query;
     }
 
-    private static IQueryable<Invoice> SortQuery(IQueryable<Invoice> query, InvoiceSortOptions sortOption)
+    private IQueryable<Invoice> SortQuery(IQueryable<Invoice> query, InvoiceSortOptions sortOption)
     {
         query = sortOption switch
         {
@@ -199,6 +229,9 @@ public class InvoiceService(
 
             _ => query.OrderByDescending(x => x.DueDate)
         };
+
+        // Log the applied sort option
+        logger.LogInformation($"Applied sort option: InvoiceSortOptions = {sortOption}");
 
         return query;
     }

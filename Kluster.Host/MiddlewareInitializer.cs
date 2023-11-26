@@ -1,5 +1,6 @@
 ﻿using Kluster.Shared.Middleware;
 using Kluster.UserModule.ModuleSetup;
+using Serilog;
 
 namespace Kluster.Host
 {
@@ -11,6 +12,7 @@ namespace Kluster.Host
         /// <param name="app">The web application.</param>
         public static void ConfigureApplication(this WebApplication app)
         {
+            app.UseSerilogRequestLogging();
             RegisterSwagger(app);
             RegisterMiddleware(app);
             RegisterModules(app);
