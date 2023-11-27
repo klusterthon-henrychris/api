@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Kluster.BusinessModule.ModuleSetup;
 using Kluster.Messaging.ModuleSetup;
 using Kluster.NotificationModule.ModuleSetup;
@@ -48,6 +50,7 @@ namespace Kluster.Host
             RegisterFilters(services);
             SetupAuthentication(services);
             SetupCors(services);
+            AddHangfire(services);
         }
 
         private static void SetupControllers(IServiceCollection services)
@@ -118,31 +121,38 @@ namespace Kluster.Host
 
         private static void BindConfigFiles(this IServiceCollection services)
         {
-            var baseConfiguration = new ConfigurationBuilder()
+            IConfiguration baseConfiguration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (env == Environments.Development)
             {
+                Console.WriteLine("Fetching Development Secrets");
                 var userSecretsId = Environment.GetEnvironmentVariable("USER_SECRETS_ID");
+                Console.WriteLine($"UserSecretsId: {userSecretsId}");
                 baseConfiguration = new ConfigurationBuilder()
                     .AddUserSecrets(userSecretsId!)
                     .AddEnvironmentVariables()
                     .Build();
+                Console.WriteLine(
+                    $"User secrets have been retrieved. Count: {baseConfiguration.AsEnumerable().Count()}");
             }
-            
-            Console.WriteLine("Trying to fetch secrets configuration from key vault.");
-            baseConfiguration = GetSecretsConfigurationAsync(baseConfiguration).GetAwaiter().GetResult();
-            Console.WriteLine("Fetched secrets configuration from key vault.");
-            
+            else
+            {
+                Console.WriteLine("Fetching Production Secrets");
+                Console.WriteLine("Trying to fetch secrets configuration from key vault.");
+                baseConfiguration = GetSecretsConfigurationAsync(baseConfiguration).GetAwaiter().GetResult();
+                Console.WriteLine("Fetched secrets configuration from key vault.");
+            }
+
             ConfigureSettings<DatabaseSettings>(services, baseConfiguration);
             ConfigureSettings<RabbitMqSettings>(services, baseConfiguration);
             ConfigureSettings<MailSettings>(services, baseConfiguration);
             ConfigureSettings<PaystackSettings>(services, baseConfiguration);
             ConfigureSettings<JwtSettings>(services, baseConfiguration);
             ConfigureSettings<KeyVault>(services, baseConfiguration);
-            Console.WriteLine("Secrets have been bound to classes from key vault.");
+            Console.WriteLine("Secrets have been bound to classes.");
         }
 
         private static async Task<IConfigurationRoot> GetSecretsConfigurationAsync(IConfiguration baseConfiguration)
@@ -201,6 +211,15 @@ namespace Kluster.Host
             services.AddPaymentModule();
             services.AddMessagingModule();
             services.AddNotificationModule();
+        }
+
+        private static void AddHangfire(IServiceCollection services)
+        {
+            var db = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>().Value;
+            services.AddHangfire(x => x.UsePostgreSqlStorage(
+                x => { x.UseNpgsqlConnection(db.ConnectionString); }));
+
+            services.AddHangfireServer();
         }
     }
 }
