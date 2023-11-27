@@ -36,8 +36,9 @@ public static class DbExtensions
 
             connectionString =
                 $"Server={updatedHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};";
+            Console.WriteLine($"ConnectionString: {connectionString}");
         }
-        
+
         services.AddDbContext<T>(options =>
         {
             options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable(
