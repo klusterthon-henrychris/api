@@ -169,29 +169,18 @@ namespace Kluster.Host
 
         private static void SetupCors(this IServiceCollection services)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            if (env == Environments.Development)
-            {
-                services.AddCors(options =>
-                {
-                    options.AddPolicy("AllowAnyOrigin",
-                        builder =>
-                        {
-                            builder.AllowAnyOrigin()
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-                        });
-                });
-            }
-
             services.AddCors(options =>
             {
-                options.DefaultPolicyName = "AllowSimpleDev";
-                options.AddDefaultPolicy(builder =>
-                {
-                    builder.AllowAnyMethod().WithOrigins("https://simple-biz.fly.dev");
-                });
+                options.AddPolicy("AllowSimpleDev",
+                    builder => { builder.AllowAnyMethod().WithOrigins("https://simple-biz.fly.dev"); });
+
+                options.AddPolicy("AllowAnyOrigin",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
             });
         }
 

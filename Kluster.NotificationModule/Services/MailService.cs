@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Azure.Storage.Blobs;
 using Kluster.NotificationModule.Models;
 using Kluster.NotificationModule.Services.Contracts;
 using Kluster.Shared.Configuration;
@@ -9,9 +10,14 @@ using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Kluster.NotificationModule.Services;
 
-public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailService> logger) : IMailService
+public class MailService(
+    IOptionsSnapshot<MailSettings> settings,
+    IOptionsSnapshot<KeyVault> options,
+    ILogger<MailService> logger) : IMailService
 {
-    private readonly MailSettings _settings = settings.Value;
+    private readonly MailSettings _mailSettings = settings.Value;
+    private readonly KeyVault _keyVault = options.Value;
+    private BlobClient _blobClient;
 
     public async Task<bool> SendAsync(MailData mailData, CancellationToken ct = default)
     {
@@ -23,8 +29,8 @@ public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailSe
             #region Sender / Receiver
 
             // Sender
-            mail.From.Add(new MailboxAddress(_settings.DisplayName, _settings.From));
-            mail.Sender = new MailboxAddress(_settings.DisplayName, _settings.From);
+            mail.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.From));
+            mail.Sender = new MailboxAddress(_mailSettings.DisplayName, _mailSettings.From);
 
             // Receiver
             if (mailData.To != null)
@@ -89,8 +95,8 @@ public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailSe
         using var smtp = new SmtpClient();
         try
         {
-            await smtp.ConnectAsync(_settings.Host, _settings.Port, GetSecureSocketOptions(), ct);
-            await smtp.AuthenticateAsync(_settings.UserName, _settings.Password, ct);
+            await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, GetSecureSocketOptions(), ct);
+            await smtp.AuthenticateAsync(_mailSettings.UserName, _mailSettings.Password, ct);
             await smtp.SendAsync(mail, ct);
         }
         finally
@@ -101,10 +107,10 @@ public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailSe
 
     private SecureSocketOptions GetSecureSocketOptions()
     {
-        return _settings.UseSsl ? SecureSocketOptions.SslOnConnect :
-            _settings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+        return _mailSettings.UseSsl ? SecureSocketOptions.SslOnConnect :
+            _mailSettings.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
     }
-    
+
     /// <inheritdoc />
     public string LoadTemplate(string pathToTemplate)
     {
@@ -120,5 +126,14 @@ public class MailService(IOptionsSnapshot<MailSettings> settings, ILogger<MailSe
         streamReader.Close();
 
         return mailTemplate;
+    }
+
+    public async Task<string> LoadTemplateFromBlob(string templateName)
+    {
+        _blobClient = new BlobClient(_keyVault.AZURE_STORAGE_CONNECTION_STRING, _keyVault.BLOB_CONTAINER_NAME,
+            $"{templateName}.html");
+
+        var blob = await _blobClient.DownloadContentAsync();
+        return blob.Value.Content.ToString();
     }
 }

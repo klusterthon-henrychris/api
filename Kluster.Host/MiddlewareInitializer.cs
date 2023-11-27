@@ -44,7 +44,8 @@ namespace Kluster.Host
             app.UseAuthorization();
             app.MapControllers();
             app.UseMiddleware<ExceptionMiddleware>();
-            app.UseCors("AllowAnyOrigin");
+
+            app.UseCors(app.Environment.IsDevelopment() ? "AllowAnyOrigin" : "AllowSimpleDev");
             app.MapHealthChecks("/health"); // todo: implement IHealthCheck
         }
 
