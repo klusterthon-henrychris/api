@@ -1,4 +1,5 @@
-﻿using Kluster.Shared.Middleware;
+﻿using Hangfire;
+using Kluster.Shared.Middleware;
 using Kluster.UserModule.ModuleSetup;
 using Serilog;
 
@@ -16,6 +17,7 @@ namespace Kluster.Host
             RegisterSwagger(app);
             RegisterMiddleware(app);
             RegisterModules(app);
+            AddHangfire(app);
         }
 
         /// <summary>
@@ -52,6 +54,11 @@ namespace Kluster.Host
         private static void RegisterModules(WebApplication app)
         {
             app.UseUserModule();
+        }
+
+        private static void AddHangfire(WebApplication app)
+        {
+            app.UseHangfireDashboard(); //Will be available under http://localhost:5000/hangfire"
         }
     }
 }

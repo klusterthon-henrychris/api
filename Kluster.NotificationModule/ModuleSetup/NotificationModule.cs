@@ -10,6 +10,8 @@ namespace Kluster.NotificationModule.ModuleSetup
         {
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IMailService, MailService>();
+            services.AddTransient<IHangfireService, HangfireService>();
+            services.AddTransient<IReminderService, ReminderService>();
         }
     }
 }
