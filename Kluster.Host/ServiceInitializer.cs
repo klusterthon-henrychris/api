@@ -9,6 +9,7 @@ using Kluster.NotificationModule.ModuleSetup;
 using Kluster.PaymentModule.ModuleSetup;
 using Kluster.Shared.Configuration;
 using Kluster.Shared.Constants;
+using Kluster.Shared.Domain;
 using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
 using Kluster.UserModule.Services;
@@ -215,10 +216,23 @@ namespace Kluster.Host
 
         private static void AddHangfire(IServiceCollection services)
         {
-            var db = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>().Value;
-            services.AddHangfire(x => x.UsePostgreSqlStorage(
-                x => { x.UseNpgsqlConnection(db.ConnectionString); }));
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            string connectionString;
+            if (env == Environments.Development)
+            {
+                var dbSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>()
+                    ?.Value;
+                connectionString = dbSettings!.ConnectionString!;
+            }
+            else
+            {
+                // Use connection string provided at runtime by Fly.
+                connectionString = SharedLogic.GetProdPostGresConnectionString();
+                Console.WriteLine($"ConnectionString: {connectionString}");
+            }
 
+            services.AddHangfire(x => x.UsePostgreSqlStorage(
+                x => { x.UseNpgsqlConnection(connectionString); }));
             services.AddHangfireServer();
         }
     }
