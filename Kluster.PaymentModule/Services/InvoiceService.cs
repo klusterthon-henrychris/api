@@ -112,12 +112,12 @@ public class InvoiceService(
         var pagedResults =
             query.Select(x => new GetInvoiceResponse(
                 x.InvoiceNo,
-                x.InvoiceNo,
                 x.Amount,
                 x.DueDate,
                 x.DateOfIssuance,
                 x.Status,
-                x.InvoiceItems
+                x.InvoiceItems,
+                x.ClientId
             ));
 
         logger.LogInformation("Retrieved all invoices successfully");
