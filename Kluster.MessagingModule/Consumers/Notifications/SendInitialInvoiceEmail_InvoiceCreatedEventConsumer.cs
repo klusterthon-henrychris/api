@@ -16,7 +16,7 @@ public class SendInitialInvoiceEmailInvoiceCreatedEventConsumer(
     public async Task Consume(ConsumeContext<InvoiceCreatedEvent> context)
     {
         logger.LogInformation(
-            $"Invoice {context.Message.InvoiceId} has been created. Sending Initial Invoice Email...");
+            "Invoice {0} has been created. Sending Initial Invoice Email...", context.Message.InvoiceId);
         var result =
             await notificationService.SendInitialInvoiceMail(
                 MessagingModuleMapper.ToSendInitialInvoiceEmailRequest(context.Message));
@@ -26,6 +26,6 @@ public class SendInitialInvoiceEmailInvoiceCreatedEventConsumer(
             throw new InvalidOperationException(result.FirstError.Code);
         }
 
-        logger.LogInformation($"Successfully sent Initial email for invoice {context.Message.InvoiceId}.");
+        logger.LogInformation("Successfully sent Initial email for invoice {0}.", context.Message.InvoiceId);
     }
 }

@@ -11,13 +11,13 @@ public class InvoicePaymentValidatedConsumer(
 {
     public async Task Consume(ConsumeContext<InvoicePaymentValidated> context)
     {
-        logger.LogInformation($"Invoice {context.Message.InvoiceId} has been validated. Completing payment...");
+        logger.LogInformation("Invoice {0} has been validated. Completing payment...", context.Message.InvoiceId);
         var result = await paymentService.CompletePayment(context.Message);
         if (result.IsError)
         {
             throw new InvalidOperationException(result.FirstError.Code);
         }
-        
+
         // todo: send email and web notifications here.  describe flow
     }
 }

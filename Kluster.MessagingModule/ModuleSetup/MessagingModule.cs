@@ -21,18 +21,36 @@ public static class MessagingModule
             x.AddSagas(assembly);
             x.AddActivities(assembly);
 
-            x.UsingRabbitMq((context, cfg) =>
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (env == Environments.Development)
             {
-                var hostUrl = new Uri(rabbitMqSettings?.Host!);
-                cfg.Host(hostUrl ?? throw new InvalidOperationException("RabbitMQ Host not Set."), "/",
-                    h =>
-                    {
-                        h.Username(rabbitMqSettings!.Username);
-                        h.Password(rabbitMqSettings!.Password);
-                    });
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(rabbitMqSettings?.Host, "/",
+                        h =>
+                        {
+                            h.Username(rabbitMqSettings!.Username);
+                            h.Password(rabbitMqSettings!.Password);
+                        });
 
-                cfg.ConfigureEndpoints(context);
-            });
+                    cfg.ConfigureEndpoints(context);
+                });
+            }
+
+            else
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(new Uri(rabbitMqSettings?.Host!), "/",
+                        h =>
+                        {
+                            h.Username(rabbitMqSettings!.Username);
+                            h.Password(rabbitMqSettings!.Password);
+                        });
+
+                    cfg.ConfigureEndpoints(context);
+                });
+            }
         });
     }
 }

@@ -37,7 +37,7 @@ public class PaymentService(
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
 
-        logger.LogInformation($"Deleted {payments.Count} payments linked to business: {command.BusinessId}.");
+        logger.LogInformation("Deleted {0} payments linked to business: {1}.", payments.Count, command.BusinessId);
     }
 
     public async Task DeleteAllPaymentsLinkedToClient(DeletePaymentsForClient command)
@@ -49,7 +49,7 @@ public class PaymentService(
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
 
-        logger.LogInformation($"Deleted {payments.Count} payments linked to client: {command.ClientId}.");
+        logger.LogInformation("Deleted {0} payments linked to client: {1}.", payments.Count, command.ClientId);
     }
 
     public async Task DeleteAllPaymentsLinkedToInvoice(DeletePaymentsForInvoice command)
@@ -61,7 +61,7 @@ public class PaymentService(
         context.RemoveRange(payments);
         await context.SaveChangesAsync();
 
-        logger.LogInformation($"Deleted {payments.Count} payments linked to invoice: {command.InvoiceId}.");
+        logger.LogInformation("Deleted {0} payments linked to invoice: {1}.", payments.Count, command.InvoiceId);
     }
 
     public async Task<ErrorOr<PaymentDetailsResponse>> GetPaymentDetails(string invoiceNo)
@@ -92,7 +92,7 @@ public class PaymentService(
     {
         if (await context.Payments.AnyAsync(x => x.InvoiceId == invoiceCreatedEvent.InvoiceId))
         {
-            logger.LogError($"Payment already exists for invoice: {invoiceCreatedEvent.InvoiceId}.");
+            logger.LogError("Payment already exists for invoice: {0}.", invoiceCreatedEvent.InvoiceId);
             throw new PaymentAlreadyExistsException(
                 $"Payment already exists for invoice: {invoiceCreatedEvent.InvoiceId}.");
         }
@@ -100,7 +100,7 @@ public class PaymentService(
         var payment = PaymentModuleMapper.ToPayment(invoiceCreatedEvent);
         await context.AddAsync(payment);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Created payment for: {invoiceCreatedEvent.InvoiceId}.");
+        logger.LogInformation("Created payment for: {0}.", invoiceCreatedEvent.InvoiceId);
     }
 
     public async Task<ErrorOr<Success>> ProcessPaymentNotification(PaystackNotification request, string ipAddress)
@@ -109,13 +109,13 @@ public class PaymentService(
         var isTransactionValid = await paystackService.VerifyTransaction(request.data.reference);
         if (!isTransactionValid)
         {
-            logger.LogError($"Payment notification not valid for reference: {request.data.reference}.");
+            logger.LogError("Payment notification not valid for reference: {0}.", request.data.reference);
             return Errors.Payment.NotValid;
         }
 
         await bus.Publish(new PaymentNotificationReceived(request.data.status, request.data.amount,
             request.data.reference));
-        logger.LogInformation($"Payment notification processed for reference: {request.data.reference}.");
+        logger.LogInformation("Payment notification processed for reference: {0}.", request.data.reference);
         return Result.Success;
     }
 
@@ -125,25 +125,25 @@ public class PaymentService(
         var notification = await payStackClient.VerifyTransaction(contextMessage.DataReference);
         if (notification is null)
         {
-            logger.LogError($"Could not find transaction with reference: {contextMessage.DataReference}.");
+            logger.LogError("Could not find transaction with reference: {0}.", contextMessage.DataReference);
             return Errors.Payment.NotValid;
         }
 
         var invoice = await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == contextMessage.DataReference);
         if (invoice is null)
         {
-            logger.LogError($"Could not find invoice with reference: {contextMessage.DataReference}.");
+            logger.LogError("Could not find invoice with reference: {0}.", contextMessage.DataReference);
             return SharedErrors<Invoice>.NotFound;
         }
 
-        if ((decimal) notification.data.amount * 100 == invoice.Amount && notification.data.status == "success")
+        if ((decimal)notification.data.amount * 100 == invoice.Amount && notification.data.status == "success")
         {
-            logger.LogInformation($"Validated invoice payment with reference: {contextMessage.DataReference}.");
+            logger.LogInformation("Validated invoice payment with reference: {0}.", contextMessage.DataReference);
             return new InvoicePaymentValidated(invoice.InvoiceNo, notification.data.amount, notification.data.channel);
         }
 
-        logger.LogError($"Could not validate invoice with reference: {contextMessage.DataReference}." +
-                        $"\nNotification: {JsonSerializer.Serialize(notification)}");
+        logger.LogError("Could not validate invoice with reference: {0}." +
+                        "\nNotification: {1}", contextMessage.DataReference, JsonSerializer.Serialize(notification));
         return Errors.Payment.NotValid;
     }
 
@@ -152,32 +152,32 @@ public class PaymentService(
         var payment = await context.Payments.FirstOrDefaultAsync(c => c.InvoiceId == invoiceCreatedEvent.InvoiceId);
         if (payment is null)
         {
-            logger.LogError($"Could not find payment with InvoiceId: {invoiceCreatedEvent.InvoiceId}.");
+            logger.LogError("Could not find payment with InvoiceId: {0}.", invoiceCreatedEvent.InvoiceId);
             return SharedErrors<Payment>.NotFound;
         }
 
         if (payment.IsCompleted)
         {
-            logger.LogInformation($"Payment with InvoiceId: {invoiceCreatedEvent.InvoiceId} is already completed.");
+            logger.LogInformation("Payment with InvoiceId: {0} is already completed.", invoiceCreatedEvent.InvoiceId);
             return Errors.Payment.AlreadyCompleted;
         }
 
         var invoice = await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == invoiceCreatedEvent.InvoiceId);
         if (invoice is null)
         {
-            logger.LogError($"Could not find invoice with InvoiceId: {invoiceCreatedEvent.InvoiceId}.");
+            logger.LogError("Could not find invoice with InvoiceId: {0}.", invoiceCreatedEvent.InvoiceId);
             return SharedErrors<Invoice>.NotFound;
         }
 
         if (invoice.Status == InvoiceStatus.Paid.ToString())
         {
-            logger.LogInformation($"Invoice with InvoiceId: {invoiceCreatedEvent.InvoiceId} is already paid.");
+            logger.LogInformation("Invoice with InvoiceId: {0} is already paid.", invoiceCreatedEvent.InvoiceId);
             return Errors.Invoice.PaymentAlreadyCompleted;
         }
 
         var amountInNaira = (decimal)invoiceCreatedEvent.AmountInKobo / 100;
         logger.LogInformation(
-            $"Crediting wallet for BusinessId: {payment.BusinessId} with amount: NGN{amountInNaira}.");
+            "Crediting wallet for BusinessId: {0} with amount: NGN{1}.", payment.BusinessId, amountInNaira);
         walletService.CreditWallet(new CreditWalletRequest(payment.BusinessId, amountInNaira));
 
         invoice.Status = InvoiceStatus.Paid.ToString();
@@ -190,7 +190,7 @@ public class PaymentService(
         context.Update(payment);
         await context.SaveChangesAsync();
 
-        logger.LogInformation($"Payment completed for InvoiceId: {invoiceCreatedEvent.InvoiceId}.");
+        logger.LogInformation("Payment completed for InvoiceId: {0}.", invoiceCreatedEvent.InvoiceId);
         return Result.Success;
     }
 }

@@ -9,7 +9,7 @@ public class CreatePaymentInvoiceCreatedEventConsumer(IPaymentService paymentSer
 {
     public Task Consume(ConsumeContext<InvoiceCreatedEvent> context)
     {
-        logger.LogInformation($"Invoice {context.Message.InvoiceId} has been created. Creating Payment Object...");
+        logger.LogInformation("Invoice {0} has been created. Creating Payment Object...", context.Message.InvoiceId);
         return paymentService.CreatePayment(context.Message);
     }
 }

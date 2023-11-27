@@ -24,7 +24,7 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
         var wallet = BusinessModuleMapper.ToWallet(createWalletCommand);
         await context.AddAsync(wallet);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Wallet created for business: {createWalletCommand.BusinessId}");
+        logger.LogInformation("Wallet created for business: {0}", createWalletCommand.BusinessId);
     }
 
     public void CreditWallet(CreditWalletRequest request)
@@ -43,7 +43,7 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
             wallet.Balance += request.AmountInNaira;
             context.SaveChanges();
             logger.LogInformation(
-                $"CREDIT: {wallet.Currency}{request.AmountInNaira}. Wallet: {wallet.WalletId}.");
+                "CREDIT: {0}{1}. Wallet: {2}.", wallet.Currency, request.AmountInNaira, wallet.WalletId);
         }
     }
 
@@ -67,7 +67,7 @@ public class WalletService(ILogger<WalletService> logger, BusinessModuleDbContex
             wallet.Balance -= request.Amount;
             context.SaveChanges();
             logger.LogInformation(
-                $"DEBIT: {wallet.Currency}{request.Amount}. Wallet: {wallet.WalletId}.");
+                "DEBIT: {0}{1}. Wallet: {2}.", wallet.Currency, request.Amount, wallet.WalletId);
         }
     }
 }

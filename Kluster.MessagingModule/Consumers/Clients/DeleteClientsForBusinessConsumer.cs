@@ -10,8 +10,7 @@ public class DeleteClientsForBusinessConsumer(
 {
     public Task Consume(ConsumeContext<DeleteClientsForBusiness> context)
     {
-        logger.LogInformation($"Received request to delete clients for business: {context.Message.BusinessId}.");
-        return clientService.DeleteAllClientsRelatedToBusiness(context.Message
-            .BusinessId);
+        logger.LogInformation("Received request to delete clients for business: {0}.", context.Message.BusinessId);
+        return clientService.DeleteAllClientsRelatedToBusiness(context.Message.BusinessId);
     }
 }

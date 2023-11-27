@@ -31,7 +31,7 @@ public class BusinessService(
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
 
-        logger.LogInformation($"Received request to create business. Request: {request}");
+        logger.LogInformation("Received request to create business. Request: {0}", request);
         var validateResult = await new CreateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
@@ -41,7 +41,7 @@ public class BusinessService(
 
         if (await context.Businesses.AnyAsync(x => x.UserId == userId))
         {
-            logger.LogError($"CreateBusinessRequest failed - {Errors.Business.BusinessAlreadyExists.Description}");
+            logger.LogError("CreateBusinessRequest failed - {0}", Errors.Business.BusinessAlreadyExists.Description);
             return Errors.Business.BusinessAlreadyExists;
         }
 
@@ -50,7 +50,7 @@ public class BusinessService(
         await context.AddAsync(business);
         await context.SaveChangesAsync();
 
-        logger.LogInformation($"Successfully created business {business.Id} for {userId}.");
+        logger.LogInformation("Successfully created business {0} for {1}.", business.Id, userId);
         await bus.Publish(new CreateWalletCommand(businessId, 0));
         return new BusinessCreationResponse(business.Id);
     }
@@ -64,7 +64,7 @@ public class BusinessService(
         var lastBusiness = await context.Businesses
             .OrderByDescending(x => x.Id)
             .FirstOrDefaultAsync();
-        
+
         if (lastBusiness is null) // only null when no other records exist
         {
             logger.LogInformation("No other business entities exist. Returning 001.");
@@ -72,7 +72,7 @@ public class BusinessService(
         }
 
         var numericId = GetValueFromId(lastBusiness.Id);
-        logger.LogInformation($"Previous businessId: {lastBusiness.Id}. New Id: B-{numericId + 1:D6}");
+        logger.LogInformation("Previous businessId: {0}. New Id: B-{1:D6}", lastBusiness.Id, numericId + 1);
         return $"B-{numericId + 1:D6}";
     }
 
@@ -92,11 +92,11 @@ public class BusinessService(
         var business = await context.Businesses.FindAsync(id);
         if (business is null)
         {
-            logger.LogError($"Business {id} does not exist.");
+            logger.LogError("Business {0} does not exist.", id);
             return SharedErrors<Business>.NotFound;
         }
 
-        logger.LogInformation($"Retrieved business {business.Id}.");
+        logger.LogInformation("Retrieved business {0}.", business.Id);
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
@@ -117,18 +117,18 @@ public class BusinessService(
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
         if (business is null)
         {
-            logger.LogError($"User {userId} does not have a business.");
+            logger.LogError("User {0} does not have a business.", userId);
             return SharedErrors<Business>.NotFound;
         }
 
-        logger.LogInformation($"Retrieved business for {userId}");
+        logger.LogInformation("Retrieved business for {0}", userId);
         return BusinessModuleMapper.ToGetBusinessResponse(business);
     }
 
     public async Task<ErrorOr<Updated>> UpdateBusinessForCurrentUser(UpdateBusinessRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Received request to update business from user: {userId}.\nRequest: {request}");
+        logger.LogInformation("Received request to update business from user: {0}.\nRequest: {1}", userId, request);
 
         var validateResult = await new UpdateBusinessRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
@@ -140,7 +140,7 @@ public class BusinessService(
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
         if (business is null)
         {
-            logger.LogError($"User {userId} does not have a business.");
+            logger.LogError("User {0} does not have a business.", userId);
             return SharedErrors<Business>.NotFound;
         }
 
@@ -152,18 +152,18 @@ public class BusinessService(
 
         context.Update(business);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Business {business.Id} has been updated.");
+        logger.LogInformation("Business {0} has been updated.", business.Id);
         return Result.Updated;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteBusinessForCurrentUser()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Received DeleteBusiness request from {userId}.");
+        logger.LogInformation("Received DeleteBusiness request from {0}.", userId);
         var business = await context.Businesses.FirstOrDefaultAsync(x => x.UserId == userId);
         if (business is null)
         {
-            logger.LogError($"User {userId} does not have a business.");
+            logger.LogError("User {0} does not have a business.", userId);
             return SharedErrors<Business>.NotFound;
         }
 
@@ -175,31 +175,31 @@ public class BusinessService(
 
         context.Remove(business);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Business {business.Id} deleted");
+        logger.LogInformation("Business {0} deleted", business.Id);
         return Result.Deleted;
     }
 
     public async Task<ErrorOr<GetWalletBalanceResponse>> GetBusinessWalletBalance()
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Fetching wallet balance for {userId}.");
+        logger.LogInformation("Fetching wallet balance for {0}.", userId);
         var business = await context.Businesses
             .Include(business => business.Wallet)
             .FirstOrDefaultAsync(x => x.UserId == userId);
 
         if (business is null)
         {
-            logger.LogError($"User {userId} does not have a business.");
+            logger.LogError("User {0} does not have a business.", userId);
             return SharedErrors<Business>.NotFound;
         }
 
         if (business.Wallet is null)
         {
-            logger.LogError($"A wallet has not been created for {business.Id}.");
+            logger.LogError("A wallet has not been created for {0}.", business.Id);
             return Errors.Business.WalletNotCreated;
         }
 
-        logger.LogInformation($"Wallet balance retrieved for {business.Id}");
+        logger.LogInformation("Wallet balance retrieved for {0}", business.Id);
         return new GetWalletBalanceResponse(business.Id, business.Name, business.Wallet.Balance);
     }
 }

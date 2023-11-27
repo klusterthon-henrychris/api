@@ -14,7 +14,7 @@ public class PaymentNotificationReceivedConsumer(
     public async Task Consume(ConsumeContext<PaymentNotificationReceived> context)
     {
         logger.LogInformation(
-            $"Received transaction webhook from Paystack for reference: {context.Message.DataReference}.");
+            "Received transaction webhook from Paystack for reference: {0}.", context.Message.DataReference);
         var isTransactionValid = await paymentService.IsPaystackTransactionNotificationValid(context.Message);
         if (isTransactionValid.IsError)
         {

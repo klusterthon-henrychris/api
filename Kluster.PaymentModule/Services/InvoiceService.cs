@@ -31,7 +31,7 @@ public class InvoiceService(
         if (!validateResult.IsValid)
         {
             // Log validation errors
-            logger.LogError($"Validation errors occurred while creating invoice: {validateResult.Errors}");
+            logger.LogError("Validation errors occurred while creating invoice: {0}", validateResult.Errors);
             return validateResult.ToErrorList();
         }
 
@@ -41,7 +41,7 @@ public class InvoiceService(
         {
             // Log client and business retrieval error
             logger.LogError(
-                $"Error occurred while retrieving client and business: {clientAndBusinessResponse.FirstError}");
+                "Error occurred while retrieving client and business: {0}", clientAndBusinessResponse.FirstError);
             return clientAndBusinessResponse.FirstError;
         }
 
@@ -61,7 +61,7 @@ public class InvoiceService(
             clientAndBusinessResponse.Value.BusinessName));
 
         // Log successful invoice creation
-        logger.LogInformation($"Invoice created successfully: {invoice.InvoiceNo}");
+        logger.LogInformation("Invoice created successfully: {0}", invoice.InvoiceNo);
 
         return PaymentModuleMapper.ToCreateInvoiceResponse(invoice);
     }
@@ -76,7 +76,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
-            logger.LogError($"Error occurred while getting business ID: {businessIdOfCurrentUser.Errors}");
+            logger.LogError("Error occurred while getting business ID: {0}", businessIdOfCurrentUser.Errors);
             return businessIdOfCurrentUser.Errors;
         }
 
@@ -86,11 +86,11 @@ public class InvoiceService(
 
         if (invoice is null)
         {
-            logger.LogInformation($"Invoice not found for invoice number: {invoiceNo}");
+            logger.LogInformation("Invoice not found for invoice number: {0}", invoiceNo);
             return SharedErrors<Invoice>.NotFound;
         }
 
-        logger.LogInformation($"Retrieved invoice successfully: {invoice.InvoiceNo}");
+        logger.LogInformation("Retrieved invoice successfully: {0}", invoice.InvoiceNo);
         return PaymentModuleMapper.ToGetInvoiceResponse(invoice);
     }
 
@@ -101,7 +101,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
-            logger.LogError($"Error occurred while getting business ID: {businessIdOfCurrentUser.Errors}");
+            logger.LogError("Error occurred while getting business ID: {0}", businessIdOfCurrentUser.Errors);
             return businessIdOfCurrentUser.Errors;
         }
 
@@ -132,7 +132,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
-            logger.LogError($"Error occurred while getting business ID: {businessIdOfCurrentUser.Errors}");
+            logger.LogError("Error occurred while getting business ID: {0}", businessIdOfCurrentUser.Errors);
             return businessIdOfCurrentUser.Errors;
         }
 
@@ -142,7 +142,7 @@ public class InvoiceService(
 
         if (invoice is null)
         {
-            logger.LogInformation($"Invoice not found for invoice number: {id}");
+            logger.LogInformation("Invoice not found for invoice number: {0}", id);
             return SharedErrors<Invoice>.NotFound;
         }
 
@@ -151,7 +151,7 @@ public class InvoiceService(
 
         context.Remove(invoice);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Deleted invoice successfully: {id}");
+        logger.LogInformation("Deleted invoice successfully: {0}", id);
         return Result.Deleted;
     }
 
@@ -163,7 +163,7 @@ public class InvoiceService(
 
         context.RemoveRange(invoices);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Deleted all invoices linked to client: {command.ClientId}");
+        logger.LogInformation("Deleted all invoices linked to client: {0}", command.ClientId);
     }
 
     public async Task DeleteAllInvoicesLinkedToBusiness(DeleteInvoicesForBusiness command)
@@ -174,7 +174,7 @@ public class InvoiceService(
 
         context.RemoveRange(invoices);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Deleted all invoices linked to business: {command.BusinessId}");
+        logger.LogInformation("Deleted all invoices linked to business: {0}", command.BusinessId);
     }
 
     public async Task<ErrorOr<int>> GetInvoiceCountForCurrentUserBusiness(string? filter)
@@ -182,8 +182,7 @@ public class InvoiceService(
         var businessIdOfCurrentUser = await businessService.GetBusinessIdOnlyForCurrentUser();
         if (businessIdOfCurrentUser.IsError)
         {
-            logger.LogError(
-                $"Request: {nameof(GetInvoiceCountForCurrentUserBusiness)}. Unable to fetch businessId, returning 0.");
+            logger.LogError("Request: {0}. Unable to fetch businessId, returning 0.", nameof(GetInvoiceCountForCurrentUserBusiness));
             return 0;
         }
 
@@ -196,7 +195,7 @@ public class InvoiceService(
         }
 
         var count = await invoicesQuery.CountAsync();
-        logger.LogInformation($"Retrieved invoice total for business {businessIdOfCurrentUser.Value}: {count}");
+        logger.LogInformation("Retrieved invoice total for business {0}: {1}", businessIdOfCurrentUser.Value, count);
         return count;
     }
 
@@ -216,7 +215,7 @@ public class InvoiceService(
             x.Status.Equals(invoiceStatusEnum.ToString(), StringComparison.CurrentCultureIgnoreCase));
 
         // Log the applied status filters
-        logger.LogInformation($"Applied status filters: InvoiceStatus = {invoiceStatus}");
+        logger.LogInformation("Applied status filters: InvoiceStatus = {0}", invoiceStatus);
 
         return query;
     }
@@ -238,7 +237,7 @@ public class InvoiceService(
         };
 
         // Log the applied sort option
-        logger.LogInformation($"Applied sort option: InvoiceSortOptions = {sortOption}");
+        logger.LogInformation("Applied sort option: InvoiceSortOptions = {0}", sortOption);
 
         return query;
     }

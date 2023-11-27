@@ -8,7 +8,7 @@ public class CreateWalletRequestConsumer(IWalletService walletService, ILogger<C
 {
     public Task Consume(ConsumeContext<CreateWalletCommand> context)
     {
-        logger.LogInformation($"Received request to create wallet for business: {context.Message.BusinessId}.");
+        logger.LogInformation("Received request to create wallet for business: {BusinessId}.", context.Message.BusinessId);
         return walletService.CreateWallet(context.Message);
     }
 }

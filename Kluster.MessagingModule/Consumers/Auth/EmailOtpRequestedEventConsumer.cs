@@ -23,9 +23,9 @@ public class EmailOtpRequestedEventConsumer(
 
         if (!success)
         {
-            throw new Exception($"{nameof(EmailOtpRequestedEvent)} failed for user: {context.Message.UserId}");
+            throw new Exception(string.Format("{0} failed for user: {1}", nameof(EmailOtpRequestedEvent), context.Message.UserId));
         }
 
-        logger.LogInformation($"Sent OTP email for: {context.Message.UserId}.");
+        logger.LogInformation("Sent OTP email for: {0}.", context.Message.UserId);
     }
 }

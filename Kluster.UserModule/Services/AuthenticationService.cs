@@ -24,7 +24,7 @@ public class AuthenticationService(
 {
     public async Task<ErrorOr<UserAuthResponse>> RegisterAsync(RegisterRequest request)
     {
-        logger.LogInformation($"Registration request received for email: {request.EmailAddress}.");
+        logger.LogInformation("Registration request received for email: {0}.", request.EmailAddress);
         var validateResult = await new RegisterRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
@@ -34,7 +34,7 @@ public class AuthenticationService(
         var user = await userManager.FindByEmailAsync(request.EmailAddress);
         if (user is not null)
         {
-            logger.LogWarning($"Duplicate email found during registration: {request.EmailAddress}");
+            logger.LogWarning("Duplicate email found during registration: {0}", request.EmailAddress);
             return Errors.User.DuplicateEmail;
         }
 
@@ -46,7 +46,7 @@ public class AuthenticationService(
             await bus.Publish(new EmailOtpRequestedEvent(newUser.FirstName, newUser.LastName, newUser.Email!,
                 newUser.Id));
 
-            logger.LogInformation($"User registered successfully: {request.EmailAddress}.");
+            logger.LogInformation("User registered successfully: {0}.", request.EmailAddress);
             return new UserAuthResponse(Id: newUser.Id,
                 Role: newUser.Role,
                 AccessToken: tokenService.CreateUserJwt(newUser.Email!, newUser.Role, newUser.Id));
@@ -56,8 +56,8 @@ public class AuthenticationService(
             .Select(error => Error.Validation("User." + error.Code, error.Description))
             .ToList();
         logger.LogError(
-            $"User registration failed for email: {request.EmailAddress}." +
-            $"\nErrors: {string.Join(", ", errors.Select(e => $"{e.Code}: {e.Description}"))}"
+            "User registration failed for email: {0}.\nErrors: {1}", request.EmailAddress,
+            string.Join(", ", errors.Select(e => $"{e.Code}: {e.Description}"))
         );
         return errors;
     }
@@ -67,14 +67,14 @@ public class AuthenticationService(
         var user = await userManager.FindByEmailAsync(request.EmailAddress);
         if (user is null)
         {
-            logger.LogWarning($"Email not found during login: {request.EmailAddress}.");
+            logger.LogWarning("Email not found during login: {0}.", request.EmailAddress);
             return Errors.Auth.LoginFailed;
         }
 
         var signInResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (signInResult.Succeeded)
         {
-            logger.LogInformation($"User {user.Id} logged in successfully.");
+            logger.LogInformation("User {0} logged in successfully.", user.Id);
             return new UserAuthResponse(Id: user.Id,
                 Role: user.Role,
                 AccessToken: tokenService.CreateUserJwt(user.Email!, user.Role, user.Id));
@@ -82,19 +82,17 @@ public class AuthenticationService(
 
         if (signInResult.IsLockedOut)
         {
-            logger.LogInformation($"User {user.Id} is locked out. End date: {user.LockoutEnd}." +
-                                  $"\n\tRequest: {JsonSerializer.Serialize(request)}");
+            logger.LogInformation("User {0} is locked out. End date: {1}.\n\tRequest: {2}", user.Id, user.LockoutEnd, JsonSerializer.Serialize(request));
             return Errors.User.IsLockedOut;
         }
 
         if (signInResult.IsNotAllowed)
         {
-            logger.LogInformation($"User {user.Id} is not allowed to access the system." +
-                                  $"\n\tRequest: {JsonSerializer.Serialize(request)}");
+            logger.LogInformation("User {0} is not allowed to access the system.\n\tRequest: {1}", user.Id, JsonSerializer.Serialize(request));
             return Errors.User.IsNotAllowed;
         }
 
-        logger.LogError($"Login failed for user {user.Id}.\n\tRequest: {JsonSerializer.Serialize(request)}");
+        logger.LogError("Login failed for user {0}.\n\tRequest: {1}", user.Id, JsonSerializer.Serialize(request));
         return Errors.Auth.LoginFailed;
     }
 

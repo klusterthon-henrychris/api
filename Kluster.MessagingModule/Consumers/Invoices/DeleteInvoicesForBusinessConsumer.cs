@@ -10,7 +10,7 @@ public class DeleteInvoicesForBusinessConsumer(
 {
     public Task Consume(ConsumeContext<DeleteInvoicesForBusiness> context)
     {
-        logger.LogInformation($"Received request to delete invoices for business: {context.Message.BusinessId}.");
+        logger.LogInformation("Received request to delete invoices for business: {BusinessId}.", context.Message.BusinessId);
         return invoiceService.DeleteAllInvoicesLinkedToBusiness(context.Message);
     }
 }

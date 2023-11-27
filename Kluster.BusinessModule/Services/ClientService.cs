@@ -28,7 +28,7 @@ public class ClientService(
     public async Task<ErrorOr<GetClientResponse>> GetClient(string id)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Fetching client with id: {id}. Request from user: {userId}");
+        logger.LogInformation("Fetching client with id: {id}. Request from user: {userId}", id, userId);
 
         var client = await context.Clients
             .Where(c => c.Business.UserId == userId && c.Id == id)
@@ -36,7 +36,7 @@ public class ClientService(
 
         if (client is null)
         {
-            logger.LogError($"Client not found, or does not belong to business owned by {userId}.");
+            logger.LogError("Client not found, or does not belong to business owned by {userId}.", userId);
             return SharedErrors<Client>.NotFound;
         }
 
@@ -47,8 +47,7 @@ public class ClientService(
     public async Task<ErrorOr<CreateClientResponse>> CreateClientAsync(CreateClientRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Received request to create client from {userId}.\n" +
-                              $"Request: {request}");
+        logger.LogInformation("Received request to create client from {userId}.\nRequest: {request}", userId, request);
         var validateResult = await new CreateClientRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
@@ -63,21 +62,21 @@ public class ClientService(
 
         if (businessId is null)
         {
-            logger.LogError($"CreateClient request failed - business {businessId} does not exist.");
+            logger.LogError("CreateClient request failed - business {businessId} does not exist.", businessId);
             return SharedErrors<Business>.NotFound;
         }
 
         var client = BusinessModuleMapper.ToClient(request, businessId);
         await context.Clients.AddAsync(client);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Successfully created client {client.Id} under business {businessId}.");
+        logger.LogInformation("Successfully created client {clientId} under business {businessId}.", client.Id, businessId);
         return new CreateClientResponse(client.Id);
     }
 
     public async Task<ErrorOr<PagedResponse<GetClientResponse>>> GetAllClients(GetClientsRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"GetAllClients method started for user {userId}.");
+        logger.LogInformation("GetAllClients method started for user {userId}.", userId);
         Enum.TryParse<ClientSortOptions>(request.SortOption, out var sortOption);
 
         var query = context.Clients
@@ -98,8 +97,7 @@ public class ClientService(
 
         var response = await new PagedResponse<GetClientResponse>().ToPagedList(pagedResults, request.PageNumber,
             request.PageSize);
-        logger.LogInformation(
-            $"GetAllClients method completed for user {userId}. Returned {response.TotalCount} clients.");
+        logger.LogInformation("GetAllClients method completed for user {userId}. Returned {totalCount} clients.", userId, response.TotalCount);
         return response;
     }
 
@@ -107,31 +105,31 @@ public class ClientService(
     {
         if (!string.IsNullOrWhiteSpace(request.FirstName))
         {
-            logger.LogInformation($"Applied filter for FirstName: {request.FirstName}");
+            logger.LogInformation("Applied filter for FirstName: {firstName}", request.FirstName);
             query = query.Where(x => x.FirstName.Contains(request.FirstName));
         }
 
         if (!string.IsNullOrWhiteSpace(request.LastName))
         {
-            logger.LogInformation($"Applied filter for LastName: {request.LastName}");
+            logger.LogInformation("Applied filter for LastName: {lastName}", request.LastName);
             query = query.Where(x => x.LastName.Contains(request.LastName));
         }
 
         if (!string.IsNullOrWhiteSpace(request.BusinessName))
         {
-            logger.LogInformation($"Applied filter for BusinessName: {request.BusinessName}");
+            logger.LogInformation("Applied filter for BusinessName: {businessName}", request.BusinessName);
             query = query.Where(x => x.BusinessName != null && x.BusinessName.Contains(request.BusinessName));
         }
 
         if (!string.IsNullOrWhiteSpace(request.EmailAddress))
         {
-            logger.LogInformation($"Applied filter for EmailAddress: {request.EmailAddress}");
+            logger.LogInformation("Applied filter for EmailAddress: {emailAddress}", request.EmailAddress);
             query = query.Where(x => x.EmailAddress.Contains(request.EmailAddress));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Address))
         {
-            logger.LogInformation($"Applied filter for Address: {request.Address}");
+            logger.LogInformation("Applied filter for Address: {address}", request.Address);
             query = query.Where(x => x.Address.Contains(request.Address));
         }
 
@@ -140,7 +138,7 @@ public class ClientService(
 
     private IQueryable<Client> SortClientsQuery(IQueryable<Client> query, ClientSortOptions sortOption)
     {
-        logger.LogInformation($"Sorting clients by: {sortOption}");
+        logger.LogInformation("Sorting clients by: {sortOption}", sortOption);
         query = sortOption switch
         {
             ClientSortOptions.FirstNameAsc => query.OrderBy(x => x.FirstName),
@@ -161,8 +159,7 @@ public class ClientService(
     public async Task<ErrorOr<Updated>> UpdateClient(string clientId, UpdateClientRequest request)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Received request to update client {clientId} from {userId}.\n" +
-                              $"Request: {request}");
+        logger.LogInformation("Received request to update client {clientId} from {userId}.\nRequest: {request}", clientId, userId, request);
         var validateResult = await new UpdateClientRequestValidator().ValidateAsync(request);
         if (!validateResult.IsValid)
         {
@@ -176,13 +173,13 @@ public class ClientService(
 
         if (client is null)
         {
-            logger.LogError($"Client {clientId} not found.");
+            logger.LogError("Client {clientId} not found.", clientId);
             return SharedErrors<Client>.NotFound;
         }
 
         if (client.Business.UserId != userId)
         {
-            logger.LogError($"Client does not belong to business owned by {userId}.");
+            logger.LogError("Client does not belong to business owned by {userId}.", userId);
             return Errors.Client.InvalidBusiness;
         }
 
@@ -194,7 +191,7 @@ public class ClientService(
 
         context.Update(client);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Client {clientId} has been updated.");
+        logger.LogInformation("Client {clientId} has been updated.", clientId);
         return Result.Updated;
     }
 
@@ -225,7 +222,7 @@ public class ClientService(
             .Where(x => x.BusinessId == businessId)
             .ToListAsync();
 
-        logger.LogInformation($"Deleting {clients.Count} client(s) for business {businessId}.");
+        logger.LogInformation("Deleting {clientCount} client(s) for business {businessId}.", clients.Count, businessId);
         context.RemoveRange(clients);
         await context.SaveChangesAsync();
         logger.LogInformation("Clients have been successfully deleted.");
@@ -234,21 +231,21 @@ public class ClientService(
     public async Task<ErrorOr<Deleted>> DeleteClient(string clientId)
     {
         var userId = currentUser.UserId ?? throw new UserNotSetException();
-        logger.LogInformation($"Received request to delete client from {userId}.");
+        logger.LogInformation("Received request to delete client from {userId}.", userId);
         var client = await context.Clients.FirstOrDefaultAsync(x => x.Id == clientId && x.Business.UserId == userId);
         if (client is null)
         {
-            logger.LogError($"Client {clientId} does not exist, or does not belong to business owned by {userId}.");
+            logger.LogError("Client {clientId} does not exist, or does not belong to business owned by {userId}.", clientId, userId);
             return SharedErrors<Client>.NotFound;
         }
 
-        logger.LogInformation($"Queueing requests to delete related payments and invoices for {clientId}.");
+        logger.LogInformation("Queueing requests to delete related payments and invoices for {clientId}.", clientId);
         await bus.Publish(new DeletePaymentsForClient(clientId));
         await bus.Publish(new DeleteInvoicesForClient(clientId));
 
         context.Remove(client);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Client {clientId} has been deleted.");
+        logger.LogInformation("Client {clientId} has been deleted.", clientId);
         return Result.Deleted;
     }
 
