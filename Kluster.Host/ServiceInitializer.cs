@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Kluster.BusinessModule.ModuleSetup;
 using Kluster.Messaging.ModuleSetup;
 using Kluster.NotificationModule.ModuleSetup;
@@ -9,7 +11,6 @@ using Kluster.Shared.Filters;
 using Kluster.UserModule.ModuleSetup;
 using Kluster.UserModule.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -28,7 +29,7 @@ namespace Kluster.Host
             var configuration = scope.ServiceProvider.GetService<IConfiguration>();
             var seqSettings = configuration?.GetSection(nameof(SeqSettings)).Get<SeqSettings>();
 
-            builder.Host.UseSerilog((ctx, lc) => lc
+            builder.Host.UseSerilog((_, lc) => lc
                 .WriteTo.Console(new JsonFormatter())
                 .WriteTo.Seq(seqSettings?.BaseUrl ?? "http://localhost:5341")
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -38,16 +39,15 @@ namespace Kluster.Host
             );
         }
 
-        public static void RegisterApplicationServices(this IServiceCollection services,
-            IWebHostEnvironment environment)
+        public static void RegisterApplicationServices(this IServiceCollection services)
         {
-            BindConfigFiles(services, environment);
+            BindConfigFiles(services);
             RegisterModules(services);
             SetupControllers(services);
             RegisterSwagger(services);
             RegisterFilters(services);
-            SetupAuthentication(services, environment);
-            SetupCors(services, environment);
+            SetupAuthentication(services);
+            SetupCors(services);
         }
 
         private static void SetupControllers(IServiceCollection services)
@@ -84,27 +84,10 @@ namespace Kluster.Host
             services.AddScoped<CustomValidationFilter>();
         }
 
-        private static void SetupAuthentication(IServiceCollection services, IWebHostEnvironment environment)
+        private static void SetupAuthentication(IServiceCollection services)
         {
-            var jwtSettings = new JwtSettings();
-            if (environment.IsDevelopment())
-            {
-                var configuration = new ConfigurationBuilder()
-                    .AddUserSecrets<Program>()
-                    .AddEnvironmentVariables()
-                    .Build();
-
-                // configure app wide
-                services.Configure<JwtSettings>(options =>
-                    configuration.GetSection(nameof(JwtSettings)).Bind(options));
-
-                jwtSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<JwtSettings>>()?.Value;
-            }
-
-            if (environment.IsProduction())
-            {
-                // todo: get the jwt settings from azure key vault.
-            }
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var jwtSettings = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<JwtSettings>>().Value;
 
             services.AddAuthentication(options =>
                 {
@@ -117,7 +100,7 @@ namespace Kluster.Host
                     {
                         x.TokenValidationParameters = new TokenValidationParameters
                         {
-                            ValidAudience = jwtSettings?.Audience ??
+                            ValidAudience = jwtSettings.Audience ??
                                             throw new InvalidOperationException("Audience is null!"),
                             ValidIssuer = jwtSettings.Issuer ??
                                           throw new InvalidOperationException("Security Key is null!"),
@@ -133,29 +116,61 @@ namespace Kluster.Host
             services.AddAuthorization();
         }
 
-        // bind config files here and use them through all modules.
-        private static void BindConfigFiles(this IServiceCollection services, IWebHostEnvironment environment)
+        private static void BindConfigFiles(this IServiceCollection services)
         {
-            using var scope = services.BuildServiceProvider().CreateScope();
-            var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+            var baseConfiguration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddUserSecrets<Program>()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
 
-            services.Configure<DatabaseSettings>(options =>
-                configuration?.GetSection(nameof(DatabaseSettings)).Bind(options));
+            Console.WriteLine("Trying to fetch secrets configuration from key vault.");
+            var secretsConfiguration = GetSecretsConfigurationAsync(baseConfiguration).GetAwaiter().GetResult();
+            Console.WriteLine("Fetched secrets configuration from key vault.");
 
-            services.Configure<RabbitMqSettings>(options =>
-                configuration?.GetSection(nameof(RabbitMqSettings)).Bind(options));
-
-            services.Configure<MailSettings>(options =>
-                configuration?.GetSection(nameof(MailSettings)).Bind(options));
-
-            services.Configure<PaystackSettings>(options =>
-                configuration?.GetSection(nameof(PaystackSettings)).Bind(options));
-            // todo: if not development, use key vault for appSettings.
+            ConfigureSettings<DatabaseSettings>(services, secretsConfiguration);
+            ConfigureSettings<RabbitMqSettings>(services, secretsConfiguration);
+            ConfigureSettings<MailSettings>(services, secretsConfiguration);
+            ConfigureSettings<PaystackSettings>(services, secretsConfiguration);
+            ConfigureSettings<JwtSettings>(services, secretsConfiguration);
+            Console.WriteLine("Secrets have been bound to classes from key vault.");
         }
 
-        private static void SetupCors(this IServiceCollection services, IWebHostEnvironment environment)
+        private static async Task<IConfiguration> GetSecretsConfigurationAsync(IConfiguration baseConfiguration)
         {
-            if (environment.IsDevelopment())
+            var keyVaultName = baseConfiguration["KeyVault:Vault"];
+            var kvUri = "https://" + keyVaultName + ".vault.azure.net";
+            var client = new SecretClient(new Uri(kvUri),
+                new ClientSecretCredential(baseConfiguration["KeyVault:AZURE_TENANT_ID"],
+                    baseConfiguration["KeyVault:AZURE_CLIENT_ID"],
+                    baseConfiguration["KeyVault:AZURE_CLIENT_SECRET"]));
+            Console.WriteLine($"Created KeyVault Uri {kvUri}.");
+
+            var secretsManager = new KeyVaultPrefixManager("KlusterApi");
+            var secrets = await secretsManager.GetAllSecretsWithPrefixAsync(client);
+            if (secrets is null)
+            {
+                throw new InvalidOperationException("SOMETHING WENT WRONG. SECRETS WEREN'T RETRIEVED CORRECTLY.");
+            }
+
+            return new ConfigurationBuilder()
+                .AddConfiguration(baseConfiguration)
+                .AddInMemoryCollection(secrets!)
+                .Build();
+        }
+
+        private static void ConfigureSettings<T>(IServiceCollection services, IConfiguration? configuration)
+            where T : class, new()
+        {
+            services.Configure<T>(options => configuration?.GetSection(typeof(T).Name).Bind(options));
+        }
+
+        private static void SetupCors(this IServiceCollection services)
+        {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (env == Environments.Development)
             {
                 services.AddCors(options =>
                 {

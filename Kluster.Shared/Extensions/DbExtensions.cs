@@ -9,11 +9,10 @@ public static class DbExtensions
 {
     public static void AddDatabase<T>(IServiceCollection services) where T : DbContext
     {
-        using var scope = services.BuildServiceProvider().CreateScope();
         var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         string connectionString;
 
-        if (env == "Development")
+        if (env == Environments.Development)
         {
             var dbSettings = services.BuildServiceProvider().GetService<IOptionsSnapshot<DatabaseSettings>>()?.Value;
             connectionString = dbSettings!.ConnectionString!;
@@ -38,7 +37,7 @@ public static class DbExtensions
             connectionString =
                 $"Server={updatedHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};";
         }
-
+        
         services.AddDbContext<T>(options =>
         {
             options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable(
@@ -46,7 +45,7 @@ public static class DbExtensions
         });
 
 
-        var dbContext = scope.ServiceProvider.GetRequiredService<T>();
+        var dbContext = services.BuildServiceProvider().GetRequiredService<T>();
         dbContext.Database.Migrate();
     }
 }
