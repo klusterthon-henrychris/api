@@ -134,6 +134,7 @@ namespace Kluster.Host
             ConfigureSettings<MailSettings>(services, secretsConfiguration);
             ConfigureSettings<PaystackSettings>(services, secretsConfiguration);
             ConfigureSettings<JwtSettings>(services, secretsConfiguration);
+            ConfigureSettings<KeyVault>(services, secretsConfiguration);
             Console.WriteLine("Secrets have been bound to classes from key vault.");
         }
 
@@ -183,6 +184,15 @@ namespace Kluster.Host
                         });
                 });
             }
+
+            services.AddCors(options =>
+            {
+                options.DefaultPolicyName = "AllowSimpleDev";
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyMethod().WithOrigins("https://simple-biz.fly.dev");
+                });
+            });
         }
 
         private static void RegisterModules(IServiceCollection services)
