@@ -119,26 +119,33 @@ namespace Kluster.Host
         private static void BindConfigFiles(this IServiceCollection services)
         {
             var baseConfiguration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddUserSecrets<Program>()
-                .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
 
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (env == Environments.Development)
+            {
+                var userSecretsId = Environment.GetEnvironmentVariable("USER_SECRETS_ID");
+                baseConfiguration = new ConfigurationBuilder()
+                    .AddUserSecrets(userSecretsId!)
+                    .AddEnvironmentVariables()
+                    .Build();
+            }
+            
             Console.WriteLine("Trying to fetch secrets configuration from key vault.");
-            var secretsConfiguration = GetSecretsConfigurationAsync(baseConfiguration).GetAwaiter().GetResult();
+            baseConfiguration = GetSecretsConfigurationAsync(baseConfiguration).GetAwaiter().GetResult();
             Console.WriteLine("Fetched secrets configuration from key vault.");
-
-            ConfigureSettings<DatabaseSettings>(services, secretsConfiguration);
-            ConfigureSettings<RabbitMqSettings>(services, secretsConfiguration);
-            ConfigureSettings<MailSettings>(services, secretsConfiguration);
-            ConfigureSettings<PaystackSettings>(services, secretsConfiguration);
-            ConfigureSettings<JwtSettings>(services, secretsConfiguration);
-            ConfigureSettings<KeyVault>(services, secretsConfiguration);
+            
+            ConfigureSettings<DatabaseSettings>(services, baseConfiguration);
+            ConfigureSettings<RabbitMqSettings>(services, baseConfiguration);
+            ConfigureSettings<MailSettings>(services, baseConfiguration);
+            ConfigureSettings<PaystackSettings>(services, baseConfiguration);
+            ConfigureSettings<JwtSettings>(services, baseConfiguration);
+            ConfigureSettings<KeyVault>(services, baseConfiguration);
             Console.WriteLine("Secrets have been bound to classes from key vault.");
         }
 
-        private static async Task<IConfiguration> GetSecretsConfigurationAsync(IConfiguration baseConfiguration)
+        private static async Task<IConfigurationRoot> GetSecretsConfigurationAsync(IConfiguration baseConfiguration)
         {
             var keyVaultName = baseConfiguration["KeyVault:Vault"];
             var kvUri = "https://" + keyVaultName + ".vault.azure.net";
