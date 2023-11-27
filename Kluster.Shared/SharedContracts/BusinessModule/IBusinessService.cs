@@ -21,4 +21,6 @@ public interface IBusinessService
     Task<ErrorOr<Updated>> UpdateBusinessForCurrentUser(UpdateBusinessRequest request);
     Task<ErrorOr<Deleted>> DeleteBusinessForCurrentUser();
     Task<ErrorOr<GetWalletBalanceResponse>> GetBusinessWalletBalance();
+
+    Task<string?> GetBusinessName(string businessId);
 }

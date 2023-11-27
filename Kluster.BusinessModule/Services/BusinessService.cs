@@ -202,4 +202,11 @@ public class BusinessService(
         logger.LogInformation("Wallet balance retrieved for {0}", business.Id);
         return new GetWalletBalanceResponse(business.Id, business.Name, business.Wallet.Balance);
     }
+
+    public async Task<string?> GetBusinessName(string businessId)
+    {
+        return await context.Businesses.Where(x => x.Id == businessId)
+            .Select(x => x.Name)
+            .FirstOrDefaultAsync();
+    }
 }
