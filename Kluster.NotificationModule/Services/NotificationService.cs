@@ -82,16 +82,16 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
             .Replace("{LastName}", request.LastName)
-            .Replace("{DueDate}", request.DueDate.ToShortDateString())
+            .Replace("{DueDate}", request.DueDate.ToString("dd:MM:yyyy HH:mm"))
             .Replace("{InvoiceNo}", request.InvoiceNo)
-            .Replace("{ReplyToMail}", _mailSettings.From)
+            .Replace("{ReplyToEmail}", _mailSettings.From)
             .Replace("{BaseUrl}", _mailSettings.BaseWebsiteUrl);
 
         var success = await mailService.SendAsync(new MailData
         {
             Attachments = null,
             Body = emailTemplate,
-            Subject = $"Invoice from {request.BusinessName}. Due on {request.DueDate.ToShortDateString()}.",
+            Subject = $"Invoice from {request.BusinessName}. Due on {request.DueDate:dd:MM:yyyy HH:mm}.",
             To = to
         }, new CancellationToken());
 
@@ -100,15 +100,15 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
 
     public async Task<ErrorOr<Success>> SendInvoiceReminderMail(SendInvoiceReminderRequest request)
     {
-        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendInitialInvoiceMail));
+        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendInvoiceReminderMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
-            .Replace("{DueDate}", request.DueDate.ToShortDateString())
-            .Replace("{IssuedDate}", request.IssuedDate.ToShortDateString())
+            .Replace("{DueDate}", request.DueDate.ToString("dd:MM:yyyy HH:mm"))
+            .Replace("{IssuedDate}", request.IssuedDate.ToString("dd:MM:yyyy HH:mm"))
             .Replace("{InvoiceNo}", request.InvoiceNo)
             .Replace("{Amount}", request.Amount.ToString(CultureInfo.CurrentCulture))
-            .Replace("{ReplyToMail}", _mailSettings.From);
+            .Replace("{ReplyToEmail}", _mailSettings.From);
         
         var success = await mailService.SendAsync(new MailData
         {
