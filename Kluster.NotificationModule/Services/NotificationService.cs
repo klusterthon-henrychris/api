@@ -18,9 +18,9 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
 {
     private readonly MailSettings _mailSettings = options.Value;
 
-    public Task<bool> SendOtpMail(SendOtpEmailRequest request)
+    public async Task<bool> SendOtpMail(SendOtpEmailRequest request)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendOtpMail));
+        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendOtpMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
@@ -29,7 +29,7 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
             // todo: remove userId from SendOtpEmailRequest
             .Replace("{BaseUrl}", _mailSettings.BaseWebsiteUrl);
 
-        return mailService.SendAsync(new MailData
+        return await mailService.SendAsync(new MailData
         {
             Attachments = null,
             Body = emailTemplate,
@@ -38,15 +38,15 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
         }, new CancellationToken());
     }
 
-    public Task<bool> SendWelcomeMail(string emailAddress, string firstName, string lastName)
+    public async Task<bool> SendWelcomeMail(string emailAddress, string firstName, string lastName)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendWelcomeMail));
+        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendWelcomeMail));
         List<string> to = [emailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", firstName)
             .Replace("{LastName}", lastName);
 
-        return mailService.SendAsync(new MailData
+        return await mailService.SendAsync(new MailData
         {
             Attachments = null,
             Body = emailTemplate,
@@ -57,7 +57,7 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
 
     public async Task<ErrorOr<Success>> SendForgotPasswordMail(SendForgotPasswordEmailCommand request)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendWelcomeMail));
+        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendWelcomeMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
@@ -77,7 +77,7 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
 
     public async Task<ErrorOr<Success>> SendInitialInvoiceMail(SendInitialInvoiceEmailRequest request)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendInitialInvoiceMail));
+        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendInitialInvoiceMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)
@@ -100,7 +100,7 @@ public class NotificationService(IMailService mailService, IOptionsSnapshot<Mail
 
     public async Task<ErrorOr<Success>> SendInvoiceReminderMail(SendInvoiceReminderRequest request)
     {
-        var emailTemplate = mailService.LoadTemplate(nameof(SendInitialInvoiceMail));
+        var emailTemplate = await mailService.LoadTemplateFromBlob(nameof(SendInitialInvoiceMail));
         List<string> to = [request.EmailAddress];
         emailTemplate = emailTemplate
             .Replace("{FirstName}", request.FirstName)

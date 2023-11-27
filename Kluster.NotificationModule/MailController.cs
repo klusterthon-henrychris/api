@@ -23,4 +23,12 @@ public class MailController(IMailService mailService) : BaseController
         return StatusCode(StatusCodes.Status500InternalServerError,
             "An error occured. The Mail could not be sent.");
     }
+
+    [ApiExplorerSettings(IgnoreApi = true)]
+    [HttpGet("{templatedName}")]
+    public async Task<IActionResult> LoadTemplateFromBlob(string templatedName)
+    {
+        var returnVal = await mailService.LoadTemplateFromBlob(templatedName);
+        return Ok(returnVal);
+    }
 }

@@ -17,4 +17,6 @@ public interface IMailService
     /// <param name="pathToTemplate">This can be the name of the file, or a path</param>
     /// <returns></returns>
     public string LoadTemplate(string pathToTemplate);
+
+    Task<string> LoadTemplateFromBlob(string templateName);
 }

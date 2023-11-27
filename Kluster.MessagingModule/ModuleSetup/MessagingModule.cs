@@ -27,7 +27,6 @@ public static class MessagingModule
                 cfg.Host(hostUrl ?? throw new InvalidOperationException("RabbitMQ Host not Set."), "/",
                     h =>
                     {
-                        // todo: get from secrets
                         h.Username(rabbitMqSettings!.Username);
                         h.Password(rabbitMqSettings!.Password);
                     });
