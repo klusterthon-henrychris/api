@@ -199,6 +199,11 @@ public class InvoiceService(
         return count;
     }
 
+    public async Task<Invoice> GetInvoiceInternal(string invoiceNo)
+    {
+        return (await context.Invoices.FirstOrDefaultAsync(x => x.InvoiceNo == invoiceNo))!;
+    }
+
     #endregion
 
     #region Filter and Query
