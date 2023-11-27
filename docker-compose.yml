@@ -4,7 +4,7 @@
     container_name: kluster.api
     build:
       context: .
-      dockerfile: Kluster.Host/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "5000:8080"
     environment:
