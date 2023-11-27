@@ -3,10 +3,10 @@
 public record SendInvoiceReminderRequest(
     string InvoiceNo,
     string FirstName,
+    string LastName,
     decimal Amount,
     DateTime DueDate,
     DateTime IssuedDate,
-    string ReplyTo,
     string EmailAddress,
     string InvoiceStatus,
     string BusinessName);
