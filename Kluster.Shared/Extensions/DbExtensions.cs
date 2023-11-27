@@ -21,6 +21,7 @@ public static class DbExtensions
         {
             // Use connection string provided at runtime by Fly.
             var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            Console.WriteLine($"ConnUrl: {connUrl}");
 
             // Parse connection URL to connection string for Npgsql
             connUrl = connUrl.Replace("postgres://", string.Empty);
