@@ -24,7 +24,7 @@ public static class PaymentModuleMapper
             DueDate = request.DueDate,
             Status = InvoiceStatus.Due.ToString(),
             BillingAddress = clientAndBusinessResponse.ClientBillingAddress,
-            DateOfIssuance = DateTime.Now,
+            DateOfIssuance = DateTime.UtcNow,
             InvoiceItems = request.InvoiceItems,
             ClientEmailAddress = clientAndBusinessResponse.ClientEmailAddress,
             ClientId = clientAndBusinessResponse.ClientId,

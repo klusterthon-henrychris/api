@@ -184,7 +184,7 @@ public class PaymentService(
 
         payment.PaymentChannel = invoiceCreatedEvent.PaymentChannel;
         payment.IsCompleted = true;
-        payment.DateOfPayment = DateTime.Now;
+        payment.DateOfPayment = DateTime.UtcNow;
 
         context.Update(invoice);
         context.Update(payment);

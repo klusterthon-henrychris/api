@@ -17,7 +17,7 @@ public class CreateInvoiceRequestValidator : AbstractValidator<CreateInvoiceRequ
         
         RuleFor(x => x.DueDate)
             .NotEmpty()
-            .GreaterThanOrEqualTo(DateTime.Now)
+            .GreaterThanOrEqualTo(DateTime.UtcNow)
             .WithMessage(Errors.Invoice.InvalidDueDate.Description)
             .WithErrorCode(Errors.Invoice.InvalidDueDate.Code);
         

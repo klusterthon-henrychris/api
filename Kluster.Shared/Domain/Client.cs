@@ -19,7 +19,7 @@ public class Client
     [MaxLength(DomainConstants.MaxAddressLength)] public required string Address { get; set; }
     [MaxLength(DomainConstants.MaxEmailAddressLength)] public required string EmailAddress { get; set; }
     
-    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     [MaxLength(DomainConstants.MaxIdLength)] public required string BusinessId { get; set; }
     public Business Business { get; set; } = null!;
