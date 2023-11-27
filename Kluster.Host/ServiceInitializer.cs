@@ -172,7 +172,10 @@ namespace Kluster.Host
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSimpleDev",
-                    builder => { builder.AllowAnyMethod().WithOrigins("https://simple-biz.fly.dev"); });
+                    builder =>
+                    {
+                        builder.AllowAnyMethod().WithOrigins("https://simple-biz.fly.dev").AllowAnyHeader();
+                    });
 
                 options.AddPolicy("AllowAnyOrigin",
                     builder =>
