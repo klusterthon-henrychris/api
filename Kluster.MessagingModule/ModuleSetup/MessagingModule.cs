@@ -14,21 +14,22 @@ public static class MessagingModule
         services.AddMassTransit(x =>
         {
             x.SetKebabCaseEndpointNameFormatter();
-            
+
             var assembly = Assembly.GetAssembly(typeof(MessagingModule));
             x.AddConsumers(assembly);
             x.AddSagaStateMachines(assembly);
             x.AddSagas(assembly);
             x.AddActivities(assembly);
-            
+
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(rabbitMqSettings?.Host ?? throw new InvalidOperationException("RabbitMQ Host not Set."), "/",
+                var hostUrl = new Uri(rabbitMqSettings?.Host!);
+                cfg.Host(hostUrl ?? throw new InvalidOperationException("RabbitMQ Host not Set."), "/",
                     h =>
                     {
                         // todo: get from secrets
-                        h.Username(rabbitMqSettings.Username);
-                        h.Password(rabbitMqSettings.Password);
+                        h.Username(rabbitMqSettings!.Username);
+                        h.Password(rabbitMqSettings!.Password);
                     });
 
                 cfg.ConfigureEndpoints(context);
