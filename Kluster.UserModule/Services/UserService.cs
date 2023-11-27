@@ -109,17 +109,17 @@ public class UserService(
     /// <summary>
     /// This resends the email or sms to the user trying to verify their email or phoneNumber
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="email"></param>
     /// <param name="verificationRoute">Can be either Email or Phone.</param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException">Throws an exception when the choice isn't email.</exception>
-    public async Task<ErrorOr<Success>> ResendVerificationMessage(string id, string verificationRoute)
+    public async Task<ErrorOr<Success>> ResendVerificationMessage(string email, string verificationRoute)
     {
-        var user = await userManager.FindByIdAsync(id);
+        var user = await userManager.FindByEmailAsync(email);
         if (user is null)
         {
             // for security reasons, don't say User not found.
-            logger.LogInformation("User not found for ID: {0}", id);
+            logger.LogInformation("User not found for email: {0}", email);
             return Errors.User.ReconfirmEmail;
         }
 

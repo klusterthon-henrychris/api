@@ -11,7 +11,7 @@ public interface IUserService
 
     Task<string> GenerateOtpForEmail(string userId);
     Task<ErrorOr<Success>> ConfirmEmailWithToken(string emailAddress, string otp); // todo: create endpoint
-    Task<ErrorOr<Success>> ResendVerificationMessage(string id, string verificationRoute);
+    Task<ErrorOr<Success>> ResendVerificationMessage(string email, string verificationRoute);
 
     Task<ErrorOr<Success>> SendForgotPasswordMail(ForgotPasswordRequest request);
     Task<ErrorOr<Success>> ResetPassword(ResetPasswordRequest request);

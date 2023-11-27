@@ -38,11 +38,11 @@ public class UserController(IUserService userService) : BaseController
     }
     
     [AllowAnonymous]
-    [HttpPost("{id}/resend-email-verification")]
+    [HttpPost("resend-email-verification")]
     // route is email or phone
-    public async Task<IActionResult> ResendVerificationMessage(string id, string verificationRoute)
+    public async Task<IActionResult> ResendVerificationMessage(string email, string verificationRoute)
     {
-        var generateNewOtpResult = await userService.ResendVerificationMessage(id, verificationRoute);
+        var generateNewOtpResult = await userService.ResendVerificationMessage(email, verificationRoute);
         return generateNewOtpResult.Match(_ => NoContent(), ReturnErrorResponse);
     }
 
