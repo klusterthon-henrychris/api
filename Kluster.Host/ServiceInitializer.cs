@@ -130,10 +130,10 @@ namespace Kluster.Host
             if (env == Environments.Development)
             {
                 Console.WriteLine("Fetching Development Secrets");
-                var userSecretsId = Environment.GetEnvironmentVariable("USER_SECRETS_ID");
-                Console.WriteLine($"UserSecretsId: {userSecretsId}");
+                // var userSecretsId = Environment.GetEnvironmentVariable("USER_SECRETS_ID");
+                // Console.WriteLine($"UserSecretsId: {userSecretsId}");
                 baseConfiguration = new ConfigurationBuilder()
-                    .AddUserSecrets(userSecretsId!)
+                    .AddUserSecrets<Program>()
                     .AddEnvironmentVariables()
                     .Build();
                 Console.WriteLine(
