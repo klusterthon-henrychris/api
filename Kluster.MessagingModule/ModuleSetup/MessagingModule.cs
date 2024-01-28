@@ -22,6 +22,8 @@ public static class MessagingModule
             x.AddActivities(assembly);
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            Console.WriteLine($"Host: {rabbitMqSettings?.Host}. Username: {rabbitMqSettings?.Username} Password: {rabbitMqSettings?.Password}");
+            
             if (env == Environments.Development)
             {
                 x.UsingRabbitMq((context, cfg) =>
